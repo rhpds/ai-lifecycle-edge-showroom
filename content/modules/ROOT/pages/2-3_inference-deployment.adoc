@@ -1,0 +1,115 @@
+= Deploying AI Model Inference Server
+
+In this section, we will deploy the AI model inference server that will serve our battery monitoring models. The inference server is a critical component that enables real-time AI predictions for battery stress detection and time-to-failure estimation.
+
+The inference server is responsible for loading and serving our AI models to make predictions based on real-time sensor data. Red Hat OpenShift AI Self-Managed provides a single-model serving platform based on the KServe component of Kubernetes. The inference server is necessary for:
+
+* *Real-time predictions*: It provides low-latency inference capabilities for our battery monitoring system, enabling immediate responses to sensor data
+* *Model serving*: It loads and manages our AI models (_stress-detection_ and _time-to-failure_) from the MinIO storage
+* *API endpoints*: It exposes RESTful APIs that our Battery Monitoring System can query for predictions
+* *Resource efficiency*: It optimizes model loading and inference performance in the constrained edge environment
+
+The inference server uses KServe custom resource definitions (CRDs) to define the lifecycle of deployment objects, storage access, and networking setup, making it ideal for our autonomous vehicle's edge deployment.
+
+== Deploying Inference Server using GitOps
+
+We will deploy the inference server using the same GitOps approach we used with MinIO, ensuring consistent deployment and management of our edge components.
+
+=== Step 1: Deploy GitOps Application
+
+Deploy the inference server GitOps application:
+
+[.console-input]
+[source,yaml]
+----
+oc apply -f - <<EOF
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: model-server
+  namespace: openshift-gitops
+spec:
+  destination:
+    name: ''
+    namespace: ''
+    server: https://kubernetes.default.svc
+  source:
+    path: bootstrap/model-server/groups/dev
+    repoURL: https://github.com/rhpds/ai-lifecycle-edge-gitops.git
+    targetRevision: main
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
+----
+
+The GitOps Application will deploy the following Inference components:
+
+* *Namespace*: An _inference_ namespace that isolates all AI model serving resources from other system components.
+* *ServingRuntime*: OpenVINO Model Server configuration supporting multiple model formats including OpenVINO IR, ONNX, TensorFlow, PaddlePaddle, and PyTorch. This runtime provides optimized edge inference with both REST and gRPC protocol support.
+* *Service and Route*: Network components that expose inference endpoints for external access, enabling the Battery Monitoring System to query AI models through REST APIs.
+* *Service Account*: Kubernetes service account configured with S3 access permissions to retrieve models from MinIO storage.
+* *InferenceServices*: Two specialized inference services that load and serve AI models from MinIO storage:
+  - Stress-detection service for identifying battery stress conditions
+  - Time-to-failure service for predicting remaining battery life
+
+These components work together to provide a complete AI model serving solution that can load models from MinIO storage and serve real-time predictions for our battery monitoring system.
+
+Monitor the deployment progress to ensure all components are properly deployed:
+
+[.console-input]
+[source,bash,subs="attributes+"]
+----
+watch oc get pods -n inference
+----
+
+[NOTE]
+====
+_You can exit the watch command by pressing *Ctrl+C* in your keyboard._
+====
+
+When all pods show `Running` status, the inference server deployment is complete and ready to serve AI models.
+
+=== Step 2: Test Inference Endpoints
+
+Once the inference services are ready, the AI models should also be loaded from MinIO and ready for inference. We can manually test this connection to verify that everything is working correctly. Later, the Battery Monitoring System application we deploy will automatically perform these inference queries.
+
+Let's start by testing the *Stress Detection* model. The following command sends simulated sensor data to the inference pod to determine whether the battery is under stress or not:
+
+[.console-input]
+[source,bash,subs="attributes+"]
+----
+curl -s -X POST http://$(oc get pod -n inference -l app=isvc.stress-detection-predictor -o jsonpath='{.items[0].status.podIP}'):8888/v2/models/stress-detection/infer \
+     -H "Content-Type: application/json" \
+     -d '{"inputs": [{"name": "keras_tensor", "shape": [1, 9], "datatype": "FP32", "data": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]}]}' | \
+     jq -r '.outputs[0].data[0] | if . > 0.5 then "STRESSED" else "NORMAL" end'
+----
+
+If everything is correctly configured, you should receive a response indicating either _STRESSED_ or _NORMAL_ battery status.
+
+Now, let's perform the same test against the *Time to Failure* model:
+
+[.console-input]
+[source,bash,subs="attributes+"]
+----
+curl -s -X POST http://$(oc get pod -n inference -l app=isvc.time-to-failure-predictor -o jsonpath='{.items[0].status.podIP}'):8888/v2/models/time-to-failure/infer \
+     -H "Content-Type: application/json" \
+     -d '{
+           "inputs": [
+             {
+               "name": "keras_tensor",
+               "shape": [1, 5],
+               "datatype": "FP32",
+               "data": [40.0, 48.0, 162.5, -2.0, -18.0]
+             }
+           ]
+         }' | \
+     jq -r '.outputs[0].data[0] | "Predicted Time Before Failure: \(.) hours"'
+----
+
+This command should return a prediction of the remaining time until a potential battery failure.
+
+With both inference endpoints responding correctly, our AI model serving infrastructure is fully operational and ready to be consumed by the Battery Monitoring System.

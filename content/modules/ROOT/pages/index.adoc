@@ -1,43 +1,58 @@
 = {lab_name}
 
-The `lab_name` var, known as an asciidoc attribute, above was set in `./content/antora.yml` and can be used to set the lab_name or title of your content.
-You are both free to change its value and if you prefer to use a different var name, you can change the value of `lab_name`, for example to `title` in `./content/antora.yml` and then reference it in your content as `\{title}`. +
+== Lab overview
 
-image::rhel-logo-black.jpg[rhel-logo-black,55%,55%]
+This project showcases how the integration of AI and edge computing can effectively address specific customer use cases and fit seamlessly into various real-world scenarios. The demo will highlight the practical application of AI in resource-constrained environments, making it essential to use lightweight topologies and platforms such as Single Node OpenShift (SNO) and Red Hat Device Edge.
 
-== Variables
+During the demo, we will develop a robust solution for the automotive industry, highlighting the importance of automation, as dedicated teams are not feasible at the edge. To address this challenge, our solution incorporates key components within Red Hat OpenShift AI to support the entire AI/ML lifecycle at the edge, including model training, data science pipelines, model serving, and model monitoring.
 
-Other vars can also be set there, such as `ssh_user` and `ssh_password`, and referenced inline in the lab content by using the `\{foo}` syntax.
+== Lab contents
 
-This is another var, or asciidoc attribute, from `./content/antora.yml` {my_var}
+To bring this demo to life, several technologies will be used and covered during this lab. Below is a summary of the materials that will be covered:
 
-== Writing your lab
+[width="100%",cols="6,^4,7",options="header"]
+|===
+| Chapter | Duration | Contents
 
-Whatever type of content you are writing we'll refer to your *content* as "your lab" in this document.
+| AI & Edge Use case | 10min 
+a|- Understanding our case
+- Essentials of Edge
+- Explore our design
 
-=== Lab structure
+| Dashboards Control Center | 1min 
+a|- Control center access
 
-Wether you are writing a lab
+| Autonomous Vehicle | 15min 
+a|- Understand the vehicle infrastructure
+- Deplying MinIO storage and models
+- Deplying Inference servers
+- Deploying the Battery Monitoring System
 
-* First, we will build a monolithic application already compiled as RPM packages and put it into a container. This will allow us to deploy the application, copy it between machines, and update it separately from the operating system. This process affords us a portable and easily maintained component instead of tightly coupling the application with your operating system maintenance.
+| RHOAI configuration | 15min 
+a|- RHOAI installation
+- Datascience projects
+- DataConnections
 
-* In closing we will build a second container on a different operating system version that makes an application not packaged into RPMs. This will be similar to a web application deployment, positioning the correct files at the right locations. To do this, we will pull a project from GitHub and position the component files within our container image. The purpose of this is to achieve a portable application container that can deploy on several different versions of Red Hat Enterprise Linux. This also provides the benefit of decoupling your application maintenance, which would all happen by building new containers versus operating system maintenance. The container is no longer reliant on the operating system installed on the machine where the application is deployed.
+| Model Re-training | 15min 
+a|- Workbenches
+- Import Notebooks
+- Training our models
 
-. Now let's examine this cluster a bit more by describing the cluster (the `$GUID` environment variable is already set for you so you can immediately describe your individual cluster):
-+
-[source,sh,role=execute]
-----
-podman ps
-----
-+
-.Sample Output
-[source,texinfo,subs="attributes"]
-----
-CONTAINER ID  IMAGE                        COMMAND           CREATED      STATUS      PORTS                 NAMES
-2dcfee9e50c4  docker.io/library/httpd:2.4  httpd-foreground  3 hours ago  Up 3 hours  0.0.0.0:8080->80/tcp  showroom-httpd
-----
+| Model Serving | 10min 
+a|- Stress Detection serving
+- Time to Failure serving
+- Querying endpoints
 
-=== Lab Access
+| Pipelines Automation | 5min 
+a|- Pipeline server
+- Pipelines execution
+- Pipelines scheduled automation
 
-The terminal window to your right is *already* logged into the lab environment as the `{ssh_user}` user via `ssh`.
-All steps of this lab are to be completed as the `{ssh_user}` user.
+| Model Monitoring | 5min 
+a|- TrustyAI
+- Bias detection
+- Data drift
+
+| Battery Monitoring System | 15min 
+a|- Test alerting system
+|===

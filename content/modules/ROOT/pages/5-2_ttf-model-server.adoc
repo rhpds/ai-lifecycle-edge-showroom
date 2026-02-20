@@ -1,0 +1,23 @@
+= Create a Model Serving platform
+
+It's time to repeat the same steps for the Time to Failure AI model. The steps will be quite similar, but make sure you specify the right path to our second model.
+
+== Time to Failure model
+
+. Ensure you are in the *Models* tab inside our `ai-edge-project` project.
+. Click on *Deploy model*.
+. Complete again the following fields in the form:
+ ** *Project*: The `ai-edge-project` namespace should be already selected by default.
+ ** *Model deployment name*: Name for the `Time to Failure` model server.
+ ** *Serving runtime*: Choose `OpenVINO Model Server` runtime.
+ ** *Model framework*: Our model was saved in `openvino_ir - opset13` format.
+ ** *Model server replicas*: Keep `1` for the number of pods.
+ ** *Model server size*: Assign `Small` to the server size.
+ ** *Check* the *Existing data connection* box.
+** *Connection*: Select again the `vehicle-models` DataConnection.
+** *Path*: Our Time to Failure model was saved in `time-to-failure`.
+. Finally, click on *Deploy*.
+
+Wait until you see a *green checkmark* in the Status column. Then, the *Internal endpoint details* will show the model inference API for our second AI model.
+
+image::5-2_time-to-failure.png[Time to Failure inference endpoint]
