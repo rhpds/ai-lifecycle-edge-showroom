@@ -1,45 +1,178 @@
-= Red Hat OpenShift AI installation
+= Module 2.1: Review RHOAI Configuration
 
-The fundamental piece and operational hub will be the Red Hat OpenShift AI platform, running in our Single Node OpenShift. The RHOAI operator provides data scientists and developers the possibility to work within a common platform where they can collaborate during the entire model lifecycle, making use of both containerization perks and several machine learning and data analytics capabilities.
+Red Hat OpenShift AI (RHOAI) running on Single Node OpenShift provides the complete AI/ML platform for model training, serving, pipelines, and monitoring. This module reviews the pre-configured RHOAI installation.
 
-. Open the *OpenShift Web Console* and log in using the credentials provided with in the lab instructions. The Console URL is:
-+
-[.console-input]
+[#access-openshift-console]
+== Task 1: Access the OpenShift Console
+
+Log in to the Single Node OpenShift cluster:
+
 [source,bash,subs="attributes+"]
 ----
 {openshift_cluster_console_url}
 ----
-+
-* *User*: {openshift_cluster_admin_username}
-* *Password*: {openshift_cluster_admin_password}
 
-. Navigate to the *Operators* tab on the left panel. Then select *OperatorHub*.
-. Type `OpenShift AI` to search the item in the operators' catalog.
-. Select the *Red Hat OpenShift AI* operator and click on *Install*. The most recent version will be displayed by default.
-. The operator will create the `redhat-ods-operator` project. Review the rest of the parameters and press *Install* to start the operator installation.
-. When the installation finishes, we need to configure the DataScienceCluster custom resource. Select *Create DataScienceCluster*
-. Once in the configuration page, scroll down and click *Components*. Here you can see a list of all the components that can be enabled/disabled from Red Hat OpenShift AI. It's on this step when we enable the different components. Reproduce the following setup:
- ** Locate and select the *kserve* component. Unless otherwise specified, the default deployment mode used by kserve will be Serverless. Change the *defaultDeploymentMode* to *RawDeployment* and verify that the *managementState* shows *Managed*.
- ** Also, under *serving*, we need to modify the KNative-Serving stack used for model serving. As mentioned before, the RawDeployment mode does not use KNative. Therefore, we need to switch the *managementState* to *Removed*.
- ** Finally, scroll down to the *trustyAI* configuration and enable the component by switching again the *managementState* field to *Managed*.
-. The configuration should look like this:
-+
-image::3-1_rhoai-kserve-config.png[Kserve configuration]
-+
-image::3-1_rhoai-knative-config.png[KNative-Serving configuration]
+**Credentials:**
 
-. Keep the rest of the default values and press *Create*.
-. Wait for the _Phase_ to become _Ready_. This will mean that the operator is successfully configured and can be used.
+* Username: `{openshift_cluster_admin_username}`
+* Password: `{openshift_cluster_admin_password}`
 
-Now, we should be able to access the OpenShift AI Web Console. On the right side of the top navigation bar, you will find a square icon formed by 9 smaller squares. Click it and select *Red Hat OpenShift AI* from the dropdown menu:
+=== Verify
 
-image::3-1_rhoai-access.png[Access RHOAI]
+Confirm you are logged into the OpenShift Console:
 
-A new tab will open. Log in using your OpenShift credentials:
+✓ OpenShift Console loads successfully
+✓ You see the cluster name in the top navigation
+✓ Perspective switcher shows **Administrator** and **Developer** options
+✓ Navigation menu displays on the left sidebar
 
-* *User*: {openshift_cluster_admin_username}
-* *Password*: {openshift_cluster_admin_password}
+[#verify-rhoai-operator]
+== Task 2: Verify RHOAI Operator Installation
 
-You may need to authorize access to our user. If so, click *Allow selected permissions* and you will be redirected to the Red Hat OpenShift AI landing page:
+The RHOAI operator is already installed. Verify its status:
 
-image::3-1_rhoai-landing.png[RHOAI landing page]
+1. Navigate to **Operators** → **Installed Operators**
+2. Verify **Red Hat OpenShift AI** appears with status **Succeeded**
+3. Note the operator namespace: `redhat-ods-operator`
+
+The operator manages all RHOAI components and lifecycle.
+
+=== Verify
+
+Confirm the RHOAI operator is installed and healthy:
+
+✓ **Red Hat OpenShift AI** appears in the operator list
+✓ **Status** column shows **Succeeded**
+✓ **Namespace** shows `redhat-ods-operator`
+✓ **Provided APIs** include: DataScienceCluster, DSCInitialization, FeatureTracker
+
+[#review-datasciencecluster]
+== Task 3: Review DataScienceCluster Configuration
+
+The DataScienceCluster custom resource defines which RHOAI components are enabled and how they're configured.
+
+1. In **Installed Operators**, click **Red Hat OpenShift AI**
+2. Navigate to the **DataScienceCluster** tab
+3. Click the existing DataScienceCluster instance
+4. Click the **YAML** tab to view the configuration
+
+=== Understanding key components
+
+**KServe Configuration:**
+
+1. Locate the `kserve` section in the YAML
+2. Note: `defaultDeploymentMode: RawDeployment`
+
+**Why RawDeployment for Edge?**
+
+* Full control over Kubernetes resources without Knative overhead
+* Ideal for resource-constrained SNO environments
+* Predictable resource usage (no auto-scaling)
+* Simpler configuration for edge deployments
+
+3. Verify: `managementState: Managed`
+
+**KNative-Serving Configuration:**
+
+1. Locate the `serving` section (KNative-Serving stack)
+2. Note: `managementState: Removed`
+
+**Why Remove KNative?**
+
+* RawDeployment doesn't use KNative
+* Reduces resource consumption on SNO
+* Eliminates unnecessary components
+
+**TrustyAI Configuration:**
+
+1. Locate the `trustyai` section
+2. Verify: `managementState: Managed`
+
+**Why Enable TrustyAI?**
+
+* Monitors model bias and fairness
+* Detects data drift over time
+* Essential for automated retraining (models continuously update without human oversight)
+
+You can also view component status visually:
+
+1. Click the **Details** tab
+2. Scroll to see component configurations
+
+IMAGE_HERE: DataScienceCluster component configuration showing kserve, trustyai, and knative settings
+
+=== Verify
+
+Confirm the DataScienceCluster configuration:
+
+✓ `kserve.defaultDeploymentMode` = `RawDeployment`
+✓ `kserve.managementState` = `Managed`
+✓ `serving.managementState` = `Removed` (KNative not needed)
+✓ `trustyai.managementState` = `Managed`
+✓ DataScienceCluster YAML contains all expected component sections
+
+[#verify-rhoai-status]
+== Task 4: Verify RHOAI Status
+
+Check the DataScienceCluster status:
+
+1. In the Details view, locate the **Phase** field
+2. Confirm it shows **Ready**
+
+This indicates all RHOAI components are deployed and operational.
+
+=== Verify
+
+Confirm RHOAI is fully operational:
+
+✓ **Phase** field shows **Ready**
+✓ **Conditions** section shows all components with status `True`
+✓ No error messages or warnings in the status section
+✓ All enabled components (KServe, TrustyAI, Workbenches, etc.) are running
+
+[#access-rhoai-dashboard]
+== Task 5: Access the RHOAI Dashboard
+
+Access the RHOAI web interface:
+
+1. In the OpenShift Console, click the **application launcher** icon (9 squares) in the top-right corner
+2. Select **Red Hat OpenShift AI** from the dropdown
+
+IMAGE_HERE: OpenShift Console application launcher showing RHOAI option
+
+3. A new tab opens. Log in with OpenShift credentials:
+   * Username: `{openshift_cluster_admin_username}`
+   * Password: `{openshift_cluster_admin_password}`
+
+4. If prompted, click **Allow selected permissions**
+
+5. You'll see the RHOAI landing page
+
+IMAGE_HERE: RHOAI Dashboard landing page showing Data Science Projects and other sections
+
+[#summary]
+== Summary
+
+You have reviewed the pre-configured Red Hat OpenShift AI installation on Single Node OpenShift. The configuration is optimized for edge AI workloads:
+
+**✓ RHOAI Operator** - Manages all AI/ML components
+
+**✓ KServe (RawDeployment)** - Efficient model serving without Knative overhead
+
+**✓ TrustyAI** - Model monitoring for bias and drift detection
+
+**✓ KNative Removed** - Reduced resource footprint for edge deployment
+
+**✓ DataScienceCluster Ready** - All components operational
+
+**What RHOAI Provides:**
+
+* **Data Science Projects** - Organized workspaces for ML teams
+* **Workbenches** - JupyterLab environments with pre-installed frameworks
+* **Model Serving** - Deploy models via KServe for inference
+* **Pipelines** - Automated ML workflows (training, validation, deployment)
+* **Model Monitoring** - TrustyAI for bias detection and drift analysis
+
+This platform enables the complete AI lifecycle: develop → train → serve → monitor → retrain.
+
+Navigate to link:./3-2_datascience-project.html[Module 2.2: Review DataScience Project].

@@ -1,16 +1,17 @@
-= Deploying the Battery Monitoring System
+= Module 1.4: Battery Monitoring System Deployment
 
-In this final section, we will deploy the Battery Monitoring System (BMS) application that brings together all the components we've previously deployed. The BMS serves as the main interface for monitoring battery health in our autonomous vehicle, providing real-time telemetry data visualization and AI-powered predictions.
+The Battery Monitoring System (BMS) brings together all robot components to provide real-time battery health monitoring. It collects telemetry data, displays it on a dashboard, and uses the AI inference endpoints to generate predictions.
 
-== Deploying BMS using GitOps
+**BMS Architecture:**
 
-Again, we will use GitOps to deploy all the Battery Monitoring System components:
+* **Battery Simulator** → **MQTT Broker** → **Data Processors** → **InfluxDB** + **Dashboard**
+* **Dashboard** → **Inference APIs** → **AI Predictions** → **Alerting**
 
-=== Step 1: Deploy GitOps Application
+[#deploy-bms-gitops]
+== Task 1: Deploy BMS using GitOps
 
-Deploy the Battery Monitoring System GitOps application:
+Deploy the complete Battery Monitoring System application:
 
-[.console-input]
 [source,yaml,subs="attributes+"]
 ----
 oc apply -f - <<EOF
@@ -52,65 +53,169 @@ spec:
 EOF
 ----
 
-Monitor the deployment progress to ensure all BMS components are properly deployed:
+This deploys:
 
-[.console-input]
-[source,bash,subs="attributes+"]
+* **Namespace** - `battery-demo` for BMS components
+* **Battery Simulator** - Quarkus app generating realistic telemetry (voltage, temperature, distance, velocity)
+* **MQTT Broker** - Mosquitto broker as central messaging hub
+* **Data Processors**:
+** `mqtt2ws` - Exposes data as WebSocket for dashboard
+** `data-ingester` - Stores data in InfluxDB
+* **InfluxDB** - Time-series database for historical sensor data
+* **BMS Dashboard** - Web UI showing real-time telemetry and AI predictions
+
+Monitor the deployment:
+
+[source,bash]
 ----
 watch oc get pods -n battery-demo
 ----
 
-[NOTE]
-====
-_You can exit the watch command by pressing *Ctrl+C* in your keyboard._
-====
+Press `Ctrl+C` to exit when all pods show `Running` status.
 
-When all pods show `Running` status, the Battery Monitoring System deployment is complete.
+=== Verify
 
-The GitOps Application will deploy the following BMS components:
+Check that all BMS pods are running:
 
-* *Namespace*: A _battery-demo_ namespace that contains all BMS-related resources, providing isolation for the monitoring system.
-* *Battery Simulator*: A Quarkus component that simulates battery behavior and generates realistic telemetry data including voltage, temperature, driving distance, or velocity.
-* *MQTT Broker*: A Mosquitto MQTT broker that acts as the central messaging hub, receiving sensor data from the battery simulator and distributing it to other components.
-* *Data Processing Components*: Two Quarkus services that process MQTT data:
-  - _mqtt2ws_ service that exposes data as WebSocket for the BMS dashboard
-  - _data ingester_ service that stores sensor data in InfluxDB time series database
-* *InfluxDB*: A time series database that stores historical sensor data for analysis and monitoring.
-* *BMS Dashboard*: A web-based dashboard that displays real-time battery telemetry data and AI predictions.
+[source,bash]
+----
+oc get pods -n battery-demo
+----
 
-=== Step 2: Access BMS Dashboards
+Expected output:
+----
+NAME                                  READY   STATUS    RESTARTS   AGE
+battery-simulation-xxxxx-xxxxx        1/1     Running   0          2m
+bms-dashboard-xxxxx-xxxxx             1/1     Running   0          2m
+data-ingester-xxxxx-xxxxx             1/1     Running   0          2m
+influxdb-xxxxx-xxxxx                  1/1     Running   0          2m
+mosquitto-mqtt-broker-xxxxx-xxxxx     1/1     Running   0          2m
+mqtt2ws-xxxxx-xxxxx                   1/1     Running   0          2m
+----
 
-Once deployed, you can access the Battery Monitoring System dashboard:
+Verify the GitOps Application:
 
-[.console-input]
+[source,bash]
+----
+oc get application -n openshift-gitops battery-simulation
+----
+
+Expected output:
+----
+NAME                 SYNC STATUS   HEALTH STATUS
+battery-simulation   Synced        Healthy
+----
+
+✓ All 6 BMS pods show `1/1` ready and `Running` status
+✓ GitOps application shows `Synced` and `Healthy`
+✓ Complete battery monitoring system is operational
+
+[#access-bms-dashboard]
+== Task 2: Access the BMS Dashboard
+
+Open the Battery Monitoring System dashboard:
+
 [source,bash,subs="attributes+"]
 ----
 https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
 ----
 
-The dashboard will display real-time battery telemetry data, AI predictions for stress detection and time-to-failure, and provide alerting capabilities for battery health monitoring.
+The dashboard displays:
 
-image::2-4_bms-dashboard.png[Battery Monitoring System]
+* **Real-time telemetry** - Voltage, temperature, charge level, operational metrics
+* **AI predictions** - Stress detection status (NORMAL/STRESSED)
+* **Time-to-failure estimates** - Predicted hours until battery failure
+* **Alerts** - Notifications when stress is detected or failure is imminent
 
-Also you can access the InfluxDB dashboard where the sensor data es collected and prepared to be sent to the BMS dashbaord.
+IMAGE_HERE: BMS dashboard showing real-time telemetry graphs and AI prediction indicators
 
-[.console-input]
+=== Verify
+
+Confirm the dashboard is accessible and displaying live data:
+
+✓ Dashboard loads successfully in browser
+✓ **Telemetry charts** show live updates (voltage, temperature, etc.)
+✓ **AI Prediction panel** displays stress detection status
+✓ **Time to Failure** shows estimated hours remaining
+✓ Data updates automatically every 30 seconds
+
+[#verify-influxdb]
+== Task 3: Verify Data in InfluxDB
+
+Access the InfluxDB dashboard to see historical sensor data:
+
 [source,bash,subs="attributes+"]
 ----
 https://influx-db-microshift-001.{openshift_cluster_ingress_domain}
 ----
 
-Use the following credentials to log in:
+**Credentials:**
 
-* *Username*: `admin`
-* *Password*: `password`
+* Username: `admin`
+* Password: `password`
 
-To verify the data stream:
+Navigate to **Explore** in the left menu:
 
-* Navigate to *Explore* in the left-hand menu.
-* Select the *bms* and *battery_data* filters at the bottom.
-* Click *Submit* to execute the query.
+1. Select the `bms` bucket from the dropdown
+2. Choose `battery_data` measurement
+3. Click **Submit** to execute the query
 
-Data will start appearing from the right side of the screen. If you recently deployed the BMS app, the data may be difficult to see, so you can adjust the time interval to expand the graph. The following image shows data generated over the *past 5 minutes*:
+Adjust the time interval (e.g., "Past 5 minutes") to see recent data.
 
-image::2-4_influxdb-telemetry.png[Sensor Telemetry in InfluxDB]
+IMAGE_HERE: InfluxDB dashboard showing battery telemetry time-series data
+
+=== Verify
+
+Confirm data is being stored in InfluxDB:
+
+✓ InfluxDB dashboard loads successfully
+✓ `bms` bucket exists and is selectable
+✓ `battery_data` measurement contains records
+✓ Time-series graphs display sensor values (voltage, temperature, etc.)
+✓ Data points are timestamped with recent times
+✓ Query results update when time range is changed
+
+[#how-it-works]
+== How the BMS works
+
+**Data Flow:**
+
+1. **Battery Simulator** generates realistic sensor data mimicking a robot battery in operation
+2. **MQTT Broker** receives telemetry messages via MQTT protocol
+3. **mqtt2ws** processor exposes data as WebSocket stream for dashboard
+4. **data-ingester** processor stores data in InfluxDB for historical analysis
+5. **BMS Dashboard** subscribes to WebSocket, displays real-time graphs
+6. **Dashboard** periodically sends telemetry to **inference endpoints** (every 30 seconds)
+7. **Inference APIs** return predictions (stress score, time-to-failure estimate)
+8. **Dashboard** displays predictions and triggers alerts if thresholds are exceeded
+
+This closed-loop system enables real-time battery health monitoring with AI-powered predictions.
+
+[#summary]
+== Summary: Module 1 Complete
+
+You have successfully deployed the complete factory robot infrastructure on MicroShift. The robot now has:
+
+**✓ MicroShift** - Lightweight Kubernetes platform running on RHEL 9.6
+
+**✓ MinIO Storage** - S3-compatible storage with AI models in the `inference` bucket
+
+**✓ Model Serving** - OpenVINO inference servers for Stress Detection and Time to Failure models
+
+**✓ Battery Monitoring System** - Complete telemetry collection, visualization, and AI prediction pipeline
+
+**What You've Learned:**
+
+* How to access edge infrastructure via bastion host
+* GitOps-based deployment for edge automation
+* S3 object storage for AI model distribution
+* KServe model serving architecture on edge devices
+* Inference API request/response format (KServe v2 protocol)
+* Real-time telemetry collection and time-series storage
+* Integration of AI predictions into monitoring dashboards
+
+**The robot is now operational with real-time battery health monitoring.**
+
+Next, you'll explore the **Single Node OpenShift (SNO) re-training server** where AI models are automatically retrained every 10 minutes using fresh data from the robot fleet.
+
+Navigate to link:./3-1_rhoai-install.html[Module 2.1: Review RHOAI Configuration].

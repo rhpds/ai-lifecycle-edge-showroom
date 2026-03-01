@@ -1,53 +1,243 @@
-= Pipelines scheduled automation
+= Module 5.3: Schedule Pipeline Automation
 
-Our machine learning models need to adapt to evolving data patterns to maintain their accuracy and relevance. By scheduling our pipeline to run automatically every 10 minutes, we ensure that both the Stress Detection and Time to Failure Prediction models are continuously retrained with the latest battery data collected from the BMS application. This automated approach eliminates manual intervention, reduces the risk of model drift, and guarantees that our predictive models always reflect the most current battery behavior patterns.
+Scheduled pipelines enable fully automated model retraining. Configure the pipeline to run every 10 minutes, ensuring models continuously improve without manual intervention.
 
-== Schedule recurring execution
+[#why-scheduled-automation]
+== Why scheduled automation matters
 
-Now let's configure the pipeline to execute automatically:
+Machine learning models drift over time as operational conditions change:
 
-. Now, let's go back to the *Pipelines* view in the left-hand menu.
-. Click again on the *Three dots* at the far right of our *Model Retraining* pipeline.
-+
-image::6-3_pipeline-scheduled.png[Start Pipeline schedule]
+* **Battery aging** - Performance degrades as batteries wear
+* **Temperature variations** - Seasonal changes affect battery behavior
+* **Workload patterns** - Different operational routes stress batteries differently
 
-. Select *Create schedule* from the dropdown menu.
-. Fill in the schedule configuration form:
- ** *Name*: `Scheduled run`
- ** *Trigger type*: Select *Periodic*
- ** *Run every*: `10` `minutes`
-. Scroll down and verify that the *Model Retraining* pipeline has been automatically selected.
-. Check that the *Parameters* match the following values:
-+
-[cols="1,1", subs="attributes+"]
+**Scheduled Retraining Benefits:**
+
+* **Eliminates manual intervention** - No human involvement required
+* **Reduces model drift** - Models stay accurate with fresh data
+* **Ensures reliability** - Predictive accuracy maintained over time
+* **Enables true edge AI** - Autonomous systems that self-improve
+
+For our 18-robot fleet operating 24/7, automation is essential.
+
+[#create-scheduled-run]
+== Task 1: Create a Scheduled Pipeline Run
+
+Configure the pipeline to execute automatically every 10 minutes.
+
+1. In the **Red Hat OpenShift AI (RHOAI) Dashboard**, navigate to the **Pipelines** tab in `ai-edge-project`
+2. Locate the `Model Retraining` pipeline
+3. Click the **three dots** (⋮) at the far right of the pipeline row
+
+IMAGE_HERE: Pipeline list with three-dot menu for Model Retraining pipeline
+
+4. Select **Create schedule** from the dropdown
+
+5. Fill in the schedule configuration:
+   * **Name**: `Scheduled run`
+   * **Trigger type**: Select **Periodic**
+   * **Run every**: `10` `minutes`
+
+6. Scroll down to verify the **Model Retraining** pipeline is automatically selected
+
+7. Review parameters (same as manual run):
+
+[cols="2,3",options="header"]
 |===
 | Parameter | Value
 
-| aws_access_key_id
+| `aws_access_key_id`
 | `minio`
 
-| aws_s3_bucket
+| `aws_s3_bucket`
 | `inference`
 
-| aws_s3_endpoint
-| `http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
+| `aws_s3_endpoint`
+| `\http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
 
-| aws_secret_access_key
+| `aws_secret_access_key`
 | `minio123`
 
-| influxdb_bucket
+| `influxdb_bucket`
 | `bms`
 
-| influxdb_org
+| `influxdb_org`
 | `redhat`
 
-| influxdb_token
+| `influxdb_token`
 | `admin_token`
 
-| influxdb_url
-| `https://influx-db-microshift-001.{openshift_cluster_ingress_domain}/`
+| `influxdb_url`
+| `\https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
 |===
 
-. When all parameters are correctly configured, click *Create schedule*.
+8. Click **Create schedule**
 
-The pipeline will now execute automatically every 10 minutes, continuously improving your models with fresh battery data. Come back after 10 minutes and the first scheduled run should be underway.
+=== Verify
+
+Confirm the schedule was created successfully:
+
+✓ **Create schedule** dialog accepts all parameters
+✓ Schedule name set to `Scheduled run`
+✓ **Trigger type** is Periodic
+✓ **Run every** is set to `10 minutes`
+✓ Click **Create schedule** completes without errors
+✓ Redirected to Schedules tab showing new schedule
+
+[#monitor-scheduled-runs]
+== Task 2: Monitor Scheduled Runs
+
+Verify the schedule is active and pipelines execute automatically.
+
+**View Schedule Configuration:**
+
+1. In the **Pipelines** tab, click the **Schedules** sub-tab
+2. Locate the `Scheduled run` schedule
+3. Verify details:
+   * **Trigger type**: Periodic
+   * **Schedule**: Every 10 minutes
+   * **Status**: Enabled
+
+IMAGE_HERE: Schedules tab showing Scheduled run with Periodic trigger and Enabled status
+
+**View Automated Runs:**
+
+1. Click the **Runs** sub-tab
+2. After 10 minutes, a new run appears automatically
+3. Each run shows:
+   * **Name**: Auto-generated timestamp
+   * **Pipeline**: Model retraining
+   * **Status**: Running → Succeeded (when complete)
+   * **Trigger**: Scheduled (vs. Manual for your first run)
+
+=== Verify
+
+Confirm the schedule is active and executing:
+
+**Schedule Configuration:**
+
+✓ **Schedules** tab shows `Scheduled run` entry
+✓ **Trigger type**: Periodic
+✓ **Schedule**: Every 10 minutes
+✓ **Status**: Enabled (toggle switch is ON)
+
+**Automated Runs:**
+
+Wait 10 minutes, then verify:
+
+✓ **Runs** tab shows new automatically created run
+✓ Run name is auto-generated with timestamp
+✓ **Trigger** column shows "Scheduled" (not "Manual")
+✓ **Pipeline** column shows "Model retraining"
+✓ Run executes and completes successfully
+
+[#understand-automated-workflow]
+== Understanding the Automated Workflow
+
+Every 10 minutes, the scheduled pipeline:
+
+1. **Retrieves** - Fresh battery telemetry from factory robots (last hour of data)
+2. **Processes** - Normalizes and prepares training datasets
+3. **Trains** - New Stress Detection and Time-to-Failure models
+4. **Validates** - Compares new models against existing models
+5. **Deploys** - Uploads improved models to robot storage (if they outperform)
+6. **Repeats** - Cycle continues every 10 minutes
+
+This creates a **self-improving system** where models get better over time without human intervention.
+
+[#pause-or-disable-schedule]
+== Task 3: Pause Scheduling (Optional)
+
+If needed, temporarily pause scheduled runs:
+
+1. Navigate to the **Schedules** sub-tab
+2. Find the `Scheduled run` schedule
+3. Click the **toggle switch** to disable
+4. To re-enable, click the toggle again
+
+The schedule configuration is preserved when disabled.
+
+=== Verify
+
+Confirm you can control the schedule:
+
+✓ Toggle switch in Schedules tab is accessible
+✓ Clicking toggle changes status from "Enabled" to "Disabled"
+✓ Disabled schedule stops creating new runs
+✓ Re-enabling the toggle resumes automated execution
+✓ Schedule parameters remain unchanged when toggled
+
+[#verify-automation]
+== Task 4: Verify Automation is Working
+
+Confirm the complete pipeline automation system is operational.
+
+=== Verify
+
+**End-to-end automation check:**
+
+✓ **Schedule exists**: Appears in Schedules tab with "Enabled" status
+✓ **Configuration correct**: Trigger type "Periodic", interval "Every 10 minutes"
+✓ **Automatic execution**: New runs appear automatically every 10 minutes (check Runs tab)
+✓ **Successful runs**: Scheduled runs show green checkmarks (Succeeded status)
+✓ **Continuous improvement**: Models update with fresh data from robots
+✓ **No manual intervention needed**: System operates autonomously
+
+**Observe over time:**
+
+- **Runs tab** shows increasing number of scheduled runs
+- Each run has timestamp-based auto-generated name
+- **Trigger** column consistently shows "Scheduled"
+- Run history provides complete audit trail
+- MinIO models update when new versions outperform existing ones
+
+**This confirms:**
+✅ Automation is working correctly
+✅ System is self-sustaining
+✅ Models continuously improve without human oversight
+
+[#summary]
+== Summary: Module 5 Complete
+
+You have configured fully automated pipeline scheduling for continuous model retraining:
+
+**Module 5.1 - Pipeline Server:**
+
+* ✓ Verified pipeline server deployment
+* ✓ Reviewed pipeline storage configuration
+* ✓ Examined DataSciencePipelineApplication CR
+* ✓ Verified pipeline server pods running
+
+**Module 5.2 - Pipeline Execution:**
+
+* ✓ Imported Model retraining pipeline
+* ✓ Executed pipeline manually
+* ✓ Monitored all stages (data → training → validation → deployment)
+* ✓ Verified conditional deployment logic
+
+**Module 5.3 - Pipeline Automation:**
+
+* ✓ Created scheduled pipeline run (every 10 minutes)
+* ✓ Verified schedule configuration
+* ✓ Monitored automated pipeline executions
+* ✓ Confirmed continuous model improvement workflow
+
+**What You've Learned:**
+
+* Kubeflow Pipelines automate ML workflows end-to-end
+* Scheduled runs eliminate manual intervention
+* Pipelines run every 10 minutes with fresh robot data
+* Validation ensures only better models are deployed
+* Complete audit trail tracks all training activities
+* This is MLOps at the edge - fully automated model lifecycle
+
+**The Foundation of Edge AI Automation:**
+
+* **Self-improving models** - Accuracy improves as robots generate more data
+* **Zero human oversight** - Operates autonomously once configured
+* **Resilient** - Handles failures gracefully (failed runs logged, not deployed)
+* **Auditable** - Complete history of all training runs and deployments
+
+Next, you'll explore TrustyAI for model monitoring to ensure automated models remain fair and accurate over time.
+
+Navigate to link:./7-1_trustyai.html[Module 6.1: Enable TrustyAI Monitoring].

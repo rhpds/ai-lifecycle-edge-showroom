@@ -1,87 +1,143 @@
-= Vehicle Infrastructure Setup
+= Module 1.1: Robot Infrastructure Setup
 
-In this section, we will work with our autonomous vehicle operating within the industrial plant. This vehicle will be equipped with a battery monitoring system that uses AI models to predict battery stress conditions and time to failure.
+This module explores the infrastructure running on our factory transportation robots. Each robot runs Red Hat Device Edge (MicroShift), a lightweight Kubernetes platform optimized for resource-constrained environments.
 
-Our goal in this section is to verify that the vehicle's infrastructure is properly configured and running, so we can deploy the necessary components to run our Battery Monitoring System app in the following sections.
+[#connect-robot]
+== Task 1: Connect to the Factory Robot
 
-== Connecting to the Autonomous Vehicle
+Access the robot infrastructure via the bastion host, then connect to the MicroShift virtual machine.
 
-To access the autonomous vehicle's infrastructure, you need to connect through the bastion host first, and then 
-access the MicroShift virtual machine.
+=== Connect to Bastion Host
 
-First, establish an `ssh` connection to the bastion host using the command provided in your environment credentials. 
-When asked for a password, please anter the bastion password provided in the lab credentials. Something like:
+Establish an SSH connection to the bastion host:
 
-[.console-input]
 [source,bash,subs="attributes+"]
 ----
 {bastion_ssh_command}
 ----
 
-* *Password*: {bastion_ssh_password}
+**Password:** `{bastion_ssh_password}`
 
-Once connected to the bastion, use `virtctl` to access the autonomous vehicle's virtual machine. The command should 
-look similar to the following one:
+=== Connect to Robot VM
 
-[.console-input]
+Once connected to the bastion, access the factory robot's MicroShift VM:
+
 [source,bash,subs="attributes+"]
 ----
 virtctl ssh cloud-user@microshift.microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
 
-== Checking MicroShift Status
+=== Verify
 
-Once connected to our autonomous vehicle, the first step is to verify that MicroShift is running correctly. MicroShift is Red Hat's lightweight Kubernetes distribution designed specifically for edge computing environments. It provides the essential Kubernetes functionality needed to run containerized applications in resource-constrained environments like our autonomous vehicle.
+Confirm you are connected to the MicroShift VM:
 
-MicroShift is necessary for our solution because it allows us to:
-
-* Deploy and manage containerized applications in a lightweight manner
-* Orchestrate our battery monitoring system and AI model serving components
-* Provide storage and networking capabilities for our edge workloads
-
-To check the status of MicroShift, execute the following command:
-
-[.console-input]
-[source,bash,subs="attributes+"]
+[source,bash]
 ----
-oc get pods -A
+hostname
 ----
 
-You should see various pods in `Running` status across different namespaces:
-
-[source,bash,subs="attributes+"]
+Expected output:
 ----
-NAMESPACE                  NAME                                         READY   STATUS      RESTARTS        AGE
-kube-system                csi-snapshot-controller-74795dc54f-lp9tf     1/1     Running     0               1d
-openshift-dns              dns-default-vk7fd                            2/2     Running     0               1d
-openshift-dns              node-resolver-4dfs2                          1/1     Running     0               1d
-openshift-gitops           argocd-application-controller-0              1/1     Running     0               1d
-openshift-gitops           argocd-redis-648648759c-dngbg                1/1     Running     0               1d
-openshift-gitops           argocd-repo-server-7bf65c5f8f-ljjzc          1/1     Running     0               1d
-openshift-ingress          router-default-59f4f4c47b-hnqh9              1/1     Running     0               1d
-openshift-ovn-kubernetes   ovnkube-master-p5dfb                         4/4     Running     0               1d
-openshift-ovn-kubernetes   ovnkube-node-8cp97                           1/1     Running     0               1d
-openshift-service-ca	   service-ca-755884c9cf-f2g4n                  1/1     Running     0               1d
-openshift-storage          lvms-operator-65d4bdf577-j2g9z               1/1     Running     0               1d
-openshift-storage          vg-manager-vg6lr                             1/1     Running     0               1d
-redhat-ods-applications    kserve-controller-manager-548d8c4ffb-7pg5x   1/1     Running     0               1d
+microshift
 ----
 
-This indicates that MicroShift is properly initialized and all core components are operational. If all pods show `Running` status, the vehicle's infrastructure is correctly configured and ready for the next steps.
+✓ Hostname shows `microshift`
+✓ You are now inside the factory robot's VM
 
-Let's quickly review what these pods are responsible for:
+[#verify-microshift]
+== Task 2: Verify MicroShift is Running
 
-The following namespaces contain the essential MicroShift components:
+MicroShift is a lightweight Kubernetes distribution designed for edge devices. It provides:
 
-* *kube-system*: Contains the core Kubernetes system pods
-* *openshift-dns*: Handles DNS resolution services for the cluster
-* *openshift-ovn-kubernetes*: Provides the networking layer with OVN (Open Virtual Network) for communication
-* *openshift-storage*: Manages local volume management services (LVM) for persistent storage
-* *openshift-service-ca*: Provides certificate authority services for internal cluster communication
+* **Minimal footprint** - Runs with ~2 CPU cores and 2GB RAM
+* **Kubernetes API** - Full compatibility with standard Kubernetes tools
+* **Edge-optimized** - Built for resource-constrained, distributed deployments
+* **Embedded capabilities** - Model serving and GitOps built-in
 
-Beyond the core MicroShift functionality, we can see that additional services are enabled:
+Check that MicroShift is running:
 
-* *openshift-gitops*: GitOps capabilities are enabled, providing ArgoCD components for continuous deployment and configuration management. This allows us to manage our applications through Git-based workflows.
-* *redhat-ods-applications*: The KServe controller manager is running, which provides AI/ML model serving capabilities. This is essential for our battery monitoring system as it will handle the deployment and management of our AI models for stress detection and time-to-failure prediction.
+[source,bash]
+----
+sudo systemctl status microshift
+----
 
-These additional services are crucial for our autonomous vehicle's battery monitoring solution, as they provide the infrastructure needed for both application deployment (GitOps) and AI model serving (KServe).
+Expected output should show `active (running)`.
+
+Verify cluster access:
+
+[source,bash]
+----
+oc get nodes
+----
+
+You should see one node in `Ready` status.
+
+=== Verify
+
+Confirm MicroShift is operational:
+
+**Expected systemctl output:**
+----
+● microshift.service - MicroShift
+     Loaded: loaded (/usr/lib/systemd/system/microshift.service; enabled)
+     Active: active (running) since ...
+----
+
+**Expected nodes output:**
+----
+NAME         STATUS   ROLES    AGE   VERSION
+microshift   Ready    <none>   5d    v1.29.0+xxxxxxx
+----
+
+✓ MicroShift service shows `active (running)`
+✓ Node status is `Ready`
+✓ Kubernetes API is accessible via `oc` command
+
+[#explore-namespaces]
+== Task 3: Explore Deployed Namespaces
+
+List the namespaces already deployed on the robot:
+
+[source,bash]
+----
+oc get namespaces
+----
+
+You should see several namespaces including:
+
+* `openshift-gitops` - GitOps automation for edge deployments
+* `minio` - Object storage for AI models (will be deployed in next section)
+* `inference` - Model serving infrastructure (will be deployed in next section)
+* `battery-demo` - Battery Monitoring System components (will be deployed in next section)
+
+NOTE: Some namespaces may not exist yet. You'll deploy these components using GitOps in the following sections.
+
+=== Verify
+
+Expected namespaces output:
+----
+NAME                        STATUS   AGE
+default                     Active   5d
+kube-system                 Active   5d
+openshift-gitops            Active   4d
+openshift-infra             Active   5d
+openshift-operators         Active   5d
+openshift-service-ca        Active   5d
+----
+
+✓ `openshift-gitops` namespace exists (GitOps ready)
+✓ System namespaces are `Active`
+✓ Application namespaces (`minio`, `inference`, `battery-demo`) will appear after GitOps deployments
+
+[#summary]
+== Summary
+
+You have successfully connected to the factory robot infrastructure and verified that MicroShift is running. The robot provides:
+
+* **MicroShift** - Lightweight Kubernetes for edge workloads
+* **SSH access** - Remote management via bastion host
+* **GitOps readiness** - Automated deployment capabilities
+
+In the next section, you'll deploy MinIO object storage to store AI models on the robot.
+
+Navigate to link:./2-2_minio-deployment.html[Module 1.2: MinIO Storage Deployment].

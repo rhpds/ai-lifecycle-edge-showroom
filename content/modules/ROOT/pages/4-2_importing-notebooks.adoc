@@ -1,21 +1,87 @@
-= Importing Notebooks
+= Module 3.2: Import Training Notebooks
 
-Usually, model development and training is the most time-consuming part. On JupyterLab we can use Notebooks to develp and run the code needed to generate our AI models. In this demo, instead of creating the Notebooks and the code on our own, we are going to clone this link:https://github.com/rhpds/ai-lifecycle-edge-gitops.git[GitHub repository] that contains the Notebooks and adititonal resources that we will need later.
+Pre-built Jupyter notebooks contain all the code for training Stress Detection and Time-to-Failure models. Import them from a GitHub repository to accelerate development.
 
-. Make sure you are in your workbench's JupyterLab platform. There's a toolbar on the left. There, in the third position you will find the *Git* icon. Click it.
-+
-image::4-2_git-import.png[Git import]
+[#clone-repository]
+== Task 1: Clone the Training Repository
 
-. In the new menu, select the *Clone repository* option. You will be asked to type the URL to the repo. Copy and paste this one:
-+
-[.console-input]
-[source,bash,subs="attributes+"]
+In JupyterLab, clone the repository containing training notebooks:
+
+1. Locate the toolbar on the left side of JupyterLab
+2. Click the **Git** icon (third position)
+
+IMAGE_HERE: JupyterLab sidebar showing Git icon
+
+3. In the Git menu, click **Clone repository**
+4. Enter the repository URL:
+
+[source,text]
 ----
 https://github.com/rhpds/ai-lifecycle-edge-gitops.git
 ----
 
-. Click *Clone* to start pulling the contents.
+5. Click **Clone**
 
-When finished, all the lab folders and resources should appear on the left section, in the `ai-lifecycle-edge-gitops` folder.
+The repository clones into the `ai-lifecycle-edge-gitops` folder, visible in the file browser.
 
-image::4-2_imported-folder.png[Imported folder]
+IMAGE_HERE: JupyterLab file browser showing cloned ai-lifecycle-edge-gitops folder structure
+
+=== Verify
+
+Confirm the repository was cloned successfully:
+
+✓ Git clone operation completes without errors
+✓ `ai-lifecycle-edge-gitops` folder appears in file browser
+✓ Folder contains subdirectories (notebooks, bootstrap, etc.)
+✓ Git icon in sidebar shows repository status
+
+[#explore-repository-contents]
+== Task 2: Explore Repository Contents
+
+The cloned repository contains:
+
+* **Notebooks** - Jupyter notebooks for training Stress Detection and Time-to-Failure models
+* **Data** - Sample battery telemetry data from factory robots
+* **Scripts** - Helper scripts for model validation and deployment
+* **Pipelines** - Pipeline definitions for automated retraining workflows
+
+Navigate to `ai-lifecycle-edge-gitops/notebooks/training/` to see the training notebooks.
+
+=== Verify
+
+Confirm repository contents are accessible:
+
+Expected directory structure:
+----
+ai-lifecycle-edge-gitops/
+├── bootstrap/          (GitOps deployment manifests)
+├── notebooks/
+│   ├── training/       (Training notebooks - we'll use these)
+│   └── pipelines/      (Pipeline definitions)
+├── scripts/            (Helper utilities)
+└── README.md
+----
+
+✓ Navigate to `notebooks/training/` folder successfully
+✓ Folder contains multiple `.ipynb` notebook files
+✓ Notebooks for Stress Detection and Time-to-Failure models are present
+✓ All repository files are readable
+
+[#summary]
+== Summary
+
+You have imported the training repository into your JupyterLab workbench:
+
+**✓ Repository Cloned** - `ai-lifecycle-edge-gitops` available in file browser
+
+**✓ Training Notebooks** - Pre-built code for model development
+
+**✓ Sample Data** - Battery telemetry data for training
+
+**✓ Helper Scripts** - Utilities for validation and deployment
+
+**What's Next:**
+
+The notebooks are ready to execute. You'll run them sequentially to train both battery health prediction models using data collected from the factory transportation robots.
+
+Navigate to link:./4-3_running-notebooks.html[Module 3.3: Train Battery Health Models].

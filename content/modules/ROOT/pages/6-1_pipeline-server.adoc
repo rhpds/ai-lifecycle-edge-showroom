@@ -1,25 +1,201 @@
-= Configure a pipeline server
+= Module 5.1: Review Pipeline Server
 
-Automation in edge computing is crucial for ensuring reliable and efficient operations in remote environments. Given that many edge deployments are in locations where IT teams are not readily available, it is essential to develop robust and self-sustaining processes that require minimal human intervention. Automated workflows help maintain system stability, optimize performance, and reduce downtime, ensuring that critical applications continue to function without constant manual oversight.
+Automation is critical for edge deployments where IT teams aren't readily available. Red Hat OpenShift AI pipelines automate the complete ML workflow: data collection → training → validation → deployment.
 
-Red Hat OpenShift AI implements Kubeflow Pipelines 2.0. A pipeline is a workflow definition containing steps, inputs, and output artifacts, that are stored in S3-compatible storage. These pipelines enables organizations to standardize and automate machine learning workflows that might include steps such as data extraction, processsing, model training and validation.
+[#understanding-pipeline-automation]
+== Understanding pipeline automation
 
-In order to be able to run pipelines in RHOAI, first a pipelines server is needed. The pipeline server instance creates the necessary pods to manage and execute data science pipelines. Let's review the process to creatae the server:
+**Why Automation Matters at the Edge:**
 
-. Navigate back to the *Red Hat OpenShift AI Dashboard*.
-. In your `ai-edge-project` project dashboard, navigate to the *Pipelines* tab.
-+
-image::6-1_pipeline-server.png[Create Pipelines Server]
+* **No manual intervention** - Pipelines run autonomously every 10 minutes
+* **Self-sustaining** - Models continuously improve without human oversight
+* **Reliable** - Automated workflows maintain system stability
+* **Efficient** - Reduces downtime and optimizes performance
 
-. Before starting using pipelines, we need to create the server. Click on *Configure pipeline server*.
-. Here we need to create a new Object storage connection that uses our pipelines bucket. Complete the fields with your s3 data:
- ** *Access key*: Type the MinIO username. In this case `minio`.
- ** *Secret key*: The password for the previous user will be `minio123`.
- ** *Endpoint*: Specify the MinIO API endpoint: `http://minio-service.minio.svc.cluster.local:9000`.
- ** *Region*: The default value is `us-east-1`.
- ** *Bucket*: Indicate the `pipelines` bucket name.
-. When filled, scroll down and press *Configure pipeline server*.
+**Kubeflow Pipelines 2.0:**
 
-When we create the server, a new DataSciencePipelineApplication custom resource is created in your OpenShift that provides an API endpoint and a database for storing metadata. Wait until the process is complete. Take into account that it might take a few minutes to finish. Once ready, the Import pipeline option should appear:
+Red Hat OpenShift AI (RHOAI) implements Kubeflow Pipelines for ML workflow automation. Pipelines define:
 
-image::6-1_import-pipeline.png[Pipelines Server ready]
+* **Steps** - Data extraction, preprocessing, training, validation, deployment
+* **Inputs** - Source data, configuration parameters
+* **Output artifacts** - Trained models, metrics, logs (stored in S3)
+
+[#review-pipeline-server]
+== Task 1: Verify Pipeline Server is Running
+
+1. In the **RHOAI Dashboard**, navigate to the `ai-edge-project` project
+2. Click the **Pipelines** tab
+3. Verify you see the **Import pipeline** button
+
+IMAGE_HERE: Pipelines tab showing Import pipeline button (indicates server is ready)
+
+The presence of **Import pipeline** confirms the server is deployed and operational.
+
+NOTE: If you see "Configure pipeline server" instead, the server isn't deployed. For this lab, it should already be configured.
+
+=== Verify
+
+Confirm the pipeline server is deployed and accessible:
+
+✓ RHOAI Dashboard **Pipelines** tab is accessible
+✓ **Import pipeline** button is visible
+✓ No "Configure pipeline server" message (indicates server is already set up)
+✓ Pipeline server is ready to accept workflow definitions
+
+[#review-pipeline-storage]
+== Task 2: Review Pipeline Storage Connection
+
+The pipeline server uses dedicated storage for execution artifacts.
+
+1. In the **Pipelines** tab, note the pipeline server configuration
+2. Navigate to the **Connections** tab
+3. Locate the `pipeline-storage` DataConnection (alongside `vehicle-models`)
+
+Review connection details:
+
+* **Connection type**: S3 compatible object storage
+* **Endpoint**: `http://minio-service.minio.svc.cluster.local:9000` (MinIO on SNO)
+* **Region**: `us-east-1`
+* **Bucket**: `pipelines` (dedicated bucket for pipeline artifacts)
+
+**Storage Separation:**
+
+* **vehicle-models** → Robot's MinIO (models and training data)
+* **pipeline-storage** → SNO's MinIO (execution logs, metrics, intermediate data)
+
+This separation keeps pipeline artifacts isolated from production model storage.
+
+=== Verify
+
+Confirm pipeline storage connection exists:
+
+✓ **Connections** tab shows both `vehicle-models` and `pipeline-storage`
+✓ **pipeline-storage** connection type: S3 compatible object storage
+✓ **Endpoint**: Points to SNO's MinIO service (`minio-service.minio.svc.cluster.local:9000`)
+✓ **Bucket**: `pipelines` (dedicated for execution artifacts)
+✓ Connection is separate from `vehicle-models` (robot storage)
+
+[#review-datasciencepipeline]
+== Task 3: Review DataSciencePipelineApplication
+
+The pipeline server is defined by a custom resource.
+
+Switch to the **OpenShift Web Console**:
+
+1. Navigate to **Search** → **Resources** dropdown
+2. Search for `DataSciencePipelineApplication`
+3. Ensure you're in the `ai-edge-project` namespace
+4. Click the DataSciencePipelineApplication instance
+
+Review the YAML configuration:
+
+* **Object storage** - References `pipeline-storage` connection secret
+* **Database** - MariaDB for pipeline metadata
+* **API server** - Pipeline execution engine
+* **Persistence agent** - Saves pipeline run data to database
+* **Scheduled workflow controller** - Manages scheduled pipeline runs
+
+=== Verify
+
+Confirm DataSciencePipelineApplication exists and is configured:
+
+✓ **DataSciencePipelineApplication** resource exists in `ai-edge-project`
+✓ YAML configuration includes:
+** Object storage section (references `pipeline-storage` secret)
+** Database configuration (MariaDB)
+** API server settings
+✓ All required components are defined
+
+[#review-pipeline-components]
+== Task 4: Verify Pipeline Server Pods
+
+The pipeline server consists of several pods working together.
+
+1. Navigate to **Workloads** → **Pods**
+2. Ensure you're in the `ai-edge-project` namespace
+3. Identify pipeline-related pods:
+   * `ds-pipeline-<id>` - Main pipeline API server
+   * `ds-pipeline-persistenceagent-<id>` - Saves execution data
+   * `ds-pipeline-scheduledworkflow-<id>` - Handles scheduled runs
+   * `mariadb-<id>` - Database for pipeline metadata
+
+4. Click on `ds-pipeline-<id>` to view details:
+   * **Status**: Running
+   * **Containers**: API server container
+   * **Environment**: References to storage and database
+
+5. Click **Logs** tab to verify successful startup:
+   * Connection to object storage confirmed
+   * Connection to database confirmed
+   * No error messages in recent logs
+
+=== Verify
+
+Confirm all pipeline server pods are running:
+
+Expected pods in `ai-edge-project`:
+----
+NAME                                           READY   STATUS    RESTARTS   AGE
+ds-pipeline-xxxxx                              2/2     Running   0          5d
+ds-pipeline-persistenceagent-xxxxx             2/2     Running   0          5d
+ds-pipeline-scheduledworkflow-xxxxx            2/2     Running   0          5d
+mariadb-xxxxx                                  1/1     Running   0          5d
+----
+
+✓ **ds-pipeline** pod shows `2/2` ready and `Running` status
+✓ **ds-pipeline-persistenceagent** pod shows `2/2` ready
+✓ **ds-pipeline-scheduledworkflow** pod shows `2/2` ready
+✓ **mariadb** pod shows `1/1` ready
+✓ Logs show successful connections to storage and database
+✓ No error messages in recent logs
+
+[#understanding-pipeline-storage]
+== Understanding what pipelines store
+
+The `pipelines` bucket stores:
+
+* **Pipeline definitions** - Compiled workflow YAML files
+* **Execution artifacts** - Logs, metrics, intermediate outputs
+* **Model metrics** - Training accuracy, loss curves, validation scores
+* **Comparison data** - Performance comparisons between model versions
+
+This data enables:
+
+* **Reproducibility** - Re-run pipelines with identical parameters
+* **Debugging** - Analyze failed pipeline runs
+* **Metrics tracking** - Monitor model performance over time
+* **Audit trail** - Track all training and deployment activities
+
+[#summary]
+== Summary
+
+You have reviewed the pre-configured pipeline server in `ai-edge-project`:
+
+**✓ Pipeline Server Running** - Import pipeline button visible
+
+**✓ Dedicated Storage** - `pipeline-storage` connection to SNO's MinIO
+
+**✓ Database** - MariaDB for pipeline metadata
+
+**✓ API Server** - Orchestrates pipeline execution
+
+**✓ Scheduler** - Manages automated recurring runs
+
+**✓ Persistence** - Saves execution data for audit trail
+
+**Pipeline Server Architecture:**
+
+* **Vehicle-models storage** - Current models and training data on robots
+* **Pipeline storage** - Execution logs and artifacts on SNO
+* **Pipeline server** - Orchestrates automated ML workflows
+
+**What the Pipeline Server Provides:**
+
+* Automated model retraining every 10 minutes with fresh data
+* Model validation comparing new vs. existing models
+* Conditional deployment of improved models to robot storage
+* Complete audit trail of all training activities
+
+The pipeline server is the automation foundation for continuous model improvement.
+
+Navigate to link:./6-2_pipeline-execution.html[Module 5.2: Execute Retraining Pipeline].

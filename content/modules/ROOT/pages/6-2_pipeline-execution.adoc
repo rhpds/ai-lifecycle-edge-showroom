@@ -1,80 +1,227 @@
-= Pipelines execution
+= Module 5.2: Execute Retraining Pipeline
 
-Red Hat OpenShift AI gives the possibilities to create pipelines by dragging and connecting Notebooks using the Elyra extension. Another alternative, -and the one we will use- is by importing an existing pipeline in YAML format created using the KubeFlow Pipelines SDK. This programmatic platform uses Python to simplify the process of writing and building the pipeline.
+The retraining pipeline automates the complete model lifecycle: data collection → preprocessing → training → validation → conditional deployment. Execute the pipeline manually to understand the automated workflow.
 
-== Import Pipeline
+[#understanding-retraining-pipeline]
+== Understanding the retraining pipeline
 
-Once the server is set up, we will create a pipeline to fully automate the process. This pipeline will collect new data from the BMS application and use it to retrain a new model. The performance of this new model will then be compared against the existing one. If it outperforms the current model, it will be uploaded to the S3 bucket in MicroShift. This process will be repeated for both the Stress Detection and Time to Failure prediction models.
+The pipeline automates:
 
-In order to save some time we will import the pipeline instead of creating it manually. If you want to learn more about how to create pipelines, check the https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.18/html/openshift_ai_tutorial_-_fraud_detection_example/implementing-pipelines#create_a_pipeline[documentation].
+1. **Data Collection** - Retrieve fresh battery telemetry from InfluxDB on robots
+2. **Data Preparation** - Process and normalize data for training
+3. **Model Training** - Train Stress Detection and Time-to-Failure models in parallel
+4. **Model Validation** - Compare new models against existing models using test data
+5. **Conditional Deployment** - If new models outperform existing ones, upload to robot storage
 
-. First, open the *Jupyter Environment* with the Notebooks used to train the models and test the endpoints. 
-. In the folder structure on the left, navigate to the `notebooks` > `pipelines` folder and locate the *model-retraining.yaml* pipeline file. 
-. *Right-click* on it and select *Download*.
-+
-image::6-2_pipeline-download.png[Download pipeline file]
+This workflow ensures models stay accurate as robot battery behavior evolves.
 
-. Save the file locally in your laptop.
-. Now, go back to your *Red Hat OpenShift AI Dashboard*.
-. Make sure you are in the *Pipelines* tab inside our project.
-. Select *Import pipeline* and complete the form as follows:
- ** *Project*: The `ai-edge-project` project should be selected by default.
- ** *Pipeline name*: Name it as `Model retraining`.
- ** Verify that the *Upload a file* check is marked.
- ** Click the *Upload* button and select the `model-retraining.yaml` from your laptop.
-. When completed, press *Import pipeline*.
+[#import-pipeline]
+== Task 1: Import the Retraining Pipeline
 
-You should see the different pipeline nodes and steps displayed in a graphical way, like this:
+Instead of creating the pipeline from scratch, import a pre-built definition.
 
-image::6-2_pipeline-imported.png[Imported Pipeline]
+**Download Pipeline Definition:**
 
-== Run Pipeline
+1. Open the **JupyterLab** workbench (model-training)
+2. Navigate to `ai-lifecycle-edge-gitops/notebooks/pipelines/`
+3. Locate the `model-retraining.yaml` file
+4. **Right-click** on it, select **Download**
 
-To test the pipeline functionality, we will perform a first manual execution. Follow these steps:
+IMAGE_HERE: JupyterLab right-click context menu showing Download option for model-retraining.yaml
 
-. Once the pipeline is imported, click on the blue *Actions* button in the top-right corner.
-. Select *Create run* from the dropdown menu.
-. Configure the pipeline execution as follows:
- ** *Project*: Verify the `ai-edge-project` is selected.
- ** *Experiment*: Keep the `Default` one.
- ** *Name*: Type `First run`.
- ** *Pipeline*: `Model retraining` should be already selected.
- ** *Pipeline version*: `Model retraining` is pre-filled.
-. Now, check the following parameter values. You may need to change the InfluxDB URL based on your environment:
-+
-[cols="1,1", subs="attributes+"]
+5. Save the file to your laptop
+
+**Import Pipeline:**
+
+1. Switch to the **Red Hat OpenShift AI (RHOAI) Dashboard**
+2. Navigate to the **Pipelines** tab in `ai-edge-project`
+3. Click **Import pipeline**
+4. Fill in the form:
+   * **Project**: `ai-edge-project` (pre-selected)
+   * **Pipeline name**: `Model retraining`
+   * **Upload a file**: Ensure this option is checked
+   * Click **Upload**, select the `model-retraining.yaml` file from your laptop
+
+5. Click **Import pipeline**
+
+The pipeline graph displays, showing nodes and their connections.
+
+IMAGE_HERE: Pipeline graph view showing data retrieval, preparation, parallel training, validation, and deployment nodes
+
+=== Verify
+
+Confirm the pipeline was imported successfully:
+
+✓ Pipeline import completes without errors
+✓ `Model retraining` pipeline appears in Pipelines list
+✓ **Pipeline graph** displays with connected nodes
+✓ Graph shows expected stages (data retrieval, preparation, training, validation, deployment)
+✓ All nodes are properly connected with arrows
+
+[#create-pipeline-run]
+== Task 2: Create a Pipeline Run
+
+Execute the pipeline manually to test the automation workflow.
+
+1. Click the blue **Actions** button (top-right corner of pipeline graph)
+2. Select **Create run** from dropdown
+
+3. Configure the pipeline run:
+   * **Project**: `ai-edge-project` (verify selected)
+   * **Experiment**: `Default` (keep default)
+   * **Name**: `First run`
+   * **Pipeline**: `Model retraining` (pre-selected)
+   * **Pipeline version**: `Model retraining` (pre-filled)
+
+4. Review pipeline parameters (scroll down):
+
+[cols="2,3",options="header"]
 |===
 | Parameter | Value
 
-| aws_access_key_id
+| `aws_access_key_id`
 | `minio`
 
-| aws_s3_bucket
+| `aws_s3_bucket`
 | `inference`
 
-| aws_s3_endpoint
-| `http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
+| `aws_s3_endpoint`
+| `\http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
 
-| aws_secret_access_key
+| `aws_secret_access_key`
 | `minio123`
 
-| influxdb_bucket
+| `influxdb_bucket`
 | `bms`
 
-| influxdb_org
+| `influxdb_org`
 | `redhat`
 
-| influxdb_token
+| `influxdb_token`
 | `admin_token`
 
-| influxdb_url
-| `https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
+| `influxdb_url`
+| `\https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
 |===
 
-. When completed, click *Create run*.
+NOTE: Update `influxdb_url` if your environment uses a different domain.
 
-At this point, the pipeline will start executing. The first node retrieves data from InfluxDB in the vehicle, then the data is processed and prepared for model training. Next, the *Stress Detection* and *Time to Failure* models are trained in parallel. Once training is complete, the following node evaluates whether the new models outperform the existing ones in the vehicle using fresh data. If not, the models are discarded. However, if the new models show better performance, the final nodes are executed to upload them to the _inference_ bucket in MinIO on our autonomous vehicle.
+5. Click **Create run**
 
-When the execution finishes, all nodes will be marked with green checkmarks indicating a successful run, as shown in the image below:
+=== Verify
 
-image::6-2_pipeline-complete.png[Pipeline execution complete]
+Confirm the pipeline run was created:
+
+✓ **Create run** dialog accepts all parameters
+✓ Run name is set to `First run`
+✓ Pipeline parameters are correctly configured
+✓ Click **Create run** navigates to run execution page
+✓ Pipeline run begins executing immediately
+
+[#monitor-pipeline-execution]
+== Task 3: Monitor Pipeline Execution
+
+Watch the pipeline execute in real-time.
+
+**Pipeline Stages:**
+
+1. **Data Retrieval** - Fetches battery telemetry from InfluxDB on robots
+2. **Data Processing** - Prepares and normalizes data
+3. **Parallel Training** - Both models train simultaneously
+4. **Model Validation** - New models evaluated against existing models
+5. **Conditional Deployment** - If new models outperform, upload to MinIO
+
+**Node Status Colors:**
+
+* **Blue** - Currently executing
+* **Green checkmark** - Successfully completed
+* **Red X** - Failed (if any)
+
+Wait for all nodes to complete.
+
+IMAGE_HERE: Completed pipeline run with all nodes showing green checkmarks
+
+=== Verify
+
+Confirm you can monitor pipeline execution:
+
+✓ Pipeline graph shows live execution status
+✓ Currently executing nodes highlighted in **blue**
+✓ Completed nodes show **green checkmarks**
+✓ Node status updates in real-time
+✓ Can click individual nodes to view logs
+✓ Overall run status visible at top (Running → Succeeded)
+
+[#verify-pipeline-success]
+== Task 4: Verify Pipeline Success
+
+After execution completes, verify the pipeline ran successfully.
+
+=== Verify
+
+**Check Pipeline Status:**
+
+✓ All nodes show **green checkmarks** (successful completion)
+✓ No nodes show **red X** (failed status)
+✓ Pipeline run shows "Succeeded" status in the Runs tab
+✓ Run duration is reasonable (typically 5-15 minutes)
+
+**View Execution Logs:**
+
+✓ Can click any node in graph to view execution logs
+✓ Logs show detailed execution steps for that stage
+✓ No error messages in critical stages (training, validation, deployment)
+✓ Each stage reports successful completion
+
+**Check Model Deployment (if models improved):**
+
+If new models outperformed existing ones, verify they were uploaded to MinIO:
+
+1. Open MinIO dashboard: `https://minio-microshift-001.{openshift_cluster_ingress_domain}`
+2. Login: `minio` / `minio123`
+3. Navigate to `inference` bucket
+4. Check model files in `stress-detection/1/` and `time-to-failure/1/`
+
+✓ Model files (`model.xml`, `model.bin`) exist
+✓ File timestamps show recent updates (within last few minutes)
+✓ Both model directories updated if retraining improved both models
+✓ Deployment node in pipeline shows successful upload
+
+**If models did NOT improve:**
+- Deployment node may show "No deployment needed"
+- This is expected and correct behavior (keep existing better models)
+
+[#summary]
+== Summary
+
+You have successfully executed the automated model retraining pipeline:
+
+**✓ Pipeline Imported** - `Model retraining` definition loaded
+
+**✓ Manual Run** - Executed pipeline with test parameters
+
+**✓ All Stages Complete** - Data retrieval → training → validation → deployment
+
+**✓ Models Validated** - New models compared against existing models
+
+**✓ Conditional Deployment** - Improved models uploaded to robot storage (if better)
+
+**What You've Learned:**
+
+* Kubeflow Pipelines automate the complete ML workflow
+* Pipelines can be imported from YAML definitions
+* Parameters configure data sources and storage locations
+* Parallel execution trains multiple models simultaneously
+* Validation ensures only improved models are deployed
+* Pipeline runs provide complete audit trail with logs
+
+**The pipeline is now validated and ready for scheduled automation.**
+
+Every 10 minutes (when scheduled), this pipeline will:
+
+* Collect fresh data from robots
+* Train new models
+* Validate performance
+* Deploy improvements automatically
+
+Navigate to link:./6-3_pipeline-automation.html[Module 5.3: Schedule Pipeline Automation].

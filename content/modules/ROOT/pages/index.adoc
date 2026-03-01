@@ -1,58 +1,95 @@
 = {lab_name}
 
-== Lab overview
+Explore how AI and edge computing work together to solve real-world industrial automation challenges with Red Hat's edge and AI/ML platforms.
 
-This project showcases how the integration of AI and edge computing can effectively address specific customer use cases and fit seamlessly into various real-world scenarios. The demo will highlight the practical application of AI in resource-constrained environments, making it essential to use lightweight topologies and platforms such as Single Node OpenShift (SNO) and Red Hat Device Edge.
+[#about-this-lab]
+== About this workshop
 
-During the demo, we will develop a robust solution for the automotive industry, highlighting the importance of automation, as dedicated teams are not feasible at the edge. To address this challenge, our solution incorporates key components within Red Hat OpenShift AI to support the entire AI/ML lifecycle at the edge, including model training, data science pipelines, model serving, and model monitoring.
+This hands-on workshop demonstrates an end-to-end AI solution for battery health monitoring in factory transportation robots. You'll explore Red Hat Device Edge (MicroShift), Single Node OpenShift (SNO), and Red Hat OpenShift AI working together to enable intelligent automation at the edge.
 
-== Lab contents
+The lab covers pre-configured infrastructure, automated model training pipelines, model serving, and monitoring, demonstrating how AI models can continuously improve without manual intervention.
 
-To bring this demo to life, several technologies will be used and covered during this lab. Below is a summary of the materials that will be covered:
+This workshop is designed for **platform engineers, ML engineers, DevOps teams, and data scientists** working with:
 
-[width="100%",cols="6,^4,7",options="header"]
-|===
-| Chapter | Duration | Contents
+* AI/ML workloads at the edge with limited resources
+* Automated MLOps pipelines for continuous model improvement
+* Kubernetes-based edge infrastructure (MicroShift, Single Node OpenShift)
+* Red Hat OpenShift AI for the full ML lifecycle
+* IoT, industrial automation, or edge AI use cases
 
-| AI & Edge Use case | 10min 
-a|- Understanding our case
-- Essentials of Edge
-- Explore our design
+[#scenario]
+== The scenario
 
-| Dashboards Control Center | 1min 
-a|- Control center access
+An automotive parts distribution facility operates **18 battery-powered autonomous mobile robots (AMRs)** that transport components 24/7. Unexpected battery failures cause production delays, disrupted schedules, and safety risks.
 
-| Autonomous Vehicle | 15min 
-a|- Understand the vehicle infrastructure
-- Deplying MinIO storage and models
-- Deplying Inference servers
-- Deploying the Battery Monitoring System
+**The Solution:** AI-powered battery health monitoring
 
-| RHOAI configuration | 15min 
-a|- RHOAI installation
-- Datascience projects
-- DataConnections
+* **On each robot (MicroShift)** - Real-time telemetry collection, AI inference, alerting
+* **At the plant (SNO + RHOAI)** - Automated model retraining every 10 minutes with fresh data
 
-| Model Re-training | 15min 
-a|- Workbenches
-- Import Notebooks
-- Training our models
+[#lab-modules]
+== Lab modules
 
-| Model Serving | 10min 
-a|- Stress Detection serving
-- Time to Failure serving
-- Querying endpoints
+**link:./module-0.html[Introduction]** - Understand the challenge, solution architecture, and dashboards
 
-| Pipelines Automation | 5min 
-a|- Pipeline server
-- Pipelines execution
-- Pipelines scheduled automation
+**link:./2-1_vehicle-infrastructure.html[Module 1: Factory Transportation Robots]**
 
-| Model Monitoring | 5min 
-a|- TrustyAI
-- Bias detection
-- Data drift
+* 1.1 Robot Infrastructure Setup
+* 1.2 MinIO Storage Deployment
+* 1.3 Model Serving Deployment
+* 1.4 Battery Monitoring System Deployment
 
-| Battery Monitoring System | 15min 
-a|- Test alerting system
-|===
+**link:./3-1_rhoai-install.html[Module 2: RHOAI Configuration]**
+
+* 2.1 Review RHOAI Configuration
+* 2.2 Review DataScience Project
+* 2.3 Review DataConnection
+
+**link:./4-1_workbench.html[Module 3: Model Training]**
+
+* 3.1 Review Model Training Workbench
+* 3.2 Import Training Notebooks
+* 3.3 Train Battery Health Models
+
+**link:./5-1_stress-model-server.html[Module 4: Model Serving]**
+
+* 4.1 Review Stress Detection Server
+* 4.2 Review Time to Failure Server
+* 4.3 Query Model Endpoints
+
+**link:./6-1_pipeline-server.html[Module 5: Pipeline Automation]**
+
+* 5.1 Review Pipeline Server
+* 5.2 Execute Retraining Pipeline
+* 5.3 Schedule Pipeline Automation
+
+**link:./7-1_trustyai.html[Module 6: Model Monitoring]**
+
+* 6.1 Enable TrustyAI Monitoring
+
+[#what-you-will-learn]
+== What you will learn
+
+* Deploy AI/ML workloads on edge platforms (MicroShift, SNO)
+* Use Red Hat OpenShift AI components (workbenches, model serving, pipelines, monitoring)
+* Implement automated MLOps workflows for continuous model improvement
+* Configure model serving architectures for edge inference
+* Enable pipeline automation for hands-off model retraining
+* Set up model monitoring with TrustyAI
+
+[#prerequisites]
+== Prerequisites
+
+* Basic Kubernetes/OpenShift concepts
+* Python and Jupyter notebooks
+* Basic machine learning concepts
+* Command-line tools (ssh, oc)
+
+NOTE: All infrastructure is pre-configured. You'll review configurations and execute hands-on tasks to understand the complete AI lifecycle.
+
+[#get-started]
+== Get started
+
+Begin by exploring the challenge, solution architecture, and available dashboards:
+
+**Navigate to link:./module-0.html[Introduction] to start the workshop.**

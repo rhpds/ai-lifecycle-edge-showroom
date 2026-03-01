@@ -1,23 +1,223 @@
-= Create a Model Serving platform
+= Module 4.2: Review Time to Failure Server
 
-It's time to repeat the same steps for the Time to Failure AI model. The steps will be quite similar, but make sure you specify the right path to our second model.
+The Time to Failure server predicts the remaining operational life of robot batteries. Like the Stress Detection server, it validates newly trained models before deployment.
 
-== Time to Failure model
+[#review-ttf-server]
+== Task 1: Review the Time to Failure Model Server
 
-. Ensure you are in the *Models* tab inside our `ai-edge-project` project.
-. Click on *Deploy model*.
-. Complete again the following fields in the form:
- ** *Project*: The `ai-edge-project` namespace should be already selected by default.
- ** *Model deployment name*: Name for the `Time to Failure` model server.
- ** *Serving runtime*: Choose `OpenVINO Model Server` runtime.
- ** *Model framework*: Our model was saved in `openvino_ir - opset13` format.
- ** *Model server replicas*: Keep `1` for the number of pods.
- ** *Model server size*: Assign `Small` to the server size.
- ** *Check* the *Existing data connection* box.
-** *Connection*: Select again the `vehicle-models` DataConnection.
-** *Path*: Our Time to Failure model was saved in `time-to-failure`.
-. Finally, click on *Deploy*.
+1. In the **RHOAI Dashboard**, navigate to the `ai-edge-project` project
+2. Go to the **Models** tab
+3. Locate: `Time to Failure` (alongside Stress Detection)
 
-Wait until you see a *green checkmark* in the Status column. Then, the *Internal endpoint details* will show the model inference API for our second AI model.
+IMAGE_HERE: Models tab showing both Stress Detection and Time to Failure deployments with green checkmarks
 
-image::5-2_time-to-failure.png[Time to Failure inference endpoint]
+Review model server details:
+
+* **Name**: Time to Failure
+* **Serving runtime**: OpenVINO Model Server
+* **Status**: Green checkmark (deployed and ready)
+
+=== Verify
+
+Confirm the Time to Failure model server exists:
+
+✓ **Models** tab shows both Stress Detection and Time to Failure
+✓ `Time to Failure` deployment has green checkmark status
+✓ Both servers use OpenVINO Model Server runtime
+✓ Both servers are deployed and ready
+
+[#understand-ttf-configuration]
+== Task 2: Understand Configuration
+
+Click on `Time to Failure` to view details:
+
+* **Project**: `ai-edge-project`
+* **Model deployment name**: `Time to Failure`
+* **Serving runtime**: `OpenVINO Model Server` (same as Stress Detection)
+* **Model framework**: `openvino_ir - opset13` (same format)
+* **Model server replicas**: `1`
+* **Model server size**: `Small`
+* **Connection**: `vehicle-models` (same DataConnection)
+* **Path**: `time-to-failure` (different model location)
+
+Both models use the same runtime and connection but point to different paths in MinIO. This keeps models organized and allows independent versioning.
+
+=== Verify
+
+Confirm TTF model server configuration:
+
+✓ **Model deployment name**: `Time to Failure`
+✓ **Serving runtime**: `OpenVINO Model Server` (same as Stress Detection)
+✓ **Model framework**: `openvino_ir - opset13`
+✓ **Connection**: `vehicle-models` (shared with Stress Detection)
+✓ **Path**: `time-to-failure` (different from Stress Detection)
+✓ **Replicas**: `1`, **Size**: `Small` (identical to Stress Detection)
+
+[#compare-model-servers]
+== Comparing the two model servers
+
+[cols="2,3,3",options="header"]
+|===
+| Aspect | Stress Detection | Time to Failure
+
+| **Purpose**
+| Detect current battery stress
+| Predict remaining battery life
+
+| **Input Data**
+| Real-time telemetry (9 features)
+| Historical performance trends (5 features)
+
+| **Output**
+| Stress score (0-1)
+| Estimated hours until failure
+
+| **Model Path**
+| `stress-detection`
+| `time-to-failure`
+
+| **Serving Runtime**
+| OpenVINO Model Server
+| OpenVINO Model Server
+
+| **Use Case**
+| Alert on immediate risks
+| Plan preventive maintenance
+|===
+
+[#review-ttf-endpoint]
+== Task 3: Review the Model Endpoint
+
+In the Time to Failure details, locate **Internal endpoint details**.
+
+The endpoint format:
+
+[source,text]
+----
+http://time-to-failure-<namespace>.svc.cluster.local/v2/models/time-to-failure/infer
+----
+
+Applications can call both endpoints to get comprehensive battery health insights:
+
+* **Stress Detection** - Is the battery currently under stress?
+* **Time to Failure** - How much longer will the battery last?
+
+=== Verify
+
+Confirm the TTF inference endpoint:
+
+Expected endpoint format:
+----
+http://time-to-failure-ai-edge-project.svc.cluster.local/v2/models/time-to-failure/infer
+----
+
+✓ TTF endpoint URL is displayed in RHOAI Dashboard
+✓ Format follows KServe v2 protocol
+✓ Endpoint name includes `time-to-failure` model identifier
+✓ Accessible from same namespace as Stress Detection
+
+[#review-ttf-inferenceservice]
+== Task 4: Review InferenceService
+
+Switch to the **OpenShift Web Console**.
+
+1. Navigate to **Search** → **Resources** dropdown
+2. Select `InferenceService`
+3. Ensure you're in the `ai-edge-project` namespace
+4. Find the `time-to-failure` InferenceService
+5. Click to view the YAML
+
+The configuration:
+
+* References the same OpenVINO ServingRuntime
+* Specifies `time-to-failure` path in vehicle-models storage
+* Identical resource allocation as Stress Detection
+* Configured for RawDeployment mode (1 replica, no auto-scaling)
+
+=== Verify
+
+Confirm TTF InferenceService exists:
+
+✓ `InferenceService` named `time-to-failure` exists in `ai-edge-project`
+✓ References the same OpenVINO ServingRuntime as Stress Detection
+✓ Specifies `time-to-failure` path in `vehicle-models` storage
+✓ Resource allocation matches Stress Detection (Small size, 1 replica)
+✓ RawDeployment mode configured (no auto-scaling)
+
+[#verify-ttf-pod]
+== Task 5: Verify Model Server Pod
+
+1. Navigate to **Workloads** → **Pods**
+2. Find the pod containing `time-to-failure` (e.g., `time-to-failure-predictor-xxxxx`)
+3. Click to view details:
+   * **Status**: Running
+   * **Containers**: OpenVINO model server
+   * **Resources**: Small size allocation
+
+4. Click the **Logs** tab
+5. Verify successful model loading:
+   * Model initialization messages
+   * Server ready confirmation
+   * No error messages
+
+=== Verify
+
+Confirm the TTF model server pod is operational:
+
+**Expected pod:**
+----
+NAME                                         READY   STATUS    RESTARTS   AGE
+time-to-failure-predictor-xxxxx-xxxxx        2/2     Running   0          5d
+----
+
+✓ Pod shows `2/2` ready
+✓ **Status** shows `Running`
+✓ **Logs** show successful model loading
+✓ No error messages in logs
+✓ Server ready to serve inference requests
+
+**Expected log messages:**
+- "Model loaded successfully from time-to-failure/1/"
+- "Server listening on port 8080"
+- "Ready to accept inference requests"
+
+[#summary]
+== Summary: Module 4 Complete (Models Review)
+
+You have reviewed both model serving deployments for battery health monitoring:
+
+**Module 4.1 - Stress Detection Server:**
+
+* ✓ Reviewed model server configuration
+* ✓ Understood OpenVINO serving runtime
+* ✓ Verified inference endpoint
+* ✓ Examined custom resources (ServingRuntime, InferenceService)
+* ✓ Confirmed pod operational status
+
+**Module 4.2 - Time to Failure Server:**
+
+* ✓ Reviewed TTF model server configuration
+* ✓ Compared with Stress Detection server
+* ✓ Verified separate model path in storage
+* ✓ Confirmed inference endpoint availability
+* ✓ Verified pod logs show successful loading
+
+**What You've Learned:**
+
+* Model servers load models from MinIO automatically via DataConnections
+* OpenVINO Model Server provides optimized inference for edge deployments
+* RawDeployment mode offers predictable resources without auto-scaling
+* Multiple models can share the same ServingRuntime with different paths
+* ServingRuntime and InferenceService CRs define the serving architecture
+* Model servers on SNO validate models before robot deployment
+
+**Together, the two model servers provide:**
+
+* **Real-time alerts** - Stress Detection identifies immediate battery risks
+* **Predictive maintenance** - Time to Failure enables proactive scheduling
+* **Validation platform** - Test newly trained models before edge deployment
+* **Operational efficiency** - Prevent unexpected robot downtime
+
+Next, you'll learn how to query these model endpoints to perform inference and validate predictions.
+
+Navigate to link:./5-3_query-endpoints.html[Module 4.3: Query Model Endpoints].

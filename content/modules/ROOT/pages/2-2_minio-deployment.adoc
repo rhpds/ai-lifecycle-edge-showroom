@@ -1,21 +1,21 @@
-= Deploying MinIO Storage
+= Module 1.2: MinIO Storage Deployment
 
-In this section, we will deploy MinIO storage as the first component within our autonomous vehicle. MinIO will serve as our object storage solution, providing the *inference* bucket, that is used to store the AI models used for battery monitoring - initially base models that we provide, and later the retrained models from our SNO instance. Inside this bucket we have two different folders:
+MinIO provides S3-compatible object storage for AI models on the factory robot. The `inference` bucket stores two AI models: **Stress Detection** (identifies battery stress conditions) and **Time to Failure** (predicts remaining battery life).
 
-* *stress-detection*: Stores the AI model used to detect stress conditions in the battery. The base model that will be deployed when the MinIO instance is created comes in an OpenVINO IR format, consisting in two different files (_.xml_ and _.bin_) in the `/stress-detection/1/` path.
-* *time-to-failure*: Stores the AI model used to generate time-to-failure predictions. The base model that will be deployed when the MinIO instance is created comes in an OpenVINO IR format, consisting in two different files (_.xml_ and _.bin_) in the `/time-to-failure/1/` path.
+Both models are stored in OpenVINO IR format (`.xml` and `.bin` files) in versioned directories:
 
-== Deploying MinIO using GitOps
+* `/stress-detection/1/` - Stress Detection model v1
+* `/time-to-failure/1/` - Time to Failure model v1
 
-We will use GitOps to deploy MinIO in our autonomous vehicle. GitOps is the preferred method for deploying workloads at the edge, as it provides version control over what's running on the vehicle and ensures alignment between the repository code and the deployed components.
+[#deploy-minio-gitops]
+== Task 1: Deploy MinIO using GitOps
 
-The first step is to create a GitOps application project that will group all the resources we deploy in this demo.
+GitOps automates deployment and ensures consistency across edge devices. Changes to the Git repository automatically sync to the robot.
 
-=== Step 1: Create GitOps Application Project
+=== Create GitOps application project
 
-Create the following GitOps application project by applying this configuration:
+Create the default project for GitOps applications:
 
-[.console-input]
 [source,yaml]
 ----
 oc apply -f - <<EOF
@@ -36,13 +36,10 @@ spec:
 EOF
 ----
 
-=== Step 2: Create GitOps Application
+=== Create MinIO GitOps Application
 
-Now that we have the project, we will create our GitOps Application that will be responsible for checking the files in our GitOps repository and deploying the different components necessary for MinIO.
+Deploy MinIO by creating a GitOps Application:
 
-Apply the GitOps Application:
-
-[.console-input]
 [source,yaml]
 ----
 oc apply -f - <<EOF
@@ -53,14 +50,11 @@ metadata:
   namespace: openshift-gitops
 spec:
   destination:
-    name: ''
-    namespace: ''
     server: https://kubernetes.default.svc
   source:
     path: bootstrap/minio-microshift/groups/dev
     repoURL: https://github.com/rhpds/ai-lifecycle-edge-gitops.git
     targetRevision: main
-  sources: []
   project: default
   syncPolicy:
     automated:
@@ -69,47 +63,123 @@ spec:
 EOF
 ----
 
-The GitOps Application will deploy the following components for MinIO storage:
+This deploys:
 
-* *Namespace*: A dedicated _minio_ namespace that will contain all MinIO-related resources, providing isolation and organization for our storage components.
-* *Deployment*: The MinIO application deployment that runs the MinIO server instance, configured to provide object storage capabilities for our autonomous vehicle.
-* *Service and Route*: A Kubernetes service and route that expose the MinIO dashboard, allowing us to access and manage the storage through a web interface.
-* *Persistent Volume Claim (PVC)*: Provides persistent storage space that will be used by the MinIO bucket to store both AI models.
-* *Bucket Creation Script*: An initialization script that automatically creates the required _inference_ bucket.
-* *Model Download Script*: A script that downloads and stores our two baseline AI models from the GitHub repository:
-  - Stress-detection model for identifying battery stress conditions
-  - Time-to-failure model for predicting remaining battery life
+* **Namespace** - `minio` namespace for isolation
+* **Deployment** - MinIO server instance
+* **Service & Route** - Web dashboard access
+* **PersistentVolumeClaim** - Storage for model files
+* **Bucket creation** - Automatically creates `inference` bucket
+* **Model download** - Downloads baseline Stress Detection and Time to Failure models from GitHub
 
-To verify that the deployment is progressing correctly, you can monitor the status of the pods:
+=== Verify
 
-[.console-input]
-[source,bash,subs="attributes+"]
+Confirm the GitOps Application was created:
+
+[source,bash]
+----
+oc get application -n openshift-gitops minio-microshift
+----
+
+Expected output:
+----
+NAME               SYNC STATUS   HEALTH STATUS
+minio-microshift   Synced        Healthy
+----
+
+✓ Application exists in `openshift-gitops` namespace
+✓ Sync status shows `Synced`
+✓ Health status shows `Healthy` (may take 1-2 minutes)
+
+[#monitor-deployment]
+== Task 2: Monitor MinIO Deployment
+
+Watch the deployment progress:
+
+[source,bash]
 ----
 watch oc get pods -n minio
 ----
 
-[NOTE]
-====
-_You can exit the watch command by pressing *Ctrl+C* in your keyboard._
-====
+Press `Ctrl+C` to exit when pods show `Running` and `Completed` status.
 
-When the pods show `Running` and `Completed` status, it means that MinIO has been successfully deployed and is ready to use.
+=== Verify
 
-=== Step 3: Access MinIO Dashboard
+Check pod status:
 
-Once the deployment is complete, you can access the MinIO dashboard through your web browser:
+[source,bash]
+----
+oc get pods -n minio
+----
 
-[.console-input]
+Expected output:
+----
+NAME                                READY   STATUS      RESTARTS   AGE
+create-bucket-job-xxxxx             0/1     Completed   0          2m
+download-models-job-xxxxx           0/1     Completed   0          2m
+minio-xxxxx-xxxxx                   1/1     Running     0          2m
+----
+
+✓ `minio` pod shows `Running` with `1/1` ready
+✓ `create-bucket-job` shows `Completed` status
+✓ `download-models-job` shows `Completed` status
+
+[#access-minio-dashboard]
+== Task 3: Access MinIO Dashboard
+
+Once deployed, access the MinIO web console:
+
 [source,bash,subs="attributes+"]
 ----
 https://minio-microshift-001.{openshift_cluster_ingress_domain}
 ----
 
-Use the following credentials to log in:
+**Credentials:**
 
-* *Username*: `minio`
-* *Password*: `minio123`
+* Username: `minio`
+* Password: `minio123`
 
-The dashboard will allow you to verify that the _inference_ bucket has been created and that the baseline AI models have been properly downloaded and stored. Check if the _inference_ bucket contains two folders: one containing the base Stress-Detection model and the other containing the Time-to-Failure initial model.
+Verify the `inference` bucket contains two directories:
 
-image::2-2_minio-inference.png[MinIO inference models]
+* `stress-detection/1/` - Baseline Stress Detection model files (`.xml`, `.bin`)
+* `time-to-failure/1/` - Baseline Time to Failure model files (`.xml`, `.bin`)
+
+IMAGE_HERE: MinIO dashboard showing inference bucket with model directories
+
+=== Verify
+
+Navigate through the MinIO dashboard:
+
+1. Click on the **inference** bucket
+2. Verify you see two folders: `stress-detection/` and `time-to-failure/`
+3. Click into `stress-detection/1/` - verify you see `.xml` and `.bin` files
+4. Go back and click into `time-to-failure/1/` - verify you see `.xml` and `.bin` files
+
+Expected files in each model directory:
+----
+stress-detection/1/
+  ├── model.xml          (OpenVINO model definition)
+  └── model.bin          (OpenVINO model weights)
+
+time-to-failure/1/
+  ├── model.xml
+  └── model.bin
+----
+
+✓ `inference` bucket exists
+✓ Both model directories present
+✓ Each directory contains `.xml` and `.bin` files
+
+[#summary]
+== Summary
+
+You have successfully deployed MinIO object storage on the factory robot using GitOps. The storage provides:
+
+* **S3-compatible API** - Standard object storage interface
+* **Inference bucket** - Contains AI models for battery monitoring
+* **Baseline models** - Two pre-loaded models ready for serving
+* **Automated management** - GitOps ensures configuration consistency
+
+The models are now ready to be loaded by the inference server.
+
+Navigate to link:./2-3_inference-deployment.html[Module 1.3: Model Serving Deployment].

@@ -1,4 +1,4 @@
-= Dashboards Control Center
+= Dashboards control center
 
 Welcome to the *Dashboard Control Center* - your central hub for accessing, monitoring, and managing all the dashboards involved in this demo. Some of them will be deployed along the way and cannot be accessed yet, but you can always come back here to quickly find the URLs and credentials you need.
 
@@ -7,11 +7,11 @@ Welcome to the *Dashboard Control Center* - your central hub for accessing, moni
 _This section is provided for your convenience, allowing quick access to any dashboard or machine you may need. However, all the necessary steps will be provided throughout the demo, so feel free to proceed to the next section._
 ====
 
-== Autonomous Vehicle Access
+== Autonomous vehicle access
 
 To access the autonomous vehicle's infrastructure, you need to connect through the bastion host first, and then access the MicroShift virtual machine.
 
-=== Bastion Host Connection
+=== Bastion host connection
 
 [.console-input]
 [source,bash,subs="attributes+"]
@@ -25,7 +25,7 @@ To access the autonomous vehicle's infrastructure, you need to connect through t
 | *Password* | `{bastion_ssh_password}`
 |===
 
-=== Vehicle Virtual Machine
+=== Vehicle virtual machine
 
 Once connected to the bastion, access the autonomous vehicle:
 
@@ -35,11 +35,11 @@ Once connected to the bastion, access the autonomous vehicle:
 virtctl ssh cloud-user@microshift.microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
 
-== Vehicle Dashboards
+== Vehicle dashboards
 
 These dashboards provide visibility into the autonomous vehicle's systems running on MicroShift.
 
-=== MinIO Storage Dashboard
+=== MinIO storage dashboard
 
 Object storage containing the AI models used for battery monitoring inference.
 
@@ -56,7 +56,7 @@ https://minio-microshift-001.{openshift_cluster_ingress_domain}
 | *Password* | `minio123`
 |===
 
-=== Battery Monitoring System Dashboard
+=== Battery monitoring system dashboard
 
 Real-time telemetry data, AI predictions for stress detection, and time-to-failure alerts.
 
@@ -66,7 +66,7 @@ Real-time telemetry data, AI predictions for stress detection, and time-to-failu
 https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
 ----
 
-=== InfluxDB Dashboard
+=== InfluxDB dashboard
 
 Time-series database storing historical sensor data from the battery simulator.
 
@@ -83,11 +83,11 @@ https://influx-db-microshift-001.{openshift_cluster_ingress_domain}
 | *Password* | `password`
 |===
 
-== Re-Training Node Consoles
+== Re-training node consoles
 
 These consoles provide access to the Single Node OpenShift (SNO) instance where AI model re-training takes place.
 
-=== OpenShift Web Console
+=== OpenShift web console
 
 Central management console for the SNO cluster.
 
@@ -104,9 +104,9 @@ Central management console for the SNO cluster.
 | *Password* | `{openshift_cluster_admin_password}`
 |===
 
-=== Red Hat OpenShift AI Dashboard
+=== Red Hat OpenShift AI dashboard
 
-AI/ML platform for model training, serving, and pipeline automation. 
+AI/ML platform for model training, serving, and pipeline automation.
 
 [.console-input]
 [source,bash,subs="attributes+"]
@@ -121,7 +121,7 @@ https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domai
 | *Password* | `{openshift_cluster_admin_password}`
 |===
 
-=== MinIO Storage Dashboard
+=== MinIO storage dashboard
 
 Object storage containing the bucket needed to store pipeline artifacts.
 

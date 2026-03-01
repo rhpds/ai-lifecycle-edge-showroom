@@ -1,27 +1,191 @@
-= Create a workbench
+= Module 3.1: Review Model Training Workbench
 
-Inside the new project, we can create different components. One of them, and probably the most important one when it comes to model training, will be the Workbench. A workbench is a containerized workspace that operates within a pod and contains a collection of different AI/ML libraries and a JupyterLab server.
+A workbench is a containerized JupyterLab environment with pre-installed AI/ML frameworks. The `model-training` workbench provides everything needed to develop and train battery health prediction models.
 
-. There are different tabs inside our project page. Click on *Workbenches*.
-. On there, select the *Create workbench* button to open the configuration window.
-+
-image::4-1_create-workbench.png[Create Workbench]
+[#understanding-workbenches]
+== Understanding workbenches
 
-. Complete the fields as follows. You will see that there are plenty of different configurations depending on your model and environment specifications:
- ** *Name*: Type your preferred name. I will use `model-training`.
- ** *Image selection*: the election will depend on the model requirements. Click on View package information to see the packages included. Our model will use `Jupyter | TensorFlow | CUDA | Python 3.12`.
- ** *Version selection*: The recommendation is to use the latest package versions. That will be the `2025.2` version.
- ** *Container size*: we can select the resources assigned depending on our hardware: number of CPUs, memory, and request capacity of the container. In this case, the `Small` size is enough.
- ** Make sure a persisten volume called `model-training-storage` is going to be created with `20GB`.
- ** Under connections, select *Attach existing connections*. Verify that the `vehicle-models` connection is selected and click *Attach*.
-. Review your configuration and press *Create workbench*. This last step will trigger the workbench creation.
-. You will be automatically redirected to another page where you can track the workbench deployment process. Wait until the _Status_ shows *Running* and click *model-training*.
-+
-image::4-1_workbench.png[Workbench status]
+Workbenches provide:
 
-. A new tab will open. Enter again your OpenShift credentials to authenticate to the workbench's JupyterLab platform.
-+
-* *User*: {openshift_cluster_admin_username}
-* *Password*: {openshift_cluster_admin_password}
+* **JupyterLab** - Interactive development environment
+* **Pre-installed frameworks** - TensorFlow, PyTorch, scikit-learn, etc.
+* **Data connections** - Direct access to robot storage via `vehicle-models`
+* **Persistent storage** - Notebooks and datasets survive pod restarts
+* **GPU support** - When available for training acceleration
 
-image::4-1_jupyterlab.png[JupyterLab landing page]
+[#review-workbench-configuration]
+== Task 1: Review the Workbench Configuration
+
+1. In the **RHOAI Dashboard**, navigate to the `ai-edge-project` project
+2. Click the **Workbenches** tab
+3. Locate the existing workbench: `model-training`
+
+IMAGE_HERE: Workbenches tab showing model-training workbench with Running status
+
+Review the workbench details:
+
+* **Name**: `model-training`
+* **Image**: Jupyter | TensorFlow | CUDA | Python 3.12
+* **Container size**: Small (sufficient for edge-optimized models)
+* **Status**: Running (green checkmark)
+
+=== Verify
+
+Confirm the workbench exists and is running:
+
+✓ **Workbenches** tab shows `model-training` workbench
+✓ **Status** shows green checkmark with "Running"
+✓ **Image** shows "Jupyter | TensorFlow | CUDA | Python 3.12"
+✓ **Open** button is available (workbench is accessible)
+
+[#understand-workbench-configuration]
+== Task 2: Understand Configuration Choices
+
+**Image Selection:**
+
+The `Jupyter | TensorFlow | CUDA | Python 3.12` image includes:
+
+* **TensorFlow** - Neural network framework for training models
+* **CUDA support** - GPU acceleration (if hardware available)
+* **Python 3.12** - Latest Python with data science libraries (NumPy, Pandas, Matplotlib)
+* **JupyterLab** - Interactive notebook interface
+
+TIP: Click **View package information** next to any image to see the complete list of pre-installed packages.
+
+**Persistent Storage:**
+
+The workbench has a persistent volume: `model-training-storage` (20GB)
+
+This storage persists:
+
+* Jupyter notebooks
+* Training datasets
+* Model checkpoints
+* Experiment results
+
+NOTE: Even if the workbench pod restarts, all data remains intact.
+
+**Data Connection:**
+
+Expand the **Connections** section. Verify `vehicle-models` is attached.
+
+This connection enables:
+
+* Reading training data from robot's MinIO
+* Accessing existing model files
+* Saving retrained models back to robot storage
+
+=== Verify
+
+Confirm workbench configuration details:
+
+✓ **Image** includes TensorFlow, CUDA support, Python 3.12
+✓ **Persistent Storage** shows `model-training-storage` (20GB)
+✓ **Connections** section shows `vehicle-models` attached
+✓ All required components for training are configured
+
+[#review-workbench-openshift]
+== Task 3: Review Workbench Resources in OpenShift
+
+Switch to the **OpenShift Web Console** to examine underlying resources.
+
+**Workbench Pod:**
+
+1. Navigate to **Workloads** → **Pods**
+2. Ensure you're in the `ai-edge-project` namespace
+3. Find the pod starting with `model-training` (e.g., `model-training-0`)
+4. Click the pod to view details:
+   * **Status**: Running
+   * **Containers**: Jupyter notebook server
+   * **Volumes**: `model-training-storage` PVC mounted
+   * **Environment**: Variables from `vehicle-models` connection
+
+**Persistent Storage:**
+
+1. Navigate to **Storage** → **PersistentVolumeClaims**
+2. Find and click `model-training-storage`
+3. Review PVC details:
+   * **Capacity**: 20GB
+   * **Access mode**: ReadWriteOnce
+   * **Status**: Bound
+
+=== Verify
+
+Confirm underlying Kubernetes resources exist:
+
+**Expected pod:**
+----
+NAME                  READY   STATUS    RESTARTS   AGE
+model-training-0      2/2     Running   0          5d
+----
+
+**Expected PVC:**
+----
+NAME                      STATUS   VOLUME                 CAPACITY   ACCESS MODES
+model-training-storage    Bound    pvc-xxxxx-xxxxx        20Gi       RWO
+----
+
+✓ Workbench pod shows `2/2` ready and `Running` status
+✓ PVC shows `Bound` status with 20GB capacity
+✓ Pod has environment variables from `vehicle-models` connection
+✓ Storage volume is mounted to pod
+
+[#access-jupyterlab]
+== Task 4: Access the JupyterLab Environment
+
+1. Return to the **RHOAI Dashboard**
+2. In the **Workbenches** tab, ensure `model-training` status shows **Running**
+3. Click **Open** next to the workbench name
+
+4. A new tab opens. Authenticate with OpenShift credentials:
+   * Username: `{openshift_cluster_admin_username}`
+   * Password: `{openshift_cluster_admin_password}`
+
+5. If prompted, click **Allow selected permissions**
+
+6. The JupyterLab interface loads
+
+IMAGE_HERE: JupyterLab landing page showing file browser, launcher, and menu bar
+
+Explore the JupyterLab interface:
+
+* **File browser** (left sidebar) - Browse notebooks and files
+* **Launcher** tab - Create notebooks, terminals, or text files
+* **Menu bar** - File operations, kernels, and settings
+
+=== Verify
+
+Confirm JupyterLab is accessible and functional:
+
+✓ JupyterLab interface loads in new browser tab
+✓ Authentication succeeds with OpenShift credentials
+✓ **File browser** is visible on left sidebar
+✓ **Launcher** tab shows available notebook kernels (Python 3)
+✓ **Menu bar** displays File, Edit, View, Run, Kernel options
+✓ You can create new notebooks and terminals
+
+[#summary]
+== Summary
+
+You have reviewed the `model-training` workbench configured for battery health model development:
+
+**✓ Workbench Configuration** - TensorFlow image with Python 3.12
+
+**✓ Persistent Storage** - 20GB volume for notebooks and data
+
+**✓ Data Connection** - Access to robot's MinIO via `vehicle-models`
+
+**✓ JupyterLab Access** - Interactive development environment ready
+
+**✓ Resource Verification** - Pod and storage confirmed in OpenShift
+
+**What the Workbench Provides:**
+
+* Pre-configured environment for TensorFlow model training
+* Persistent workspace for iterative development
+* Direct access to robot storage for data and models
+* All tools needed for the AI/ML development lifecycle
+
+The workbench is ready for importing and executing training notebooks.
+
+Navigate to link:./4-2_importing-notebooks.html[Module 3.2: Import Training Notebooks].
