@@ -23,6 +23,7 @@ ui:
 
 runtime:
   cache_dir: ./.cache/antora
+  fetch: true
 
 antora:
   extensions:

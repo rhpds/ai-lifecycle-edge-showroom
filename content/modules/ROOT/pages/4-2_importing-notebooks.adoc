@@ -1,9 +1,18 @@
-= Module 3.2: Import Training Notebooks
+= Module 3.2: Import training notebooks
 
 Pre-built Jupyter notebooks contain all the code for training Stress Detection and Time-to-Failure models. Import them from a GitHub repository to accelerate development.
 
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Clone a Git repository within JupyterLab using the Git extension
+* Navigate repository contents and locate training notebooks
+* Understand the structure of ML training repositories
+* Identify notebooks for data retrieval, preprocessing, and model training
+
 [#clone-repository]
-== Task 1: Clone the Training Repository
+== Exercise 1: Clone the training repository
 
 In JupyterLab, clone the repository containing training notebooks:
 
@@ -36,7 +45,7 @@ Confirm the repository was cloned successfully:
 ✓ Git icon in sidebar shows repository status
 
 [#explore-repository-contents]
-== Task 2: Explore Repository Contents
+== Exercise 2: Explore repository contents
 
 The cloned repository contains:
 
@@ -84,4 +93,4 @@ You have imported the training repository into your JupyterLab workbench:
 
 The notebooks are ready to execute. You'll run them sequentially to train both battery health prediction models using data collected from the factory transportation robots.
 
-Navigate to link:./4-3_running-notebooks.html[Module 3.3: Train Battery Health Models].
+Navigate to xref:4-3_running-notebooks.adoc[Module 3.3: Train battery health models].

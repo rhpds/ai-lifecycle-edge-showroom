@@ -1,6 +1,15 @@
-= Module 4.3: Query Model Endpoints
+= Module 4.3: Query model endpoints
 
 Test the model inference endpoints to verify they respond correctly to prediction requests. You'll use a Jupyter notebook to send test data and receive predictions.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Understand KServe v2 REST API inference protocol
+* Query Stress Detection and Time-to-Failure endpoints with test data
+* Interpret model prediction responses (stress scores and time estimates)
+* Verify both model endpoints are operational using Jupyter notebooks
 
 [#understanding-inference-requests]
 == Understanding inference POST requests
@@ -64,7 +73,7 @@ For Stress Detection: values > 0.5 indicate STRESSED, ≤ 0.5 indicate NORMAL
 For Time to Failure: value represents predicted hours until battery failure
 
 [#access-query-notebook]
-== Task 1: Access the Query Notebook
+== Exercise 1: Access the query notebook
 
 1. Return to the **JupyterLab** environment (model-training workbench)
 2. Navigate to `ai-lifecycle-edge-gitops/notebooks/serving/`
@@ -82,7 +91,7 @@ Confirm the query notebook is accessible:
 ✓ Notebook opens successfully with Python kernel
 
 [#query-stress-detection]
-== Task 2: Query Stress Detection Model
+== Exercise 2: Query Stress Detection model
 
 The notebook contains code to test the Stress Detection endpoint.
 
@@ -124,7 +133,7 @@ Status: STRESSED ⚠️
 ----
 
 [#query-time-to-failure]
-== Task 3: Query Time to Failure Model
+== Exercise 3: Query Time to Failure model
 
 Scroll down in the notebook to the Time to Failure section.
 
@@ -163,7 +172,7 @@ Battery should be replaced within: 1.8 days
 ----
 
 [#verify-both-models]
-== Task 4: Verify Both Models Respond
+== Exercise 4: Verify both models respond
 
 After executing all cells in the notebook, confirm:
 
@@ -224,4 +233,4 @@ You have successfully reviewed and tested the model serving infrastructure:
 
 Next, you'll explore the automated pipeline system that retrains models every 10 minutes using fresh data from the robot fleet.
 
-Navigate to link:./6-1_pipeline-server.html[Module 5.1: Review Pipeline Server].
+Navigate to xref:6-1_pipeline-server.adoc[Module 5.1: Review pipeline server].

@@ -1,6 +1,15 @@
-= Module 2.3: Review DataConnection
+= Module 2.3: Review data connection
 
 DataConnections link Red Hat OpenShift AI (RHOAI) to external object storage. The `vehicle-models` connection provides access to the robot's MinIO storage where AI models and training data are stored.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Understand how DataConnections link RHOAI to external storage
+* Review the `vehicle-models` S3 connection configuration
+* Verify the underlying Kubernetes Secret containing S3 credentials
+* Explain how connections bridge SNO training environment and robot storage
 
 [#understanding-dataconnections]
 == Understanding DataConnections
@@ -14,7 +23,7 @@ DataConnections are stored as OpenShift Secrets containing S3 credentials. They 
 The connection bridges the SNO training environment and robot's edge storage.
 
 [#review-vehicle-models]
-== Task 1: Review the vehicle-models DataConnection
+== Exercise 1: Review the vehicle-models DataConnection
 
 1. Ensure you're in the **RHOAI Dashboard** inside the `ai-edge-project` project
 2. Navigate to the **Connections** tab
@@ -32,7 +41,7 @@ Confirm the DataConnection exists:
 ✓ Connection status shows as active/configured
 
 [#understand-connection-parameters]
-== Task 2: Understand Connection Parameters
+== Exercise 2: Understand connection parameters
 
 The `vehicle-models` connection is configured with:
 
@@ -57,7 +66,7 @@ Confirm connection parameters are correctly configured:
 ✓ **Region**: `us-east-1` (standard default)
 
 [#verify-underlying-secret]
-== Task 3: Verify the Underlying Secret
+== Exercise 3: Verify the underlying secret
 
 DataConnections are stored as Kubernetes Secrets. Review the secret:
 
@@ -135,4 +144,4 @@ You have reviewed the pre-configured Red Hat OpenShift AI environment on Single 
 
 Next, you'll explore the pre-configured workbench where data scientists train battery health prediction models.
 
-Navigate to link:./4-1_workbench.html[Module 3.1: Review Model Training Workbench].
+Navigate to xref:4-1_workbench.adoc[Module 3.1: Review model training workbench].

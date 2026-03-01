@@ -1,6 +1,15 @@
-= Module 3.1: Review Model Training Workbench
+= Module 3.1: Review model training workbench
 
 A workbench is a containerized JupyterLab environment with pre-installed AI/ML frameworks. The `model-training` workbench provides everything needed to develop and train battery health prediction models.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Understand workbench components (JupyterLab, TensorFlow, persistent storage)
+* Review the `model-training` workbench configuration
+* Verify workbench pods and persistent volume claims in OpenShift
+* Access the JupyterLab environment for model development
 
 [#understanding-workbenches]
 == Understanding workbenches
@@ -14,7 +23,7 @@ Workbenches provide:
 * **GPU support** - When available for training acceleration
 
 [#review-workbench-configuration]
-== Task 1: Review the Workbench Configuration
+== Exercise 1: Review the workbench configuration
 
 1. In the **RHOAI Dashboard**, navigate to the `ai-edge-project` project
 2. Click the **Workbenches** tab
@@ -39,7 +48,7 @@ Confirm the workbench exists and is running:
 ✓ **Open** button is available (workbench is accessible)
 
 [#understand-workbench-configuration]
-== Task 2: Understand Configuration Choices
+== Exercise 2: Understand configuration choices
 
 **Image Selection:**
 
@@ -85,7 +94,7 @@ Confirm workbench configuration details:
 ✓ All required components for training are configured
 
 [#review-workbench-openshift]
-== Task 3: Review Workbench Resources in OpenShift
+== Exercise 3: Review workbench resources in OpenShift
 
 Switch to the **OpenShift Web Console** to examine underlying resources.
 
@@ -131,7 +140,7 @@ model-training-storage    Bound    pvc-xxxxx-xxxxx        20Gi       RWO
 ✓ Storage volume is mounted to pod
 
 [#access-jupyterlab]
-== Task 4: Access the JupyterLab Environment
+== Exercise 4: Access the JupyterLab environment
 
 1. Return to the **RHOAI Dashboard**
 2. In the **Workbenches** tab, ensure `model-training` status shows **Running**
@@ -188,4 +197,4 @@ You have reviewed the `model-training` workbench configured for battery health m
 
 The workbench is ready for importing and executing training notebooks.
 
-Navigate to link:./4-2_importing-notebooks.html[Module 3.2: Import Training Notebooks].
+Navigate to xref:4-2_importing-notebooks.adoc[Module 3.2: Import training notebooks].

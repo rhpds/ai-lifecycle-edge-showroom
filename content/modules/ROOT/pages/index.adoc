@@ -30,52 +30,52 @@ An automotive parts distribution facility operates **18 battery-powered autonomo
 [#lab-modules]
 == Lab modules
 
-**link:./module-0.html[Introduction]** - Understand the challenge, solution architecture, and dashboards
+**xref:01-overview.adoc[Introduction]** - Understand the challenge, solution architecture, and dashboards
 
-**link:./2-1_vehicle-infrastructure.html[Module 1: Factory Transportation Robots]**
+**xref:2-1_vehicle-infrastructure.adoc[Module 1: Factory Transportation Robots]**
 
 * 1.1 Robot Infrastructure Setup
 * 1.2 MinIO Storage Deployment
 * 1.3 Model Serving Deployment
 * 1.4 Battery Monitoring System Deployment
 
-**link:./3-1_rhoai-install.html[Module 2: RHOAI Configuration]**
+**xref:3-1_rhoai-install.adoc[Module 2: RHOAI Configuration]**
 
 * 2.1 Review RHOAI Configuration
 * 2.2 Review DataScience Project
 * 2.3 Review DataConnection
 
-**link:./4-1_workbench.html[Module 3: Model Training]**
+**xref:4-1_workbench.adoc[Module 3: Model Training]**
 
 * 3.1 Review Model Training Workbench
 * 3.2 Import Training Notebooks
 * 3.3 Train Battery Health Models
 
-**link:./5-1_stress-model-server.html[Module 4: Model Serving]**
+**xref:5-1_stress-model-server.adoc[Module 4: Model Serving]**
 
 * 4.1 Review Stress Detection Server
 * 4.2 Review Time to Failure Server
 * 4.3 Query Model Endpoints
 
-**link:./6-1_pipeline-server.html[Module 5: Pipeline Automation]**
+**xref:6-1_pipeline-server.adoc[Module 5: Pipeline Automation]**
 
 * 5.1 Review Pipeline Server
 * 5.2 Execute Retraining Pipeline
 * 5.3 Schedule Pipeline Automation
 
-**link:./7-1_trustyai.html[Module 6: Model Monitoring]**
+**xref:7-1_TODO-test-alerts.adoc[Module 6: Test alerts]**
 
-* 6.1 Enable TrustyAI Monitoring
+* 6.1 Test Alerts Dashboard
 
 [#what-you-will-learn]
 == What you will learn
 
 * Deploy AI/ML workloads on edge platforms (MicroShift, SNO)
-* Use Red Hat OpenShift AI components (workbenches, model serving, pipelines, monitoring)
+* Use Red Hat OpenShift AI components (workbenches, model serving, pipelines)
 * Implement automated MLOps workflows for continuous model improvement
 * Configure model serving architectures for edge inference
 * Enable pipeline automation for hands-off model retraining
-* Set up model monitoring with TrustyAI
+* Configure alerting and monitoring dashboards
 
 [#prerequisites]
 == Prerequisites
@@ -92,4 +92,4 @@ NOTE: All infrastructure is pre-configured. You'll review configurations and exe
 
 Begin by exploring the challenge, solution architecture, and available dashboards:
 
-**Navigate to link:./module-0.html[Introduction] to start the workshop.**
+**Navigate to xref:01-overview.adoc[Introduction] to start the workshop.**

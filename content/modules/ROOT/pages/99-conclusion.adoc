@@ -1,0 +1,71 @@
+= Conclusion
+
+== What you've accomplished
+
+Congratulations! You've completed the AI Lifecycle at the Edge workshop. You've explored a complete solution spanning edge devices and cloud-like infrastructure:
+
+**Module 1 - Factory Transportation Robots:**
+
+* Connected to robot infrastructure via MicroShift
+* Deployed MinIO object storage for AI models
+* Configured model serving with KServe/OpenVINO
+* Deployed Battery Monitoring System with real-time predictions
+
+**Module 2 - RHOAI Configuration:**
+
+* Reviewed RHOAI installation optimized for edge
+* Explored data science project organization
+* Examined DataConnections linking SNO to robot storage
+
+**Module 3 - Model Training:**
+
+* Reviewed JupyterLab workbench configuration
+* Imported training notebooks from GitHub
+* Trained Stress Detection and Time-to-Failure models
+
+**Module 4 - Model Serving:**
+
+* Reviewed OpenVINO model servers on SNO
+* Understood KServe v2 inference API protocol
+* Queried endpoints to validate predictions
+
+**Module 5 - Pipeline Automation:**
+
+* Reviewed pipeline server architecture
+* Executed automated retraining pipeline
+* Scheduled pipelines for continuous model improvement
+
+**Module 6 - Model Monitoring:**
+
+* Enabled TrustyAI for model monitoring
+* Configured metrics collection infrastructure
+* Prepared for bias detection and drift monitoring
+
+== What you've learned
+
+✓ **Edge AI is practical** - MicroShift and SNO enable AI at resource-constrained locations
+
+✓ **Automation is essential** - Pipelines eliminate manual intervention for edge deployments
+
+✓ **MLOps at the edge works** - Complete ML lifecycle (train → serve → monitor → retrain)
+
+✓ **Red Hat provides the platform** - OpenShift AI integrates the full AI/ML toolchain
+
+✓ **Real-world value** - Factory robots operate more efficiently with AI-powered battery monitoring
+
+== Next steps
+
+* Explore link:https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed[Red Hat OpenShift AI Documentation^]
+* Learn more about link:https://www.redhat.com/en/technologies/device-edge[Red Hat Device Edge^]
+* Try deploying your own AI models at the edge
+* Experiment with different pipeline schedules and validation logic
+* Explore TrustyAI bias detection and drift monitoring capabilities
+
+== References
+
+* link:https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed[Red Hat OpenShift AI Self-Managed Documentation^]
+* link:https://www.redhat.com/en/technologies/device-edge[Red Hat Device Edge^]
+* link:https://docs.redhat.com/en/documentation/red_hat_device_edge[Red Hat Device Edge Documentation^]
+* link:https://kubeflow.org/docs/components/pipelines/[Kubeflow Pipelines Documentation^]
+
+Thank you for participating in this workshop!

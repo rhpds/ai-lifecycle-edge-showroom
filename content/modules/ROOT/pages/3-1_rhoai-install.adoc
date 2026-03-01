@@ -1,9 +1,18 @@
-= Module 2.1: Review RHOAI Configuration
+= Module 2.1: Review RHOAI configuration
 
 Red Hat OpenShift AI (RHOAI) running on Single Node OpenShift provides the complete AI/ML platform for model training, serving, pipelines, and monitoring. This module reviews the pre-configured RHOAI installation.
 
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Access the OpenShift Console and RHOAI Dashboard
+* Verify the RHOAI operator installation and status
+* Understand DataScienceCluster configuration for edge deployments
+* Explain why RawDeployment mode is used instead of Serverless for edge
+
 [#access-openshift-console]
-== Task 1: Access the OpenShift Console
+== Exercise 1: Access the OpenShift console
 
 Log in to the Single Node OpenShift cluster:
 
@@ -27,7 +36,7 @@ Confirm you are logged into the OpenShift Console:
 ✓ Navigation menu displays on the left sidebar
 
 [#verify-rhoai-operator]
-== Task 2: Verify RHOAI Operator Installation
+== Exercise 2: Verify RHOAI operator installation
 
 The RHOAI operator is already installed. Verify its status:
 
@@ -47,7 +56,7 @@ Confirm the RHOAI operator is installed and healthy:
 ✓ **Provided APIs** include: DataScienceCluster, DSCInitialization, FeatureTracker
 
 [#review-datasciencecluster]
-== Task 3: Review DataScienceCluster Configuration
+== Exercise 3: Review DataScienceCluster configuration
 
 The DataScienceCluster custom resource defines which RHOAI components are enabled and how they're configured.
 
@@ -112,7 +121,7 @@ Confirm the DataScienceCluster configuration:
 ✓ DataScienceCluster YAML contains all expected component sections
 
 [#verify-rhoai-status]
-== Task 4: Verify RHOAI Status
+== Exercise 4: Verify RHOAI status
 
 Check the DataScienceCluster status:
 
@@ -131,7 +140,7 @@ Confirm RHOAI is fully operational:
 ✓ All enabled components (KServe, TrustyAI, Workbenches, etc.) are running
 
 [#access-rhoai-dashboard]
-== Task 5: Access the RHOAI Dashboard
+== Exercise 5: Access the RHOAI dashboard
 
 Access the RHOAI web interface:
 
@@ -175,4 +184,4 @@ You have reviewed the pre-configured Red Hat OpenShift AI installation on Single
 
 This platform enables the complete AI lifecycle: develop → train → serve → monitor → retrain.
 
-Navigate to link:./3-2_datascience-project.html[Module 2.2: Review DataScience Project].
+Navigate to xref:3-2_datascience-project.adoc[Module 2.2: Review data science project].

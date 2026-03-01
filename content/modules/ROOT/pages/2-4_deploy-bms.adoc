@@ -1,4 +1,4 @@
-= Module 1.4: Battery Monitoring System Deployment
+= Module 1.4: Battery monitoring system deployment
 
 The Battery Monitoring System (BMS) brings together all robot components to provide real-time battery health monitoring. It collects telemetry data, displays it on a dashboard, and uses the AI inference endpoints to generate predictions.
 
@@ -7,8 +7,17 @@ The Battery Monitoring System (BMS) brings together all robot components to prov
 * **Battery Simulator** → **MQTT Broker** → **Data Processors** → **InfluxDB** + **Dashboard**
 * **Dashboard** → **Inference APIs** → **AI Predictions** → **Alerting**
 
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Deploy the complete Battery Monitoring System using GitOps
+* Understand the data flow from sensors through MQTT to InfluxDB
+* Access and interpret the BMS dashboard showing real-time telemetry
+* Verify AI predictions are integrated into the monitoring system
+
 [#deploy-bms-gitops]
-== Task 1: Deploy BMS using GitOps
+== Exercise 1: Deploy BMS using GitOps
 
 Deploy the complete Battery Monitoring System application:
 
@@ -111,7 +120,7 @@ battery-simulation   Synced        Healthy
 ✓ Complete battery monitoring system is operational
 
 [#access-bms-dashboard]
-== Task 2: Access the BMS Dashboard
+== Exercise 2: Access the BMS dashboard
 
 Open the Battery Monitoring System dashboard:
 
@@ -140,7 +149,7 @@ Confirm the dashboard is accessible and displaying live data:
 ✓ Data updates automatically every 30 seconds
 
 [#verify-influxdb]
-== Task 3: Verify Data in InfluxDB
+== Exercise 3: Verify data in InfluxDB
 
 Access the InfluxDB dashboard to see historical sensor data:
 
@@ -196,7 +205,7 @@ This closed-loop system enables real-time battery health monitoring with AI-powe
 
 You have successfully deployed the complete factory robot infrastructure on MicroShift. The robot now has:
 
-**✓ MicroShift** - Lightweight Kubernetes platform running on RHEL 9.6
+**✓ MicroShift** - Lightweight Kubernetes platform running on RHEL {rhel_version}
 
 **✓ MinIO Storage** - S3-compatible storage with AI models in the `inference` bucket
 
@@ -218,4 +227,4 @@ You have successfully deployed the complete factory robot infrastructure on Micr
 
 Next, you'll explore the **Single Node OpenShift (SNO) re-training server** where AI models are automatically retrained every 10 minutes using fresh data from the robot fleet.
 
-Navigate to link:./3-1_rhoai-install.html[Module 2.1: Review RHOAI Configuration].
+Navigate to xref:3-1_rhoai-install.adoc[Module 2.1: Review RHOAI configuration].

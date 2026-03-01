@@ -1,6 +1,15 @@
-= Module 5.2: Execute Retraining Pipeline
+= Module 5.2: Execute retraining pipeline
 
 The retraining pipeline automates the complete model lifecycle: data collection → preprocessing → training → validation → conditional deployment. Execute the pipeline manually to understand the automated workflow.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Import a pre-built pipeline definition from YAML
+* Execute a pipeline run manually with configured parameters
+* Monitor pipeline execution stages in real-time
+* Verify conditional deployment logic (only deploy improved models)
 
 [#understanding-retraining-pipeline]
 == Understanding the retraining pipeline
@@ -16,7 +25,7 @@ The pipeline automates:
 This workflow ensures models stay accurate as robot battery behavior evolves.
 
 [#import-pipeline]
-== Task 1: Import the Retraining Pipeline
+== Exercise 1: Import the retraining pipeline
 
 Instead of creating the pipeline from scratch, import a pre-built definition.
 
@@ -59,7 +68,7 @@ Confirm the pipeline was imported successfully:
 ✓ All nodes are properly connected with arrows
 
 [#create-pipeline-run]
-== Task 2: Create a Pipeline Run
+== Exercise 2: Create a pipeline run
 
 Execute the pipeline manually to test the automation workflow.
 
@@ -119,7 +128,7 @@ Confirm the pipeline run was created:
 ✓ Pipeline run begins executing immediately
 
 [#monitor-pipeline-execution]
-== Task 3: Monitor Pipeline Execution
+== Exercise 3: Monitor pipeline execution
 
 Watch the pipeline execute in real-time.
 
@@ -153,7 +162,7 @@ Confirm you can monitor pipeline execution:
 ✓ Overall run status visible at top (Running → Succeeded)
 
 [#verify-pipeline-success]
-== Task 4: Verify Pipeline Success
+== Exercise 4: Verify pipeline success
 
 After execution completes, verify the pipeline ran successfully.
 
@@ -224,4 +233,4 @@ Every 10 minutes (when scheduled), this pipeline will:
 * Validate performance
 * Deploy improvements automatically
 
-Navigate to link:./6-3_pipeline-automation.html[Module 5.3: Schedule Pipeline Automation].
+Navigate to xref:6-3_pipeline-automation.adoc[Module 5.3: Schedule pipeline automation].

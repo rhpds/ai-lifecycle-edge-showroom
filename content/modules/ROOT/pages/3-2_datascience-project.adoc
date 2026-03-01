@@ -1,9 +1,18 @@
-= Module 2.2: Review DataScience Project
+= Module 2.2: Review data science project
 
 Data Science Projects in Red Hat OpenShift AI (RHOAI) organize users and AI/ML resources in a single namespace. For our factory robot battery monitoring solution, the `ai-edge-project` contains all necessary components: workbenches, data connections, model servers, and pipelines.
 
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Navigate the RHOAI Dashboard and access data science projects
+* Understand how projects organize AI/ML resources in namespaces
+* Review project structure including workbenches, pipelines, and models tabs
+* Verify the underlying Kubernetes namespace and resources
+
 [#access-project]
-== Task 1: Access the ai-edge-project
+== Exercise 1: Access the ai-edge-project
 
 1. Ensure you're in the **Red Hat OpenShift AI Dashboard**
 2. Click **Data Science Projects** in the left navigation
@@ -23,7 +32,7 @@ Confirm you've accessed the correct project:
 ✓ Multiple tabs are visible (Overview, Workbenches, Pipelines, Models, Connections)
 
 [#explore-project-structure]
-== Task 2: Explore Project Structure
+== Exercise 2: Explore project structure
 
 Review the project dashboard tabs:
 
@@ -48,7 +57,7 @@ Confirm all expected tabs are present:
 ✓ **Permissions** tab - access control
 
 [#verify-project-namespace]
-== Task 3: Verify the Project Namespace
+== Exercise 3: Verify the project namespace
 
 Data Science Projects map to OpenShift namespaces. Verify the underlying namespace:
 
@@ -115,4 +124,4 @@ You have reviewed the `ai-edge-project` data science project. This project:
 
 This centralized project structure simplifies managing the complete battery monitoring AI solution.
 
-Navigate to link:./3-3_data-connection-serving.html[Module 2.3: Review DataConnection].
+Navigate to xref:3-3_data-connection-serving.adoc[Module 2.3: Review data connection].

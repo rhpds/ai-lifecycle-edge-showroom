@@ -1,6 +1,15 @@
-= Module 5.3: Schedule Pipeline Automation
+= Module 5.3: Schedule pipeline automation
 
 Scheduled pipelines enable fully automated model retraining. Configure the pipeline to run every 10 minutes, ensuring models continuously improve without manual intervention.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Create a scheduled pipeline run with periodic triggers
+* Configure pipeline schedules (every 10 minutes for continuous retraining)
+* Monitor automated pipeline executions over time
+* Understand how scheduling enables self-improving edge AI systems
 
 [#why-scheduled-automation]
 == Why scheduled automation matters
@@ -21,7 +30,7 @@ Machine learning models drift over time as operational conditions change:
 For our 18-robot fleet operating 24/7, automation is essential.
 
 [#create-scheduled-run]
-== Task 1: Create a Scheduled Pipeline Run
+== Exercise 1: Create a scheduled pipeline run
 
 Configure the pipeline to execute automatically every 10 minutes.
 
@@ -85,7 +94,7 @@ Confirm the schedule was created successfully:
 ✓ Redirected to Schedules tab showing new schedule
 
 [#monitor-scheduled-runs]
-== Task 2: Monitor Scheduled Runs
+== Exercise 2: Monitor scheduled runs
 
 Verify the schedule is active and pipelines execute automatically.
 
@@ -146,7 +155,7 @@ Every 10 minutes, the scheduled pipeline:
 This creates a **self-improving system** where models get better over time without human intervention.
 
 [#pause-or-disable-schedule]
-== Task 3: Pause Scheduling (Optional)
+== Exercise 3: Pause scheduling (optional)
 
 If needed, temporarily pause scheduled runs:
 
@@ -168,7 +177,7 @@ Confirm you can control the schedule:
 ✓ Schedule parameters remain unchanged when toggled
 
 [#verify-automation]
-== Task 4: Verify Automation is Working
+== Exercise 4: Verify automation is working
 
 Confirm the complete pipeline automation system is operational.
 
@@ -240,4 +249,4 @@ You have configured fully automated pipeline scheduling for continuous model ret
 
 Next, you'll explore TrustyAI for model monitoring to ensure automated models remain fair and accurate over time.
 
-Navigate to link:./7-1_trustyai.html[Module 6.1: Enable TrustyAI Monitoring].
+Navigate to xref:7-1_TODO-test-alerts.adoc[Module 6.1: Test alerts dashboard].

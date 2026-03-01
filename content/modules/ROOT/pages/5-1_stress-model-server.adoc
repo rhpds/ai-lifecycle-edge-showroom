@@ -1,6 +1,15 @@
-= Module 4.1: Review Stress Detection Server
+= Module 4.1: Review stress detection server
 
 Model servers provide real-time inference capabilities by loading trained models and exposing REST API endpoints. The Stress Detection server validates newly trained models before deployment to robots.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Understand model serving architecture using KServe and OpenVINO
+* Review Stress Detection model server configuration
+* Verify InferenceService and ServingRuntime custom resources
+* Understand why SNO model servers validate before robot deployment
 
 [#understanding-model-serving]
 == Understanding model serving in RHOAI
@@ -21,7 +30,7 @@ Although models run on robots for production inference, the SNO environment also
 RawDeployment provides full control without auto-scaling overhead, ideal for resource-constrained SNO.
 
 [#review-stress-detection-server]
-== Task 1: Review the Stress Detection Model Server
+== Exercise 1: Review the Stress Detection model server
 
 1. In the **RHOAI Dashboard**, navigate to the `ai-edge-project` project
 2. Click the **Models** tab
@@ -45,7 +54,7 @@ Confirm the Stress Detection model server exists:
 ✓ **Serving runtime** shows OpenVINO Model Server
 
 [#understand-configuration]
-== Task 2: Understand Model Server Configuration
+== Exercise 2: Understand model server configuration
 
 Click on `Stress Detection` to view details:
 
@@ -72,7 +81,7 @@ Confirm model server configuration details:
 ✓ **Path**: `stress-detection` (model location in MinIO)
 
 [#review-model-endpoint]
-== Task 3: Review the Model Endpoint
+== Exercise 3: Review the model endpoint
 
 In the model details view, locate **Internal endpoint details**.
 
@@ -104,7 +113,7 @@ http://stress-detection-ai-edge-project.svc.cluster.local/v2/models/stress-detec
 ✓ Accessible from workbenches and pipelines in same namespace
 
 [#review-custom-resources]
-== Task 4: Review ServingRuntime and InferenceService
+== Exercise 4: Review ServingRuntime and InferenceService
 
 Switch to the **OpenShift Web Console** to examine underlying resources.
 
@@ -150,7 +159,7 @@ Confirm custom resources exist:
 ✓ Configuration matches RHOAI Dashboard settings
 
 [#review-model-pod]
-== Task 5: Verify Model Server Pod
+== Exercise 5: Verify model server pod
 
 1. Navigate to **Workloads** → **Pods**
 2. Ensure you're in the `ai-edge-project` namespace
@@ -215,4 +224,4 @@ You have reviewed the Stress Detection model server configuration:
 
 The Stress Detection model analyzes battery telemetry (voltage, temperature, charge cycles) to predict when a robot battery is experiencing stress.
 
-Navigate to link:./5-2_ttf-model-server.html[Module 4.2: Review Time to Failure Server].
+Navigate to xref:5-2_ttf-model-server.adoc[Module 4.2: Review time to failure server].

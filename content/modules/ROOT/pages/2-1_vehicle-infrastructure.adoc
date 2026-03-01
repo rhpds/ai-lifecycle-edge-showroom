@@ -1,13 +1,22 @@
-= Module 1.1: Robot Infrastructure Setup
+= Module 1.1: Robot infrastructure setup
 
 This module explores the infrastructure running on our factory transportation robots. Each robot runs Red Hat Device Edge (MicroShift), a lightweight Kubernetes platform optimized for resource-constrained environments.
 
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Connect to factory robot infrastructure via bastion host and SSH
+* Verify MicroShift is running and operational on edge devices
+* Explore deployed namespaces and understand GitOps readiness
+* Understand MicroShift's minimal footprint and suitability for edge deployments
+
 [#connect-robot]
-== Task 1: Connect to the Factory Robot
+== Exercise 1: Connect to the factory robot
 
 Access the robot infrastructure via the bastion host, then connect to the MicroShift virtual machine.
 
-=== Connect to Bastion Host
+=== Connect to bastion host
 
 Establish an SSH connection to the bastion host:
 
@@ -18,7 +27,7 @@ Establish an SSH connection to the bastion host:
 
 **Password:** `{bastion_ssh_password}`
 
-=== Connect to Robot VM
+=== Connect to robot VM
 
 Once connected to the bastion, access the factory robot's MicroShift VM:
 
@@ -45,7 +54,7 @@ microshift
 ✓ You are now inside the factory robot's VM
 
 [#verify-microshift]
-== Task 2: Verify MicroShift is Running
+== Exercise 2: Verify MicroShift is running
 
 MicroShift is a lightweight Kubernetes distribution designed for edge devices. It provides:
 
@@ -94,7 +103,7 @@ microshift   Ready    <none>   5d    v1.29.0+xxxxxxx
 ✓ Kubernetes API is accessible via `oc` command
 
 [#explore-namespaces]
-== Task 3: Explore Deployed Namespaces
+== Exercise 3: Explore deployed namespaces
 
 List the namespaces already deployed on the robot:
 
@@ -140,4 +149,4 @@ You have successfully connected to the factory robot infrastructure and verified
 
 In the next section, you'll deploy MinIO object storage to store AI models on the robot.
 
-Navigate to link:./2-2_minio-deployment.html[Module 1.2: MinIO Storage Deployment].
+Navigate to xref:2-2_minio-deployment.adoc[Module 1.2: MinIO storage deployment].

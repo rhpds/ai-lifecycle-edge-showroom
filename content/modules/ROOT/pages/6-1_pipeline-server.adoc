@@ -1,6 +1,15 @@
-= Module 5.1: Review Pipeline Server
+= Module 5.1: Review pipeline server
 
 Automation is critical for edge deployments where IT teams aren't readily available. Red Hat OpenShift AI pipelines automate the complete ML workflow: data collection → training → validation → deployment.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Understand why pipeline automation is critical for edge deployments
+* Verify the pipeline server is running and accessible
+* Review pipeline storage configuration and DataSciencePipelineApplication
+* Identify pipeline server components (API server, scheduler, persistence agent)
 
 [#understanding-pipeline-automation]
 == Understanding pipeline automation
@@ -21,7 +30,7 @@ Red Hat OpenShift AI (RHOAI) implements Kubeflow Pipelines for ML workflow autom
 * **Output artifacts** - Trained models, metrics, logs (stored in S3)
 
 [#review-pipeline-server]
-== Task 1: Verify Pipeline Server is Running
+== Exercise 1: Verify pipeline server is running
 
 1. In the **RHOAI Dashboard**, navigate to the `ai-edge-project` project
 2. Click the **Pipelines** tab
@@ -43,7 +52,7 @@ Confirm the pipeline server is deployed and accessible:
 ✓ Pipeline server is ready to accept workflow definitions
 
 [#review-pipeline-storage]
-== Task 2: Review Pipeline Storage Connection
+== Exercise 2: Review pipeline storage connection
 
 The pipeline server uses dedicated storage for execution artifacts.
 
@@ -76,7 +85,7 @@ Confirm pipeline storage connection exists:
 ✓ Connection is separate from `vehicle-models` (robot storage)
 
 [#review-datasciencepipeline]
-== Task 3: Review DataSciencePipelineApplication
+== Exercise 3: Review DataSciencePipelineApplication
 
 The pipeline server is defined by a custom resource.
 
@@ -107,7 +116,7 @@ Confirm DataSciencePipelineApplication exists and is configured:
 ✓ All required components are defined
 
 [#review-pipeline-components]
-== Task 4: Verify Pipeline Server Pods
+== Exercise 4: Verify pipeline server pods
 
 The pipeline server consists of several pods working together.
 
@@ -198,4 +207,4 @@ You have reviewed the pre-configured pipeline server in `ai-edge-project`:
 
 The pipeline server is the automation foundation for continuous model improvement.
 
-Navigate to link:./6-2_pipeline-execution.html[Module 5.2: Execute Retraining Pipeline].
+Navigate to xref:6-2_pipeline-execution.adoc[Module 5.2: Execute retraining pipeline].

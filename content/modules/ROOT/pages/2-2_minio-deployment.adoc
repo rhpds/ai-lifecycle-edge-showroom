@@ -1,4 +1,4 @@
-= Module 1.2: MinIO Storage Deployment
+= Module 1.2: MinIO storage deployment
 
 MinIO provides S3-compatible object storage for AI models on the factory robot. The `inference` bucket stores two AI models: **Stress Detection** (identifies battery stress conditions) and **Time to Failure** (predicts remaining battery life).
 
@@ -7,8 +7,17 @@ Both models are stored in OpenVINO IR format (`.xml` and `.bin` files) in versio
 * `/stress-detection/1/` - Stress Detection model v1
 * `/time-to-failure/1/` - Time to Failure model v1
 
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Deploy MinIO object storage using GitOps automation
+* Understand S3-compatible storage architecture for edge AI models
+* Verify model files are properly stored in versioned directories
+* Access and navigate the MinIO web dashboard
+
 [#deploy-minio-gitops]
-== Task 1: Deploy MinIO using GitOps
+== Exercise 1: Deploy MinIO using GitOps
 
 GitOps automates deployment and ensures consistency across edge devices. Changes to the Git repository automatically sync to the robot.
 
@@ -36,7 +45,7 @@ spec:
 EOF
 ----
 
-=== Create MinIO GitOps Application
+=== Create MinIO GitOps application
 
 Deploy MinIO by creating a GitOps Application:
 
@@ -92,7 +101,7 @@ minio-microshift   Synced        Healthy
 ✓ Health status shows `Healthy` (may take 1-2 minutes)
 
 [#monitor-deployment]
-== Task 2: Monitor MinIO Deployment
+== Exercise 2: Monitor MinIO deployment
 
 Watch the deployment progress:
 
@@ -125,7 +134,7 @@ minio-xxxxx-xxxxx                   1/1     Running     0          2m
 ✓ `download-models-job` shows `Completed` status
 
 [#access-minio-dashboard]
-== Task 3: Access MinIO Dashboard
+== Exercise 3: Access MinIO dashboard
 
 Once deployed, access the MinIO web console:
 
@@ -182,4 +191,4 @@ You have successfully deployed MinIO object storage on the factory robot using G
 
 The models are now ready to be loaded by the inference server.
 
-Navigate to link:./2-3_inference-deployment.html[Module 1.3: Model Serving Deployment].
+Navigate to xref:2-3_inference-deployment.adoc[Module 1.3: Model serving deployment].

@@ -1,9 +1,18 @@
-= Module 4.2: Review Time to Failure Server
+= Module 4.2: Review time to failure server
 
 The Time to Failure server predicts the remaining operational life of robot batteries. Like the Stress Detection server, it validates newly trained models before deployment.
 
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Review Time-to-Failure model server configuration
+* Compare two complementary model servers (Stress vs TTF)
+* Verify separate model paths in shared storage
+* Understand how multiple models use the same ServingRuntime
+
 [#review-ttf-server]
-== Task 1: Review the Time to Failure Model Server
+== Exercise 1: Review the Time to Failure model server
 
 1. In the **RHOAI Dashboard**, navigate to the `ai-edge-project` project
 2. Go to the **Models** tab
@@ -27,7 +36,7 @@ Confirm the Time to Failure model server exists:
 ✓ Both servers are deployed and ready
 
 [#understand-ttf-configuration]
-== Task 2: Understand Configuration
+== Exercise 2: Understand configuration
 
 Click on `Time to Failure` to view details:
 
@@ -86,7 +95,7 @@ Confirm TTF model server configuration:
 |===
 
 [#review-ttf-endpoint]
-== Task 3: Review the Model Endpoint
+== Exercise 3: Review the model endpoint
 
 In the Time to Failure details, locate **Internal endpoint details**.
 
@@ -117,7 +126,7 @@ http://time-to-failure-ai-edge-project.svc.cluster.local/v2/models/time-to-failu
 ✓ Accessible from same namespace as Stress Detection
 
 [#review-ttf-inferenceservice]
-== Task 4: Review InferenceService
+== Exercise 4: Review InferenceService
 
 Switch to the **OpenShift Web Console**.
 
@@ -145,7 +154,7 @@ Confirm TTF InferenceService exists:
 ✓ RawDeployment mode configured (no auto-scaling)
 
 [#verify-ttf-pod]
-== Task 5: Verify Model Server Pod
+== Exercise 5: Verify model server pod
 
 1. Navigate to **Workloads** → **Pods**
 2. Find the pod containing `time-to-failure` (e.g., `time-to-failure-predictor-xxxxx`)
@@ -220,4 +229,4 @@ You have reviewed both model serving deployments for battery health monitoring:
 
 Next, you'll learn how to query these model endpoints to perform inference and validate predictions.
 
-Navigate to link:./5-3_query-endpoints.html[Module 4.3: Query Model Endpoints].
+Navigate to xref:5-3_query-endpoints.adoc[Module 4.3: Query model endpoints].

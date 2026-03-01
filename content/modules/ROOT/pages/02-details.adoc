@@ -1,0 +1,187 @@
+= Technical details
+
+This section provides the technical specifications, architecture, and access information for the AI Lifecycle at the Edge lab environment.
+
+[#prerequisites]
+== Prerequisites
+
+This lab assumes familiarity with:
+
+* Basic Kubernetes/OpenShift concepts (pods, services, deployments)
+* Python and Jupyter notebooks
+* Basic machine learning concepts (training, validation, inference)
+* Command-line tools (ssh, oc, kubectl)
+
+NOTE: All infrastructure is pre-configured. You will review configurations and execute hands-on tasks to understand the complete AI lifecycle.
+
+[#edge-computing-essentials]
+== Edge computing essentials
+
+Our solution is designed to run at the edge, directly on the vehicles operating within the plant during real operational conditions. This means it operates far from centralized data centers. Therefore, the corresponding infrastructure must be as lightweight as possible due to space limitations. For this reason, compact architectures such as Single Node OpenShift (SNO) and Red Hat Device Edge have been used.
+
+**Why Edge Matters:**
+
+When moving the entire AI/ML lifecycle to the edge, models are trained, deployed, and managed closer to where the data is generated, which introduces several distinct advantages:
+
+* **Data sovereignty** - Processing data at its point of origin ensures that it remains within the local environment, eliminating the need to transport it to outside infrastructure
+* **Limited-to-no connectivity** - Because data processing doesn't rely on network connectivity, critical operations can continue functioning uninterrupted even during network outages or in disconnected environments
+* **Faster decision-making** - With no need to transmit data over the network, latency is reduced, allowing for quicker response times and near-real-time decision-making
+* **Cost efficiency** - Less data transfer to cloud systems
+
+**Edge Challenges:**
+
+However, the edge environment presents challenges as well:
+
+* **Constrained resources** - AI/ML processes often demand significant power and hardware resources, which can be difficult to provide in an environment with limited space and resources
+* **Limited IT support** - Edge locations often lack extensive dedicated IT support, requiring architectures that are resilient and simple, with operations that are automated and need minimal human intervention
+* **Network connectivity limitations** - Connectivity can be intermittent or unavailable
+
+**Red Hat Edge Platforms:**
+
+To address these challenges, we use:
+
+* **MicroShift** - Lightweight Kubernetes for resource-constrained devices (robots)
+** Minimal footprint (~2 CPU cores, 2GB RAM)
+** Runs on Red Hat Enterprise Linux (RHEL)
+** Includes model serving and GitOps capabilities
+** Perfect for distributed robot fleet deployments
+
+* **Single Node OpenShift (SNO)** - Full OpenShift on a single machine (training server)
+** Edge server with greater compute capacity located at the plant
+** Runs Red Hat OpenShift AI for model training and pipeline automation
+** Optimized for edge locations without dedicated IT teams
+** Provides enterprise Kubernetes features in a single-node deployment
+
+[#architecture]
+== Solution architecture
+
+Now that we understand the goal of the lab, the solution we want to implement, and the existing limitations, let's focus on the infrastructure we'll be working with. This infrastructure consists of two key components: the autonomous vehicle and the re-training machine.
+
+=== Autonomous vehicle (Red Hat Device Edge)
+
+Our autonomous vehicle runs on a Red Hat Enterprise Linux (RHEL) operating system where we have deployed MicroShift. This MicroShift instance also comes with the AI model serving component and GitOps service enabled. The model serving platform will be used to load and serve the AI models for inference.
+
+Components running on each robot:
+
+* **MicroShift** - Lightweight Kubernetes platform
+* **MinIO Storage** - Stores AI models in the `inference` bucket used for battery stress and fault detection. By default, two baseline models are preloaded at startup. These will later be replaced by the retrained models coming from our Single Node OpenShift instance
+* **Model Serving** - KServe/ModelMesh for loading and serving models via API
+* **Battery Monitoring System (BMS)** - Dashboard showing real-time telemetry and AI predictions, making use of the trained models to provide predictions through the telemetry dashboard along with the data generated
+* **InfluxDB** - Time-series database storing historical sensor data
+* **MQTT Broker** - Mosquitto MQTT broker receives telemetry from battery simulators
+* **Battery Simulator** - Quarkus app generating realistic battery consumption data
+
+=== Re-training node (Single Node OpenShift)
+
+This is a single-node deployment of OpenShift that will serve as the primary platform for re-training and validating our AI models in an automated manner thanks to Red Hat OpenShift AI (RHOAI). This single node is located outside our vehicle in the plant. The sensor data will be collected from the InfluxDB component in the MicroShift instance and used to re-train the models.
+
+Components on the SNO server:
+
+* **Red Hat OpenShift AI** - Complete AI/ML platform
+** Data science projects and workbenches (JupyterLab)
+** Model training with TensorFlow
+** Automated pipelines for retraining workflow
+** Model serving for validation
+** TrustyAI for model monitoring
+
+* **MinIO Storage** - Another MinIO storage instance is already deployed in our SNO and will be used to store pipeline artifacts in the `pipelines` bucket
+
+=== Solution workflow
+
+Sometimes, a picture is worth a thousand words. Below, you will find a diagram illustrating the main components involved in our solution:
+
+image::1-3_diagram.png[AI lifecycle edge architecture diagram showing MicroShift robots with MinIO and model serving connecting to SNO training server with RHOAI pipelines and automated model retraining workflow,link=self,window=blank,width=700]
+
+**Workflow Steps:**
+
+1. Our environment comes with two base AI models stored in the _inference_ MinIO bucket. The first one called **Stress Detection** will be able to identify early signs of battery stress - conditions that may lead to degradation or failure. The second one - **Time to Failure** - uses sensor data to provide an estimate of the remaining time until a potential battery failure.
+
+2. Both models are loaded into the InferenceServer instance to make them available for inference via API endpoints.
+
+3. Once the infrastructure is ready, it's time to start generating data. The Battery simulator item is a Quarkus component that simulates the battery consumption of an operating autonomous vehicle and sends telemetry data to the Mosquitto MQTT broker that acts as the central messaging hub, receiving the data coming from the emulated sensors.
+
+4. Two different Camel Quarkus components are in charge of reading the data from Mosquitto and sending it to the Battery Monitoring System (BMS) app. The **mqtt2ws** exposes the data as WebSocket for the BMS Dashboard and the **data ingester** stores it in InfluxDB. From there, a scheduled pipeline running every 10 minutes in the SNO collects all the data stored in the time series database during the last hour and is used to re-train both models.
+
+5. The Battery Monitoring System application includes a component that retrieves real-time data from InfluxDB and sends it as queries to the two inference endpoints and receives the predictions from the AI models currently being served.
+
+6. The response returned by the models is analyzed, and if necessary, it is forwarded to an alerting system that triggers notifications in case of detected battery stress conditions or signs of an imminent failure.
+
+7. Every 10 minutes, a pipeline is triggered to collect the data, retrain the model, and compare its performance against the existing one. All in a fully automated manner.
+
+8. If the comparison results show that the new models perform better, they are sent back to the _inference_ MinIO bucket in the autonomous vehicle, so the cycle can start again with the updated models.
+
+[#dashboards]
+== Dashboard control center
+
+Below are the dashboards and consoles you'll use during this lab. Some will become available as you progress through the modules.
+
+=== Factory robot dashboards (MicroShift)
+
+Access the robot infrastructure via bastion host:
+
+[source,bash,subs="attributes+"]
+----
+{bastion_ssh_command}
+----
+
+**Password:** `{bastion_ssh_password}`
+
+Then connect to robot VM:
+
+[source,bash,subs="attributes+"]
+----
+virtctl ssh cloud-user@microshift.microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
+----
+
+**Available Dashboards:**
+
+[cols="2,3,2",options="header"]
+|===
+| Dashboard | URL | Purpose
+
+| *MinIO Storage*
+| `\https://minio-microshift-001.{openshift_cluster_ingress_domain}`
+| Model storage (`inference` bucket)
+
+| *Battery Monitoring System*
+| `\https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}`
+| Real-time telemetry and AI predictions
+
+| *InfluxDB*
+| `\https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
+| Historical sensor data
+|===
+
+**MinIO Credentials:** Username: `minio`, Password: `minio123`
+
+**InfluxDB Credentials:** Username: `admin`, Password: `password`
+
+=== Re-training server dashboards (SNO)
+
+[cols="2,3,2",options="header"]
+|===
+| Dashboard | URL | Purpose
+
+| *OpenShift Console*
+| `{openshift_cluster_console_url}`
+| Cluster management
+
+| *OpenShift AI Dashboard*
+| `\https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}`
+| AI/ML workbench, pipelines, models
+
+| *MinIO Storage*
+| `\https://minio-ui-minio.{openshift_cluster_ingress_domain}`
+| Pipeline artifacts (`pipelines` bucket)
+|===
+
+**OpenShift Credentials:** Username: `{openshift_cluster_admin_username}`, Password: `{openshift_cluster_admin_password}`
+
+**MinIO Credentials:** Username: `minio`, Password: `minio123`
+
+[#next-steps]
+== Next steps
+
+Now that you understand the technical architecture and have access to all dashboards, you're ready to begin the hands-on modules.
+
+**Begin the hands-on exercises:** xref:2-1_vehicle-infrastructure.adoc[Module 1: Factory Transportation Robots]
