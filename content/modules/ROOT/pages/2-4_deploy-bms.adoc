@@ -116,7 +116,9 @@ battery-simulation   Synced        Healthy
 ----
 
 ✓ All 6 BMS pods show `1/1` ready and `Running` status
+
 ✓ GitOps application shows `Synced` and `Healthy`
+
 ✓ Complete battery monitoring system is operational
 
 [#access-bms-dashboard]
@@ -136,16 +138,20 @@ The dashboard displays:
 * **Time-to-failure estimates** - Predicted hours until battery failure
 * **Alerts** - Notifications when stress is detected or failure is imminent
 
-IMAGE_HERE: BMS dashboard showing real-time telemetry graphs and AI prediction indicators
+image::2-4_bms-dashboard.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
 
 === Verify
 
 Confirm the dashboard is accessible and displaying live data:
 
 ✓ Dashboard loads successfully in browser
+
 ✓ **Telemetry charts** show live updates (voltage, temperature, etc.)
+
 ✓ **AI Prediction panel** displays stress detection status
+
 ✓ **Time to Failure** shows estimated hours remaining
+
 ✓ Data updates automatically every 30 seconds
 
 [#verify-influxdb]
@@ -171,17 +177,22 @@ Navigate to **Explore** in the left menu:
 
 Adjust the time interval (e.g., "Past 5 minutes") to see recent data.
 
-IMAGE_HERE: InfluxDB dashboard showing battery telemetry time-series data
+image::2-4_influxdb-telemetry.png[InfluxDB dashboard showing battery telemetry time-series data,link=self,window=blank,width=700]
 
 === Verify
 
 Confirm data is being stored in InfluxDB:
 
 ✓ InfluxDB dashboard loads successfully
+
 ✓ `bms` bucket exists and is selectable
+
 ✓ `battery_data` measurement contains records
+
 ✓ Time-series graphs display sensor values (voltage, temperature, etc.)
+
 ✓ Data points are timestamped with recent times
+
 ✓ Query results update when time range is changed
 
 [#how-it-works]

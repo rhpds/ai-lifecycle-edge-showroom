@@ -97,7 +97,9 @@ minio-microshift   Synced        Healthy
 ----
 
 ✓ Application exists in `openshift-gitops` namespace
+
 ✓ Sync status shows `Synced`
+
 ✓ Health status shows `Healthy` (may take 1-2 minutes)
 
 [#monitor-deployment]
@@ -130,7 +132,9 @@ minio-xxxxx-xxxxx                   1/1     Running     0          2m
 ----
 
 ✓ `minio` pod shows `Running` with `1/1` ready
+
 ✓ `create-bucket-job` shows `Completed` status
+
 ✓ `download-models-job` shows `Completed` status
 
 [#access-minio-dashboard]
@@ -153,7 +157,7 @@ Verify the `inference` bucket contains two directories:
 * `stress-detection/1/` - Baseline Stress Detection model files (`.xml`, `.bin`)
 * `time-to-failure/1/` - Baseline Time to Failure model files (`.xml`, `.bin`)
 
-IMAGE_HERE: MinIO dashboard showing inference bucket with model directories
+image::2-2_minio-inference.png[MinIO dashboard showing inference bucket with model directories,link=self,window=blank,width=700]
 
 === Verify
 
@@ -176,7 +180,9 @@ time-to-failure/1/
 ----
 
 ✓ `inference` bucket exists
+
 ✓ Both model directories present
+
 ✓ Each directory contains `.xml` and `.bin` files
 
 [#summary]

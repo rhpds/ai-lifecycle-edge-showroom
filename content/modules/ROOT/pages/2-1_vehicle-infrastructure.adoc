@@ -33,7 +33,7 @@ Once connected to the bastion, access the factory robot's MicroShift VM:
 
 [source,bash,subs="attributes+"]
 ----
-virtctl ssh cloud-user@microshift.microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
+virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
 
 === Verify
@@ -51,6 +51,7 @@ microshift
 ----
 
 ✓ Hostname shows `microshift`
+
 ✓ You are now inside the factory robot's VM
 
 [#verify-microshift]
@@ -94,12 +95,14 @@ Confirm MicroShift is operational:
 
 **Expected nodes output:**
 ----
-NAME         STATUS   ROLES    AGE   VERSION
-microshift   Ready    <none>   5d    v1.29.0+xxxxxxx
+NAME                    STATUS   ROLES                         AGE   VERSION
+localhost.localdomain   Ready    control-plane,master,worker   5d    v1.32.6
 ----
 
 ✓ MicroShift service shows `active (running)`
+
 ✓ Node status is `Ready`
+
 ✓ Kubernetes API is accessible via `oc` command
 
 [#explore-namespaces]
@@ -114,10 +117,8 @@ oc get namespaces
 
 You should see several namespaces including:
 
-* `openshift-gitops` - GitOps automation for edge deployments
-* `minio` - Object storage for AI models (will be deployed in next section)
-* `inference` - Model serving infrastructure (will be deployed in next section)
-* `battery-demo` - Battery Monitoring System components (will be deployed in next section)
+* `openshift-gitops` - GitOps packages in MicroShift
+* `redhat-ods-applications` - Model serving packages in MicroShift
 
 NOTE: Some namespaces may not exist yet. You'll deploy these components using GitOps in the following sections.
 
@@ -125,18 +126,29 @@ NOTE: Some namespaces may not exist yet. You'll deploy these components using Gi
 
 Expected namespaces output:
 ----
-NAME                        STATUS   AGE
-default                     Active   5d
-kube-system                 Active   5d
-openshift-gitops            Active   4d
-openshift-infra             Active   5d
-openshift-operators         Active   5d
-openshift-service-ca        Active   5d
+NAME                                 STATUS   AGE
+default                              Active   5d
+kube-node-lease                      Active   5d
+kube-public                          Active   5d
+kube-system                          Active   5d
+openshift-controller-manager         Active   5d
+openshift-dns                        Active   5d
+openshift-gitops                     Active   5d
+openshift-infra                      Active   5d
+openshift-ingress                    Active   5d
+openshift-kube-controller-manager    Active   5d
+openshift-ovn-kubernetes             Active   5d
+openshift-route-controller-manager   Active   5d
+openshift-service-ca                 Active   5d
+openshift-storage                    Active   5d
+redhat-ods-applications              Active   5d
 ----
 
 ✓ `openshift-gitops` namespace exists (GitOps ready)
+
+✓ `redhat-ods-applications` namespace exists (Inference ready)
+
 ✓ System namespaces are `Active`
-✓ Application namespaces (`minio`, `inference`, `battery-demo`) will appear after GitOps deployments
 
 [#summary]
 == Summary
@@ -146,6 +158,7 @@ You have successfully connected to the factory robot infrastructure and verified
 * **MicroShift** - Lightweight Kubernetes for edge workloads
 * **SSH access** - Remote management via bastion host
 * **GitOps readiness** - Automated deployment capabilities
+* **Inference readiness** - Automated AI inference capabilitites
 
 In the next section, you'll deploy MinIO object storage to store AI models on the robot.
 

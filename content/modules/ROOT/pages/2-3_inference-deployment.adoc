@@ -95,7 +95,9 @@ model-server   Synced        Healthy
 ----
 
 ✓ Application exists in `openshift-gitops` namespace
+
 ✓ Sync status shows `Synced`
+
 ✓ Health status shows `Healthy`
 
 [#monitor-inference-deployment]
@@ -148,7 +150,9 @@ time-to-failure     http://time-to-failure.inference.svc.cluster.local         T
 ----
 
 ✓ Both predictor pods show `2/2` ready and `Running` status
+
 ✓ Both InferenceServices show `READY = True`
+
 ✓ Models are loaded from MinIO and serving predictions
 
 [#test-inference-endpoints]
