@@ -2,25 +2,10 @@
 
 Welcome to the AI Lifecycle at the Edge lab. This hands-on workshop demonstrates how AI and edge computing work together to solve real-world industrial automation challenges.
 
-[#about-this-lab]
-== About this workshop
-
-This workshop shows you how to implement an end-to-end AI solution for battery health monitoring in a fleet of factory transportation robots. You'll explore Red Hat's edge computing and AI/ML platforms working together to enable intelligent automation at the edge.
-
-The lab covers pre-configured infrastructure, automated model training pipelines, model serving, and monitoring, demonstrating how AI models can continuously improve without manual intervention.
-
-This workshop is designed for **platform engineers, ML engineers, DevOps teams, and data scientists** who are:
-
-* Deploying AI/ML workloads at the edge with limited resources
-* Building automated MLOps pipelines for continuous model improvement
-* Managing Kubernetes-based edge infrastructure (MicroShift, Single Node OpenShift)
-* Interested in Red Hat OpenShift AI for the full ML lifecycle
-* Working with IoT, industrial automation, or edge AI use cases
-
 [#the-challenge]
 == The challenge: Factory robot battery monitoring
 
-Batteries power modern industrial automation. In automotive manufacturing and logistics facilities, battery-powered autonomous mobile robots (AMRs) have become essential for efficient operations. Our facility operates a **fleet of 18 battery-powered robots** that transport pallets of automotive components between receiving docks, warehouse storage, production lines, and shipping areas **24/7**.
+Batteries power modern industrial automation. In automotive manufacturing and logistics facilities, battery-powered autonomous mobile robots (AMRs) have become essential for efficient operations. Our facility operates a **fleet of battery-powered robots** that transport pallets of automotive components between receiving docks, warehouse storage, production lines, and shipping areas **24/7**.
 
 Batteries are the heart of these machines. An unexpected battery failure can lead to:
 
@@ -34,7 +19,7 @@ Batteries are the heart of these machines. An unexpected battery failure can lea
 [#the-solution]
 == Our AI-powered solution
 
-As systems engineers for an automotive parts distribution center, we've developed an end-to-end AI solution that covers two scenarios:
+As systems engineers for an automotive parts distribution center, we've developed an end-to-end AI solution that covers 2 scenarios:
 
 === Battery monitoring system
 
@@ -49,7 +34,7 @@ To support this containerized solution on each robot, we use **Red Hat Device Ed
 
 === Automated model re-training at the edge
 
-AI models must stay accurate as battery behavior evolves over time. However, robots generate massive amounts of telemetry data (40-60 trips per shift, 24/7 operations), making it impractical to continuously upload all data over the factory network.
+AI models must stay accurate as battery behavior evolves over time. However, robots generate massive amounts of telemetry data, making it impractical to continuously upload all data over the factory network.
 
 Our solution:
 
@@ -60,35 +45,6 @@ Our solution:
 * Automatically deploys improved models back to robots if they outperform existing ones
 
 This ensures smarter battery monitoring without manual intervention.
-
-[#lab-modules]
-== Lab modules overview
-
-This lab is divided into modules that guide you through the complete AI lifecycle at the edge:
-
-**Module 1: Factory Transportation Robots** - Explore robot infrastructure, MinIO storage, model serving, and Battery Monitoring System
-
-**Module 2: RHOAI Configuration** - Review pre-configured OpenShift AI installation, data science project, and connections
-
-**Module 3: Model Training** - Review workbench setup, import training notebooks, train battery health models
-
-**Module 4: Model Serving** - Review model servers for Stress Detection and Time-to-Failure, query inference endpoints
-
-**Module 5: Pipeline Automation** - Review pipeline server, execute automated retraining pipeline, schedule recurring runs
-
-**Module 6: Model Monitoring** - Enable TrustyAI for bias detection and data drift monitoring
-
-[#what-you-will-learn]
-== What you will learn
-
-By the end of this workshop, you will understand:
-
-* How to deploy AI/ML workloads on edge platforms (MicroShift, SNO)
-* Red Hat OpenShift AI components (workbenches, model serving, pipelines, monitoring)
-* Automated MLOps workflows for continuous model improvement
-* Model serving architectures for edge inference
-* Pipeline automation for hands-off model retraining
-* Model monitoring with TrustyAI for production AI systems
 
 [#get-started]
 == Get started

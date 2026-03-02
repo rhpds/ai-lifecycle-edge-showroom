@@ -55,7 +55,7 @@ To address these challenges, we use:
 [#architecture]
 == Solution architecture
 
-Now that we understand the goal of the lab, the solution we want to implement, and the existing limitations, let's focus on the infrastructure we'll be working with. This infrastructure consists of two key components: the autonomous vehicle and the re-training machine.
+Now that we understand the goal of the lab, the solution we want to implement, and the existing limitations, let's focus on the infrastructure we'll be working with. This infrastructure consists of 2 key components: the autonomous vehicle and the re-training machine.
 
 === Autonomous vehicle (Red Hat Device Edge)
 
@@ -64,7 +64,7 @@ Our autonomous vehicle runs on a Red Hat Enterprise Linux (RHEL) operating syste
 Components running on each robot:
 
 * **MicroShift** - Lightweight Kubernetes platform
-* **MinIO Storage** - Stores AI models in the `inference` bucket used for battery stress and fault detection. By default, two baseline models are preloaded at startup. These will later be replaced by the retrained models coming from our Single Node OpenShift instance
+* **MinIO Storage** - Stores AI models in the `inference` bucket used for battery stress and fault detection. By default, 2 baseline models are preloaded at startup. These will later be replaced by the retrained models coming from our Single Node OpenShift instance
 * **Model Serving** - KServe/ModelMesh for loading and serving models via API
 * **Battery Monitoring System (BMS)** - Dashboard showing real-time telemetry and AI predictions, making use of the trained models to provide predictions through the telemetry dashboard along with the data generated
 * **InfluxDB** - Time-series database storing historical sensor data
@@ -94,15 +94,15 @@ image::1-3_diagram.png[AI lifecycle edge architecture diagram showing MicroShift
 
 **Workflow Steps:**
 
-1. Our environment comes with two base AI models stored in the _inference_ MinIO bucket. The first one called **Stress Detection** will be able to identify early signs of battery stress - conditions that may lead to degradation or failure. The second one - **Time to Failure** - uses sensor data to provide an estimate of the remaining time until a potential battery failure.
+1. Our environment comes with 2 base AI models stored in the _inference_ MinIO bucket. The first one called **Stress Detection** will be able to identify early signs of battery stress - conditions that may lead to degradation or failure. The second one - **Time to Failure** - uses sensor data to provide an estimate of the remaining time until a potential battery failure.
 
 2. Both models are loaded into the InferenceServer instance to make them available for inference via API endpoints.
 
 3. Once the infrastructure is ready, it's time to start generating data. The Battery simulator item is a Quarkus component that simulates the battery consumption of an operating autonomous vehicle and sends telemetry data to the Mosquitto MQTT broker that acts as the central messaging hub, receiving the data coming from the emulated sensors.
 
-4. Two different Camel Quarkus components are in charge of reading the data from Mosquitto and sending it to the Battery Monitoring System (BMS) app. The **mqtt2ws** exposes the data as WebSocket for the BMS Dashboard and the **data ingester** stores it in InfluxDB. From there, a scheduled pipeline running every 10 minutes in the SNO collects all the data stored in the time series database during the last hour and is used to re-train both models.
+4. 2 different Camel Quarkus components are in charge of reading the data from Mosquitto and sending it to the Battery Monitoring System (BMS) app. The **mqtt2ws** exposes the data as WebSocket for the BMS Dashboard and the **data ingester** stores it in InfluxDB. From there, a scheduled pipeline running every 10 minutes in the SNO collects all the data stored in the time series database during the last hour and is used to re-train both models.
 
-5. The Battery Monitoring System application includes a component that retrieves real-time data from InfluxDB and sends it as queries to the two inference endpoints and receives the predictions from the AI models currently being served.
+5. The Battery Monitoring System application includes a component that retrieves real-time data from InfluxDB and sends it as queries to the 2 inference endpoints and receives the predictions from the AI models currently being served.
 
 6. The response returned by the models is analyzed, and if necessary, it is forwarded to an alerting system that triggers notifications in case of detected battery stress conditions or signs of an imminent failure.
 

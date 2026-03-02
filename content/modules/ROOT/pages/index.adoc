@@ -17,16 +17,6 @@ This workshop is designed for **platform engineers, ML engineers, DevOps teams, 
 * Red Hat OpenShift AI for the full ML lifecycle
 * IoT, industrial automation, or edge AI use cases
 
-[#scenario]
-== The scenario
-
-An automotive parts distribution facility operates **a fleet of battery-powered autonomous mobile robots (AMRs)** that transport components 24/7. Unexpected battery failures cause production delays, disrupted schedules, and safety risks. For this reason, a Battery Monitoring System (BMS) application will be deployed in the transportation robot.
-
-**The Solution:** AI-powered battery health monitoring
-
-* **On each robot (MicroShift + BMS app)** - Real-time telemetry collection, AI inference, alerting
-* **At the plant (SNO + RHOAI)** - Automated model retraining every 10 minutes with fresh data
-
 [#lab-modules]
 == Lab modules
 
@@ -92,6 +82,6 @@ NOTE: Part of the infrastructure is pre-configured. You'll review configurations
 [#get-started]
 == Get started
 
-Begin by exploring the challenge, solution architecture, and available dashboards:
+Begin by exploring the existing challenge and solution architecture:
 
 **Navigate to xref:01-overview.adoc[Introduction] to start the workshop.**
