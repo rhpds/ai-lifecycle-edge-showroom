@@ -1,13 +1,13 @@
 = {lab_name}
 
-Explore how AI and edge computing work together to solve real-world industrial automation challenges with Red Hat's edge and AI/ML platforms.
+Explore how AI and edge computing work together to solve real-world industrial automation challenges with Red Hat's edge topologies and its AI/ML platform.
 
 [#about-this-lab]
 == About this workshop
 
-This hands-on workshop demonstrates an end-to-end AI solution for battery health monitoring in factory transportation robots. You'll explore Red Hat Device Edge (MicroShift), Single Node OpenShift (SNO), and Red Hat OpenShift AI working together to enable intelligent automation at the edge.
+This hands-on workshop demonstrates an end-to-end AI solution for battery health monitoring in factory transportation robots. You'll explore **Red Hat Device Edge (MicroShift)**, **Single Node OpenShift (SNO)**, and **Red Hat OpenShift AI (RHOAI)** working together to enable intelligent automation at the edge.
 
-The lab covers pre-configured infrastructure, automated model training pipelines, model serving, and monitoring, demonstrating how AI models can continuously improve without manual intervention.
+The lab covers GitOps deployment, AI inference, model serving, and automated model training via pipelines, demonstrating how AI models can run at the edge while continuously improving without manual intervention.
 
 This workshop is designed for **platform engineers, ML engineers, DevOps teams, and data scientists** working with:
 
@@ -20,11 +20,11 @@ This workshop is designed for **platform engineers, ML engineers, DevOps teams, 
 [#scenario]
 == The scenario
 
-An automotive parts distribution facility operates **18 battery-powered autonomous mobile robots (AMRs)** that transport components 24/7. Unexpected battery failures cause production delays, disrupted schedules, and safety risks.
+An automotive parts distribution facility operates **a fleet of battery-powered autonomous mobile robots (AMRs)** that transport components 24/7. Unexpected battery failures cause production delays, disrupted schedules, and safety risks. For this reason, a Battery Monitoring System (BMS) application will be deployed in the transportation robot.
 
 **The Solution:** AI-powered battery health monitoring
 
-* **On each robot (MicroShift)** - Real-time telemetry collection, AI inference, alerting
+* **On each robot (MicroShift + BMS app)** - Real-time telemetry collection, AI inference, alerting
 * **At the plant (SNO + RHOAI)** - Automated model retraining every 10 minutes with fresh data
 
 [#lab-modules]
@@ -32,7 +32,9 @@ An automotive parts distribution facility operates **18 battery-powered autonomo
 
 **xref:01-overview.adoc[Introduction]** - Understand the challenge, solution architecture, and dashboards
 
-**xref:2-1_vehicle-infrastructure.adoc[Module 1: Factory Transportation Robots]**
+**xref:02-details.adoc[Technical Details]** - Technical specs, architecture, and lab access
+
+**xref:2-1_vehicle-infrastructure.adoc[Module 1: Transportation Robot]**
 
 * 1.1 Robot Infrastructure Setup
 * 1.2 MinIO Storage Deployment
@@ -75,17 +77,17 @@ An automotive parts distribution facility operates **18 battery-powered autonomo
 * Implement automated MLOps workflows for continuous model improvement
 * Configure model serving architectures for edge inference
 * Enable pipeline automation for hands-off model retraining
-* Configure alerting and monitoring dashboards
+* Configure alerting and monitoring in critical components at the edge
 
 [#prerequisites]
 == Prerequisites
 
 * Basic Kubernetes/OpenShift concepts
-* Python and Jupyter notebooks
+* Basic Python and Jupyter notebooks knowledge
 * Basic machine learning concepts
-* Command-line tools (ssh, oc)
+* Experience with Command-line tools (ssh, oc)
 
-NOTE: All infrastructure is pre-configured. You'll review configurations and execute hands-on tasks to understand the complete AI lifecycle.
+NOTE: Part of the infrastructure is pre-configured. You'll review configurations and execute hands-on tasks to understand the complete AI/ML lifecycle.
 
 [#get-started]
 == Get started

@@ -1,7 +1,7 @@
 * xref:01-overview.adoc[Introduction]
 * xref:02-details.adoc[Technical Details]
 
-* Module 1: Factory Transportation Robots
+* Module 1: Transportation Robot
 ** xref:2-1_vehicle-infrastructure.adoc[1.1 Robot Infrastructure]
 ** xref:2-2_minio-deployment.adoc[1.2 MinIO Storage]
 ** xref:2-3_inference-deployment.adoc[1.3 Model Serving]
