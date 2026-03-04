@@ -1,33 +1,35 @@
+* xref:index.adoc[Workshop Overview]
 * xref:01-overview.adoc[Introduction]
 * xref:02-details.adoc[Technical Details]
 
-* Module 1: Transportation Robot
-** xref:2-1_vehicle-infrastructure.adoc[1.1 Robot Infrastructure]
-** xref:2-2_minio-deployment.adoc[1.2 MinIO Storage]
-** xref:2-3_inference-deployment.adoc[1.3 Model Serving]
-** xref:2-4_deploy-bms.adoc[1.4 Battery Monitoring System]
+* xref:03-module-01-transportation-robot.adoc[Module 1: Transportation Robot]
+** xref:03-module-01-transportation-robot.adoc#connect-robot[1.1 Robot Infrastructure]
+** xref:03-module-01-transportation-robot.adoc#deploy-minio[1.2 MinIO Storage]
+** xref:03-module-01-transportation-robot.adoc#deploy-model-serving[1.3 Model Serving]
+** xref:03-module-01-transportation-robot.adoc#deploy-bms[1.4 Battery Monitoring System]
 
-* Module 2: RHOAI Configuration
-** xref:3-1_rhoai-install.adoc[2.1 Review RHOAI]
-** xref:3-2_datascience-project.adoc[2.2 Review Project]
-** xref:3-3_data-connection-serving.adoc[2.3 Review DataConnection]
+* xref:04-module-02-rhoai-configuration.adoc[Module 2: RHOAI Configuration]
+** xref:04-module-02-rhoai-configuration.adoc#access-openshift[2.1 Review RHOAI]
+** xref:04-module-02-rhoai-configuration.adoc#review-project[2.2 Review Project]
+** xref:04-module-02-rhoai-configuration.adoc#review-dataconnection[2.3 Review DataConnection]
 
-* Module 3: Model Training
-** xref:4-1_workbench.adoc[3.1 Review Workbench]
-** xref:4-2_importing-notebooks.adoc[3.2 Import Notebooks]
-** xref:4-3_running-notebooks.adoc[3.3 Train Models]
+* xref:05-module-03-model-training.adoc[Module 3: Model Training]
+** xref:05-module-03-model-training.adoc#review-workbench[3.1 Review Workbench]
+** xref:05-module-03-model-training.adoc#import-notebooks[3.2 Import Notebooks]
+** xref:05-module-03-model-training.adoc#train-models[3.3 Train Models]
 
-* Module 4: Model Serving
-** xref:5-1_stress-model-server.adoc[4.1 Stress Detection Server]
-** xref:5-2_ttf-model-server.adoc[4.2 Time to Failure Server]
-** xref:5-3_query-endpoints.adoc[4.3 Query Endpoints]
+* xref:06-module-04-model-serving.adoc[Module 4: Model Serving]
+** xref:06-module-04-model-serving.adoc#stress-detection-server[4.1 Stress Detection Server]
+** xref:06-module-04-model-serving.adoc#ttf-server[4.2 Time to Failure Server]
+** xref:06-module-04-model-serving.adoc#query-endpoints[4.3 Query Endpoints]
 
-* Module 5: Pipeline Automation
-** xref:6-1_pipeline-server.adoc[5.1 Review Pipeline Server]
-** xref:6-2_pipeline-execution.adoc[5.2 Execute Pipeline]
-** xref:6-3_pipeline-automation.adoc[5.3 Schedule Automation]
+* xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline Automation]
+** xref:07-module-05-pipeline-automation.adoc#review-pipeline-server[5.1 Review Pipeline Server]
+** xref:07-module-05-pipeline-automation.adoc#execute-pipeline[5.2 Execute Pipeline]
+** xref:07-module-05-pipeline-automation.adoc#schedule-automation[5.3 Schedule Automation]
 
-* Module 6: Test alerts
-** xref:7-1_TODO-test-alerts.adoc[6.1 Test Alerts Dashboard]
+* xref:08-module-06-test-alerts.adoc[Module 6: Test Alerts]
+** xref:08-module-06-test-alerts.adoc#test-alerts[6.1 Test Battery Health Alerts]
+** xref:08-module-06-test-alerts.adoc#monitor-inference[6.2 Monitor Inference Execution]
 
-* xref:99-conclusion.adoc[Conclusion]
+* xref:09-conclusion.adoc[Conclusion and Next Steps]

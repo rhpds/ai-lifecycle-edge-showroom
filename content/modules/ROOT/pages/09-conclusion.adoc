@@ -1,19 +1,19 @@
-= Conclusion
+= Conclusion and Next Steps
 
 == What you've accomplished
 
 Congratulations! You've completed the AI Lifecycle at the Edge workshop. You've explored a complete solution spanning edge devices and cloud-like infrastructure:
 
-**Module 1 - Factory Transportation Robots:**
+**Module 1 - Transportation Robot:**
 
 * Connected to robot infrastructure via MicroShift
 * Deployed MinIO object storage for AI models
 * Configured model serving with KServe/OpenVINO
 * Deployed Battery Monitoring System with real-time predictions
 
-**Module 2 - RHOAI Configuration:**
+**Module 2 - Red Hat OpenShift AI (RHOAI) Configuration:**
 
-* Reviewed RHOAI installation optimized for edge
+* Reviewed Red Hat OpenShift AI (RHOAI) installation optimized for edge
 * Explored data science project organization
 * Examined DataConnections linking SNO to robot storage
 
@@ -35,11 +35,14 @@ Congratulations! You've completed the AI Lifecycle at the Edge workshop. You've 
 * Executed automated retraining pipeline
 * Scheduled pipelines for continuous model improvement
 
-**Module 6 - Model Monitoring:**
+**Module 6 - Test Alerts:**
 
-* Enabled TrustyAI for model monitoring
-* Configured metrics collection infrastructure
-* Prepared for bias detection and drift monitoring
+* Tested battery health alerts dashboard
+* Verified auto-inference and AI predictions
+* Simulated battery stress scenarios
+* Monitored real-time inference execution in model server logs
+* Analyzed inference performance and latency metrics
+* Confirmed alerting system functionality
 
 == What you've learned
 

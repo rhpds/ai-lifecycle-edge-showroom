@@ -1,11 +1,13 @@
 = Introduction
 
-Welcome to the AI Lifecycle at the Edge lab. This hands-on workshop demonstrates how AI and edge computing work together to solve real-world industrial automation challenges.
+This hands-on workshop showcases how the integration of AI and edge computing can effectively address specific customer use cases and fit seamlessly into various real-world scenarios. The demo will highlight the practical application of AI in resource-constrained environments, making it essential to use lightweight topologies and platforms such as Single Node OpenShift (SNO) and Red Hat Device Edge.
+
+During the demo, we will develop a production-ready solution for the automotive industry, highlighting the importance of automation, as dedicated teams are not feasible at the edge. To address this challenge, our solution incorporates key components within Red Hat OpenShift AI to support the entire AI/ML lifecycle at the edge, including model training, data science pipelines and model serving.
 
 [#the-challenge]
 == The challenge: Factory robot battery monitoring
 
-Batteries power modern industrial automation. In automotive manufacturing and logistics facilities, battery-powered autonomous mobile robots (AMRs) have become essential for efficient operations. Our facility operates a **fleet of battery-powered robots** that transport pallets of automotive components between receiving docks, warehouse storage, production lines, and shipping areas **24/7**.
+Batteries power modern industrial automation. In automotive manufacturing and logistics facilities, battery-powered autonomous mobile robots (AMRs) have become essential for efficient operations. Our facility operates a **fleet of battery-powered robots** that transport pallets of automotive components between receiving docks, warehouse storage, production lines, and shipping areas non stop.
 
 Batteries are the heart of these machines. An unexpected battery failure can lead to:
 
@@ -19,7 +21,7 @@ Batteries are the heart of these machines. An unexpected battery failure can lea
 [#the-solution]
 == Our AI-powered solution
 
-As systems engineers for an automotive parts distribution center, we've developed an end-to-end AI solution that covers 2 scenarios:
+As systems engineers for **Red Bot Logistics**, we've developed an end-to-end AI solution that covers 2 scenarios:
 
 === Battery monitoring system
 
@@ -30,21 +32,19 @@ Each factory robot runs an application that monitors battery health during opera
 * Predicts potential battery failure before it happens
 * Triggers alerts to maintenance teams
 
-To support this containerized solution on each robot, we use **Red Hat Device Edge (MicroShift)**, a lightweight Kubernetes platform optimized for resource-constrained environments.
+To support this containerized solution on each robot, we use **Red Hat Device Edge (MicroShift)**, a lightweight Kubernetes platform optimized for resource-constrained environments with model serving and GitOps capabilities.
 
 === Automated model re-training at the edge
 
-AI models must stay accurate as battery behavior evolves over time. However, robots generate massive amounts of telemetry data, making it impractical to continuously upload all data over the factory network.
+AI models must stay accurate as battery behavior evolves over time. However, robots generate massive amounts of telemetry data, making it impractical to continuously upload all data over the factory network. Our solution uses **Red Hat OpenShift AI (RHOAI)** for the entire AI/ML lifecycle:
 
-Our solution:
-
-* Collects new data every 10 minutes from the robot fleet
-* Retrains AI models on an edge server with greater compute capacity (Single Node OpenShift) at the plant
-* Uses **Red Hat OpenShift AI (RHOAI)** for the entire AI/ML lifecycle
+* Collects new data every 10 minutes from the robot
+* Trains 2 AI models based using the new data
+* Serve both models to test performace
 * Runs a fully automated pipeline: data collection → model training → validation → deployment
 * Automatically deploys improved models back to robots if they outperform existing ones
 
-This ensures smarter battery monitoring without manual intervention.
+This RHOAI operator is deployed on an **Single Node OpenShift** instance with greater compute capacity at the plant. SNO is optimized for edge locations providing enterprise Kubernetes features in a single-node deployment.
 
 [#get-started]
 == Get started

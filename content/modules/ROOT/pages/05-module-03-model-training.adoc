@@ -1,0 +1,358 @@
+= Module 3: Model Training
+
+This module explores the model training infrastructure on the Single Node OpenShift (SNO) server. You'll access a Jupyter notebook environment, import training notebooks from Git, and execute the complete model training workflow for battery health prediction models.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Access and configure Jupyter workbench environments in Red Hat OpenShift AI
+* Import training notebooks from Git repositories using JupyterLab
+* Execute model training workflows for Stress Detection and Time to Failure prediction
+* Understand the training pipeline from data collection through model export
+* Export trained models to OpenVINO format for edge deployment
+
+[#access-workbench]
+== Exercise 3.1: Access Jupyter workbench
+
+Red Hat OpenShift AI provides Jupyter workbench environments for data scientists to develop and train machine learning models. The workbench includes pre-configured runtimes with necessary libraries and tools.
+
+=== Navigate to RHOAI dashboard
+
+. Open the **Red Hat OpenShift AI (RHOAI) Dashboard**
+. Navigate to the **Data Science Projects** section
+. Locate and click on the `ai-edge-project` project
+
+The project contains:
+
+* **Workbenches** - Jupyter notebook environments for model development
+* **Data Connections** - S3 storage credentials for MinIO access
+* **Pipelines** - Automated ML workflows (covered in Module 5)
+* **Models** - Deployed inference services (covered in Module 4)
+
+=== Start the model-training workbench
+
+. In the `ai-edge-project` project, navigate to the **Workbenches** tab
+. Locate the `model-training` workbench
+. Click **Open** to launch JupyterLab
+
+IMAGE_HERE: Workbenches tab showing model-training workbench with "Open" button
+
+The workbench launches with:
+
+* **Python runtime** - Pre-configured with TensorFlow, scikit-learn, pandas
+* **S3 access** - Connected to robot MinIO storage via DataConnection
+* **Git integration** - Clone repositories directly in JupyterLab
+* **Persistent storage** - Work saved across sessions
+
+=== Verify workbench access
+
+Once JupyterLab loads, verify you can access the environment:
+
+. The JupyterLab interface displays with file browser on the left
+. Launcher shows available kernels (Python 3.9 or later)
+. Terminal access is available for command-line operations
+
+=== Verify
+
+Confirm the workbench is accessible and operational:
+
+✓ RHOAI Dashboard loads successfully
+
+✓ `ai-edge-project` project is visible
+
+✓ `model-training` workbench exists in Workbenches tab
+
+✓ **Open** button launches JupyterLab interface
+
+✓ JupyterLab displays file browser and launcher
+
+✓ Python kernel is available in launcher
+
+✓ Terminal option is available for CLI access
+
+[#import-notebooks]
+== Exercise 3.2: Import training notebooks
+
+The training notebooks are stored in a Git repository. You'll clone the repository directly into your JupyterLab environment to access the complete training workflow.
+
+=== Clone the Git repository
+
+. In JupyterLab, click the **Git** icon in the left sidebar (looks like a branching diagram)
+. Click **Clone a Repository**
+. Enter the repository URL:
++
+[source,text]
+----
+https://github.com/rhpds/ai-lifecycle-edge-gitops.git
+----
+
+. Click **Clone**
+
+JupyterLab clones the repository and creates an `ai-lifecycle-edge-gitops` folder in your workspace.
+
+IMAGE_HERE: JupyterLab Git clone dialog with repository URL field and Clone button
+
+=== Navigate to training notebooks
+
+After cloning completes:
+
+. In the file browser, expand the `ai-lifecycle-edge-gitops` folder
+. Navigate to `notebooks/training/`
+. Verify you see the training notebooks:
++
+* `stress-detection-training.ipynb` - Trains the Stress Detection model
+* `time-to-failure-training.ipynb` - Trains the Time to Failure model
+
+IMAGE_HERE: JupyterLab file browser showing notebooks/training folder with training notebooks
+
+=== Verify
+
+Confirm the repository was cloned successfully:
+
+✓ Git icon is accessible in left sidebar
+
+✓ Clone operation completes without errors
+
+✓ `ai-lifecycle-edge-gitops` folder appears in file browser
+
+✓ `notebooks/training/` directory exists
+
+✓ Both training notebooks are visible:
+  - `stress-detection-training.ipynb`
+  - `time-to-failure-training.ipynb`
+
+✓ Notebooks can be opened (double-click to verify)
+
+[#run-training]
+== Exercise 3.3: Execute training notebooks
+
+Run the training notebooks to train both battery health prediction models. The notebooks demonstrate the complete ML workflow from data collection to model export.
+
+=== Understand the training workflow
+
+Both notebooks follow the same pattern:
+
+1. **Data Collection** - Retrieve battery telemetry from InfluxDB on robots
+2. **Data Preprocessing** - Clean, normalize, and prepare training datasets
+3. **Model Training** - Train neural network models using TensorFlow
+4. **Model Evaluation** - Validate performance on test data
+5. **Model Export** - Convert to OpenVINO IR format for edge deployment
+6. **Model Upload** - Store in MinIO for distribution to robots
+
+**Stress Detection Model:**
+
+* **Input**: 9 features (voltage, temperature, state of charge, discharge rate, time elapsed, cycle count, ambient temperature, usage pattern, health status)
+* **Output**: Binary classification (STRESSED vs NORMAL, threshold 0.5)
+* **Architecture**: Neural network with dense layers and dropout
+
+**Time to Failure Model:**
+
+* **Input**: 5 features (temperature delta, voltage delta, resistance, current delta, capacity fade)
+* **Output**: Regression (predicted hours until failure)
+* **Architecture**: Neural network optimized for time-series prediction
+
+=== Run Stress Detection training
+
+. Open `stress-detection-training.ipynb`
+. Execute cells sequentially using **Shift+Enter** or **Run** → **Run All Cells**
+. Monitor execution:
++
+* **Data retrieval** - Fetches telemetry from InfluxDB
+* **Preprocessing** - Normalizes features, creates train/test split
+* **Training** - Trains model, shows loss/accuracy metrics
+* **Evaluation** - Tests on validation data, displays confusion matrix
+* **Export** - Converts to OpenVINO IR format (`.xml` and `.bin` files)
+* **Upload** - Stores model in MinIO `inference/stress-detection/1/` bucket
+
+IMAGE_HERE: Jupyter notebook showing Stress Detection training with loss curves and accuracy metrics
+
+Wait for all cells to complete execution. Training typically takes 2-5 minutes.
+
+=== Run Time to Failure training
+
+. Open `time-to-failure-training.ipynb`
+. Execute cells sequentially using **Shift+Enter** or **Run** → **Run All Cells**
+. Monitor execution:
++
+* **Data retrieval** - Fetches historical battery performance data
+* **Feature engineering** - Calculates delta metrics and trends
+* **Training** - Trains regression model
+* **Evaluation** - Tests predictions, shows MAE (Mean Absolute Error)
+* **Export** - Converts to OpenVINO IR format
+* **Upload** - Stores model in MinIO `inference/time-to-failure/1/` bucket
+
+Wait for all cells to complete execution. Training typically takes 2-5 minutes.
+
+=== Verify model export
+
+After both notebooks complete:
+
+. Check that models were exported to OpenVINO format
+. In the notebook file browser, you should see generated model files in the workspace
+. Verify MinIO contains updated models:
++
+.. Open MinIO dashboard: `https://minio-microshift-001.{openshift_cluster_ingress_domain}`
+.. Navigate to `inference` bucket
+.. Verify `stress-detection/1/` contains `model.xml` and `model.bin`
+.. Verify `time-to-failure/1/` contains `model.xml` and `model.bin`
+.. Check file timestamps show recent updates
+
+=== Verify
+
+Confirm both training notebooks executed successfully:
+
+**Stress Detection Training:**
+
+✓ Notebook executes all cells without errors
+
+✓ Data collection retrieves telemetry from InfluxDB
+
+✓ Training shows loss decreasing over epochs
+
+✓ Evaluation displays accuracy metrics (>85% typical)
+
+✓ Model export creates `.xml` and `.bin` files
+
+✓ Upload confirms storage to MinIO
+
+**Time to Failure Training:**
+
+✓ Notebook executes all cells without errors
+
+✓ Data collection retrieves historical battery data
+
+✓ Training shows loss convergence
+
+✓ Evaluation displays MAE (Mean Absolute Error) metric
+
+✓ Model export creates OpenVINO IR files
+
+✓ Upload confirms storage to MinIO
+
+**Model Files in MinIO:**
+
+✓ `stress-detection/1/model.xml` exists with recent timestamp
+
+✓ `stress-detection/1/model.bin` exists with recent timestamp
+
+✓ `time-to-failure/1/model.xml` exists with recent timestamp
+
+✓ `time-to-failure/1/model.bin` exists with recent timestamp
+
+✓ File sizes are reasonable (not empty, typically several MB)
+
+[#troubleshooting]
+== Troubleshooting
+
+**Issue**: Workbench fails to start or shows "Spawner timeout"
+
+**Solution**:
+
+. Check workbench pod status: `oc get pods -n ai-edge-project | grep model-training`
+. Verify pod is running: `oc describe pod <workbench-pod> -n ai-edge-project`
+. Check resource quotas: `oc get resourcequota -n ai-edge-project`
+. Common fix: Stop and restart the workbench from RHOAI Dashboard
+
+**Issue**: Git clone fails with "Authentication required" error
+
+**Solution**:
+
+. Verify repository URL is correct (public repositories don't need auth)
+. Check network connectivity from workbench pod
+. Try cloning via terminal: `git clone https://github.com/rhpds/ai-lifecycle-edge-gitops.git`
+. Common fix: Use HTTPS URL instead of SSH for public repos
+
+**Issue**: Notebook execution fails with "ModuleNotFoundError"
+
+**Solution**:
+
+. Verify Python kernel is selected (top-right of notebook)
+. Check installed packages: Run `!pip list` in a notebook cell
+. Install missing packages: `!pip install <package-name>`
+. Common fix: Restart kernel and run all cells again
+
+**Issue**: InfluxDB data retrieval returns empty dataset
+
+**Solution**:
+
+. Verify InfluxDB is accessible from workbench
+. Check InfluxDB credentials in notebook configuration
+. Verify battery simulation is generating data on robot
+. Check InfluxDB query time range includes recent data
+. Common fix: Adjust query time range to "Past 24 hours"
+
+**Issue**: Model upload to MinIO fails with "Access Denied"
+
+**Solution**:
+
+. Verify DataConnection credentials are configured in project
+. Check MinIO accessibility: `curl http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
+. Verify bucket exists: Check MinIO dashboard
+. Common fix: Recreate DataConnection with correct credentials
+
+[#learning-outcomes]
+== Learning outcomes
+
+Before moving to the next module, verify you understand:
+
+**Concepts you should now understand:**
+
+* How Jupyter workbench environments provide isolated development spaces in RHOAI
+* The role of DataConnections in providing S3 credentials to workbenches
+* The complete ML training workflow from data collection to model deployment
+* Why OpenVINO IR format is used for edge deployment (optimization for Intel architectures)
+* How model versioning works with numbered directories (`/1/`, `/2/`, etc.)
+* The difference between classification (Stress Detection) and regression (Time to Failure) models
+
+**Tasks you should be able to perform:**
+
+* Launch and access Jupyter workbench environments in RHOAI
+* Clone Git repositories into JupyterLab
+* Execute Jupyter notebooks for model training
+* Interpret training metrics (loss, accuracy, MAE)
+* Verify model export to OpenVINO format
+* Confirm model upload to S3-compatible storage (MinIO)
+* Troubleshoot common workbench and training issues
+
+**Key questions to ask yourself:**
+
+. Why use Jupyter notebooks for model training instead of scripts? (Answer: Interactive development, visualization, documentation, reproducibility)
+. What is the purpose of train/test split? (Answer: Evaluate model performance on unseen data to prevent overfitting)
+. Why convert TensorFlow models to OpenVINO format? (Answer: Optimized inference performance on Intel edge devices, reduced model size)
+. How does MinIO enable model distribution to robots? (Answer: S3-compatible storage accessible from both SNO and robot MicroShift environments)
+. What happens if the uploaded model performs worse than the existing one? (Answer: Validation steps in pipelines prevent deployment of inferior models)
+
+If you can answer these questions confidently, you're ready to proceed to the next module!
+
+[#summary]
+== Summary
+
+You have successfully trained battery health prediction models using Red Hat OpenShift AI:
+
+**✓ Workbench Access** - Launched Jupyter environment with pre-configured Python runtime
+
+**✓ Git Integration** - Cloned training notebooks from repository
+
+**✓ Stress Detection Training** - Trained binary classification model for battery stress
+
+**✓ Time to Failure Training** - Trained regression model for remaining battery life
+
+**✓ Model Export** - Converted models to OpenVINO IR format for edge deployment
+
+**✓ Model Storage** - Uploaded trained models to MinIO for distribution
+
+**What You've Learned:**
+
+* How to access and use RHOAI Jupyter workbench environments
+* Git integration in JupyterLab for notebook management
+* Complete ML training workflow from data to deployment
+* TensorFlow model training and evaluation techniques
+* OpenVINO model conversion for edge optimization
+* S3 storage integration for model distribution
+
+**The models are now trained and ready for serving.**
+
+Next, you'll explore the model serving infrastructure that loads these models and exposes inference endpoints for real-time predictions.
+
+Navigate to xref:06-module-04-model-serving.adoc[Module 4: Model Serving].
