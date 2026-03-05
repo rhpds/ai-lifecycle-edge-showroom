@@ -8,7 +8,6 @@ By the end of this module, you will be able to:
 
 * Access the OpenShift Console and RHOAI Dashboard
 * Verify RHOAI operator installation and DataScienceCluster configuration
-* Understand why RawDeployment mode is used instead of Serverless for edge
 * Navigate data science projects and understand how they organize AI/ML resources
 * Review DataConnections linking RHOAI to robot storage
 
@@ -29,65 +28,15 @@ Log in to the Single Node OpenShift cluster and verify RHOAI is installed.
 * Username: `{openshift_cluster_admin_username}`
 * Password: `{openshift_cluster_admin_password}`
 
-=== Verify RHOAI operator
-
-The RHOAI operator is already installed. Verify its status:
-
-. Navigate to **Operators** → **Installed Operators**
-. Verify **Red Hat OpenShift AI** appears with status **Succeeded**
-. Note the operator namespace: `redhat-ods-operator`
-
-The operator manages all RHOAI components and lifecycle.
-
-=== Review DataScienceCluster configuration
-
-The DataScienceCluster custom resource defines which RHOAI components are enabled and how they're configured.
-
-. In **Installed Operators**, click **Red Hat OpenShift AI**
-. Navigate to the **DataScienceCluster** tab
-. Click the existing DataScienceCluster instance
-. Click the **YAML** tab to view the configuration
-
-**Key configuration points:**
-
-**KServe Configuration:**
-
-* `defaultDeploymentMode: RawDeployment` - Full control over Kubernetes resources without Knative overhead
-* `managementState: Managed` - KServe is enabled and managed by the operator
-
-**Why RawDeployment for Edge?**
-
-* Full control over Kubernetes resources without Knative overhead
-* Ideal for resource-constrained SNO environments
-* Predictable resource usage (no auto-scaling)
-* Simpler configuration for edge deployments
-
-**KNative-Serving Configuration:**
-
-* `managementState: Removed` - KNative stack is disabled
-
-**Why Remove KNative?**
-
-* RawDeployment doesn't use KNative
-* Reduces resource consumption on SNO
-* Eliminates unnecessary components
-
-**TrustyAI Configuration:**
-
-* `managementState: Managed` - TrustyAI is enabled for model monitoring
-
-**Why Enable TrustyAI?**
-
-* Monitors model bias and fairness
-* Detects data drift over time
-* Essential for automated retraining (models continuously update without human oversight)
-
 === Access the RHOAI dashboard
 
 Access the RHOAI web interface:
 
 . In the OpenShift Console, click the **application launcher** icon (9 squares) in the top-right corner
 . Select **Red Hat OpenShift AI** from the dropdown
++
+image::3-1_rhoai-access.png[RHOAI Dashboard access menu,link=self,window=blank,width=700]
+
 . A new tab opens. Log in with OpenShift credentials if prompted
 . Click **Allow selected permissions** if prompted
 . You'll see the RHOAI landing page
@@ -96,19 +45,7 @@ image::3-1_rhoai-landing.png[RHOAI Dashboard landing page showing Data Science P
 
 === Verify
 
-Confirm RHOAI is properly configured:
-
 ✓ OpenShift Console loads successfully
-
-✓ **Red Hat OpenShift AI** operator shows status **Succeeded**
-
-✓ DataScienceCluster YAML contains:
-** `kserve.defaultDeploymentMode: RawDeployment`
-** `kserve.managementState: Managed`
-** `serving.managementState: Removed`
-** `trustyai.managementState: Managed`
-
-✓ DataScienceCluster **Phase** shows **Ready**
 
 ✓ RHOAI Dashboard loads successfully
 
@@ -120,52 +57,25 @@ Data Science Projects in RHOAI organize users and AI/ML resources in a single na
 === Access the ai-edge-project
 
 . Ensure you're in the **Red Hat OpenShift AI Dashboard**
-. Click **Data Science Projects** in the left navigation
-. Locate and click on `ai-edge-project` in the projects list
+. Click **Projects** in the left navigation
+. Locate and click on `ai-edge-project` that has been pre-created
 
-image::3-2_project.png[Data Science Projects list showing ai-edge-project,link=self,window=blank,width=700]
+image::3-2_project.png[AI & Edge Data Science Project,link=self,window=blank,width=700]
 
 The project dashboard shows multiple tabs for managing AI/ML resources.
 
-=== Explore project structure
+=== Explore project components
 
 Review the project dashboard tabs:
 
 * **Overview** - Project details and quick access to resources
 * **Workbenches** - JupyterLab development environments
 * **Pipelines** - Automated ML workflows
-* **Models** - Deployed model servers for inference
+* **Deployents** - Deployed model servers for inference
 * **Connections** - External storage and data sources
 * **Permissions** - User access control
 
 These tabs organize all resources for the battery monitoring AI solution.
-
-=== Verify the project namespace
-
-Data Science Projects map to OpenShift namespaces. Verify the underlying namespace:
-
-. Switch to the **OpenShift Web Console** tab
-. Navigate to **Projects** in the left navigation
-. Find and click on the `ai-edge-project` namespace
-
-Explore namespace resources:
-
-**Pods:**
-
-. Navigate to **Workloads** → **Pods**
-. Observe running workbench and model server pods
-
-**Services:**
-
-. Navigate to **Networking** → **Services**
-. View model inference endpoints
-
-**Storage:**
-
-. Navigate to **Storage** → **PersistentVolumeClaims**
-. See data storage volumes for workbenches
-
-The namespace contains all Kubernetes resources for the AI/ML project.
 
 === Verify
 
@@ -173,13 +83,8 @@ Confirm the project is properly configured:
 
 ✓ `ai-edge-project` appears in Data Science Projects list
 
-✓ Project dashboard shows all tabs (Overview, Workbenches, Pipelines, Models, Connections)
+✓ Project dashboard shows all tabs (Overview, Workbenches, Pipelines, Deployents, Connections)
 
-✓ `ai-edge-project` namespace exists in OpenShift Console
-
-✓ **Workloads → Pods**: Multiple running pods visible
-
-✓ **Storage → PVCs**: Persistent volumes for workbenches exist
 
 [#review-dataconnection]
 == Exercise 2.3: Review DataConnection
@@ -199,7 +104,8 @@ The connection bridges the SNO training environment and robot's edge storage.
 . Ensure you're in the **RHOAI Dashboard** inside the `ai-edge-project` project
 . Navigate to the **Connections** tab
 . Locate the existing connection: `vehicle-models`
-
+. Click on the **three vertical dots** on the right and click **Edit**
++
 image::3-3_connection.png[Connections tab showing vehicle-models DataConnection,link=self,window=blank,width=700]
 
 === Understand connection parameters
@@ -208,25 +114,13 @@ The `vehicle-models` connection is configured with:
 
 * **Connection type**: S3 compatible object storage - v1 (standard S3 protocol compatible with MinIO)
 * **Connection name**: `vehicle-models`
-* **Endpoint**: `http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
+* **Endpoint**: `\http://minio-microshift-vm.microshift-001.svc.cluster.local:30000` (Robot's MinIO storage)
 * **Region**: `us-east-1` (default S3 region, required but unused by MinIO)
-* **Bucket**: `inference` (contains AI models and training data)
-
-**Endpoint Explanation:**
-
-The URL `minio-microshift-vm.microshift-001.svc.cluster.local:30000` uses Kubernetes service DNS to connect across clusters. The `microshift-001.svc.cluster.local` domain allows SNO to communicate with the robot's MicroShift cluster over the factory network.
+* **Bucket**: `inference` (contains AI models in the robot)
 
 === Verify the underlying secret
 
-DataConnections are stored as Kubernetes Secrets. Review the secret:
-
-. Switch to the **OpenShift Web Console**
-. Navigate to **Workloads** → **Secrets**
-. Ensure you're in the `ai-edge-project` namespace (use the project dropdown)
-. Search for or scroll to: `aws-connection-vehicle-models`
-. Click on the secret to view details
-
-The secret contains base64-encoded S3 credentials:
+DataConnections are stored as Kubernetes Secrets. The secret contains base64-encoded S3 credentials:
 
 * `AWS_ACCESS_KEY_ID` - MinIO username
 * `AWS_SECRET_ACCESS_KEY` - MinIO password
@@ -242,97 +136,9 @@ Confirm the DataConnection is properly configured:
 
 ✓ `vehicle-models` connection appears in Connections tab
 
-✓ Connection type shows "S3 compatible object storage - v1"
-
 ✓ **Endpoint**: Points to MicroShift MinIO service
 
 ✓ **Bucket**: `inference`
-
-✓ Secret `aws-connection-vehicle-models` exists in `ai-edge-project` namespace
-
-✓ Secret contains all 5 required fields (base64-encoded)
-
-[#troubleshooting]
-== Troubleshooting
-
-**Issue**: RHOAI operator shows "Failed" or "UpgradePending" status
-
-**Solution**:
-
-. Check operator events: Navigate to Operators → Installed Operators → Red Hat OpenShift AI → Events tab
-. Review operator logs: Click on operator pod in `redhat-ods-operator` namespace → Logs tab
-. Verify subscription: Operators → Installed Operators → Red Hat OpenShift AI → Subscription tab
-. Common fix: Ensure cluster has sufficient resources, wait for automatic reconciliation
-
-**Issue**: DataScienceCluster stuck in "NotReady" phase
-
-**Solution**:
-
-. Check DataScienceCluster status: Navigate to DataScienceCluster tab → Click instance → YAML tab
-. Review conditions section at bottom of YAML for error messages
-. Verify component deployments: Check pods in `redhat-ods-applications` namespace
-. Common fix: Ensure KNative is removed (`serving.managementState: Removed`) for edge deployments
-
-**Issue**: RHOAI Dashboard not accessible or shows 404 error
-
-**Solution**:
-
-. Verify route exists: In OpenShift Console → Networking → Routes → `redhat-ods-applications` namespace
-. Check for route named `rhods-dashboard`
-. Verify route target service is running
-. Common fix: Access via application launcher (9 squares icon) instead of direct URL
-
-**Issue**: Cannot access ai-edge-project in RHOAI Dashboard
-
-**Solution**:
-
-. Verify project exists: In OpenShift Console → Projects → search for `ai-edge-project`
-. Check permissions: In RHOAI Dashboard → ai-edge-project → Permissions tab
-. Verify you're logged in as cluster admin user
-. Common fix: Ensure you authenticated with correct credentials (`{openshift_cluster_admin_username}`)
-
-**Issue**: DataConnection shows error or "Connection Failed" status
-
-**Solution**:
-
-. Verify secret exists: OpenShift Console → Workloads → Secrets → `ai-edge-project` namespace
-. Check secret name: `aws-connection-vehicle-models`
-. Verify MinIO endpoint is reachable from SNO
-. Test connectivity: Create test pod in `ai-edge-project`, exec into it, curl the MinIO endpoint
-. Common fix: Verify network connectivity between SNO and MicroShift clusters
-
-[#learning-outcomes]
-== Learning outcomes
-
-Before moving to the next module, verify you understand:
-
-**Concepts you should now understand:**
-
-* How RHOAI provides a complete AI/ML platform integrated with OpenShift
-* Why RawDeployment mode is preferred over Serverless (KNative) for edge deployments with resource constraints
-* How DataScienceCluster custom resources configure and manage RHOAI components
-* The role of TrustyAI in monitoring model bias, fairness, and data drift for automated retraining scenarios
-* How Data Science Projects organize AI/ML resources in Kubernetes namespaces
-* How DataConnections bridge RHOAI workbenches/pipelines with external S3-compatible storage
-
-**Tasks you should be able to perform:**
-
-* Navigate OpenShift Console and RHOAI Dashboard
-* Verify operator installation status and health
-* Review DataScienceCluster configuration in YAML format
-* Access and explore Data Science Projects
-* Locate underlying Kubernetes resources (pods, services, secrets) for RHOAI projects
-* Review DataConnection configuration and underlying secrets
-
-**Key questions to ask yourself:**
-
-. What are the key advantages of RawDeployment over Serverless mode for edge AI? (Answer: Lower resource overhead, predictable scaling, simpler configuration)
-. Why is KNative removed from the DataScienceCluster configuration? (Answer: RawDeployment doesn't require KNative, removing it reduces resource consumption)
-. How do Data Science Projects map to Kubernetes resources? (Answer: Each project creates a namespace containing all associated pods, services, and storage)
-. What information is stored in a DataConnection secret? (Answer: S3 endpoint, credentials, region, and bucket name - all base64-encoded)
-. How does the `vehicle-models` connection enable communication between SNO and robot storage? (Answer: Kubernetes service DNS allows cross-cluster communication over the factory network)
-
-If you can answer these questions confidently, you're ready to proceed to the next module!
 
 [#summary]
 == Summary
@@ -340,8 +146,6 @@ If you can answer these questions confidently, you're ready to proceed to the ne
 You have reviewed the pre-configured Red Hat OpenShift AI environment on Single Node OpenShift:
 
 **✓ RHOAI Operator** - Manages all AI/ML components with status **Succeeded**
-
-**✓ DataScienceCluster** - Optimized for edge with RawDeployment, TrustyAI enabled, KNative removed
 
 **✓ RHOAI Dashboard** - Web interface accessible and operational
 
