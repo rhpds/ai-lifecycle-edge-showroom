@@ -44,13 +44,6 @@ virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/la
 
 === Verify MicroShift is running
 
-MicroShift is a lightweight Kubernetes distribution designed for edge devices. It provides:
-
-* **Minimal footprint** - Runs with ~2 CPU cores and 2GB RAM
-* **Kubernetes API** - Full compatibility with standard Kubernetes tools
-* **Edge-optimized** - Built for resource-constrained, distributed deployments
-* **Embedded capabilities** - Model serving and GitOps built-in
-
 Check that MicroShift is running:
 
 [source,bash]
@@ -58,67 +51,84 @@ Check that MicroShift is running:
 sudo systemctl status microshift
 ----
 
-Expected output should show `active (running)`.
+Expected output should show `active (running)`:
 
-Verify cluster access:
-
-[source,bash]
-----
-oc get nodes
-----
-
-You should see 1 node in `Ready` status.
-
-=== Explore deployed namespaces
-
-List the namespaces already deployed on the robot:
-
-[source,bash]
-----
-oc get namespaces
-----
-
-You should see several namespaces including:
-
-* `openshift-gitops` - GitOps for automated deployments
-* `redhat-ods-applications` - Model serving components
-
-NOTE: Some namespaces may not exist yet. You'll deploy these components using GitOps in the following exercises.
-
-=== Verify
-
-Confirm you are connected and MicroShift is operational:
-
-**Expected hostname:**
-----
-microshift
-----
-
-**Expected systemctl output:**
 ----
 ● microshift.service - MicroShift
      Loaded: loaded (/usr/lib/systemd/system/microshift.service; enabled)
      Active: active (running) since ...
 ----
 
-**Expected nodes output:**
+Additionaly you can check if all the MicroShift pods are Running:
+
+[source,bash]
 ----
-NAME                    STATUS   ROLES                         AGE   VERSION
-localhost.localdomain   Ready    control-plane,master,worker   5d    v1.32.6
+oc get pods -A
 ----
 
-✓ Hostname shows `microshift`
+You should see various pods in Running status across different namespaces:
 
-✓ MicroShift service shows `active (running)`
+----
+NAMESPACE                  NAME                                         READY   STATUS      RESTARTS        AGE
+kube-system                csi-snapshot-controller-74795dc54f-lp9tf     1/1     Running     0               1d
+openshift-dns              dns-default-vk7fd                            2/2     Running     0               1d
+openshift-dns              node-resolver-4dfs2                          1/1     Running     0               1d
+openshift-gitops           argocd-application-controller-0              1/1     Running     0               1d
+openshift-gitops           argocd-redis-648648759c-dngbg                1/1     Running     0               1d
+openshift-gitops           argocd-repo-server-7bf65c5f8f-ljjzc          1/1     Running     0               1d
+openshift-ingress          router-default-59f4f4c47b-hnqh9              1/1     Running     0               1d
+openshift-ovn-kubernetes   ovnkube-master-p5dfb                         4/4     Running     0               1d
+openshift-ovn-kubernetes   ovnkube-node-8cp97                           1/1     Running     0               1d
+openshift-service-ca	   service-ca-755884c9cf-f2g4n                  1/1     Running     0               1d
+openshift-storage          lvms-operator-65d4bdf577-j2g9z               1/1     Running     0               1d
+openshift-storage          vg-manager-vg6lr                             1/1     Running     0               1d
+redhat-ods-applications    kserve-controller-manager-548d8c4ffb-7pg5x   1/1     Running     0               1d
+----
 
-✓ Node status is `Ready`
+The following namespaces contain the essential MicroShift components:
 
-✓ Kubernetes API is accessible via `oc` command
+.Essential MicroShift Components
+[cols="2,5"]
+|===
+| Namespace | Purpose
+
+| `kube-system`
+| Contains the core Kubernetes system pods
+
+| `openshift-dns`
+| Handles DNS resolution services for the cluster
+
+| `openshift-ovn-kubernetes`
+| Provides the networking layer with OVN (Open Virtual Network) for communication between pods and services
+
+| `openshift-storage`
+| Manages local volume management services (LVM) for persistent storage
+
+| `openshift-service-ca`
+| Provides certificate authority services for internal cluster communication
+
+| `openshift-ingress`
+| Handles external traffic routing to services running in the cluster
+|===
+
+Beyond the core MicroShift functionality, we can see that additional services are enabled:
+
+.Additional Services
+[cols="2,5"]
+|===
+| Namespace | Purpose
+
+| `openshift-gitops`
+| Provides GitOps capabilities with ArgoCD components for continuous deployment and configuration management. Allows managing applications through Git-based workflows.
+
+| `redhat-ods-applications`
+| Runs the KServe controller manager, which provides AI/ML model serving capabilities. Essential for deploying and managing AI models for stress detection and time-to-failure prediction.
+|===
 
 [#deploy-minio]
 == Exercise 1.2: MinIO storage deployment
 
-MinIO provides S3-compatible object storage for AI models on the robot. The `inference` bucket stores two AI models: **Stress Detection** (identifies battery stress conditions) and **Time to Failure** (predicts remaining battery life).
+MinIO provides S3-compatible object storage for AI models on the robot. The `inference` bucket stores 2 AI models: **Stress Detection** (identifies battery stress conditions) and **Time to Failure** (predicts remaining battery life).
 
 Both models are stored in OpenVINO IR format (`.xml` and `.bin` files) in versioned directories.
 
@@ -189,7 +199,7 @@ Watch the deployment:
 watch oc get pods -n minio
 ----
 
-Press `Ctrl+C` to exit when pods show `Running` and `Completed` status.
+NOTE: Press `Ctrl+C` to exit when pods show `Running` and `Completed` status.
 
 === Access MinIO dashboard
 
@@ -207,7 +217,7 @@ https://minio-microshift-001.{openshift_cluster_ingress_domain}
 * Username: `minio`
 * Password: `minio123`
 
-. Verify the `inference` bucket contains two directories:
+. Verify the `inference` bucket contains 2 directories:
 +
 * `stress-detection/1/` - Baseline Stress Detection model files (`.xml`, `.bin`)
 * `time-to-failure/1/` - Baseline Time to Failure model files (`.xml`, `.bin`)
@@ -216,27 +226,7 @@ image::2-2_minio-inference.png[MinIO dashboard showing inference bucket with mod
 
 === Verify
 
-Navigate through the MinIO dashboard:
-
-1. Click on the **inference** bucket
-2. Verify you see two folders: `stress-detection/` and `time-to-failure/`
-3. Click into `stress-detection/1/` - verify you see `.xml` and `.bin` files
-4. Go back and click into `time-to-failure/1/` - verify you see `.xml` and `.bin` files
-
-Expected files in each model directory:
-----
-stress-detection/1/
-  ├── model.xml          (OpenVINO model definition)
-  └── model.bin          (OpenVINO model weights)
-
-time-to-failure/1/
-  ├── model.xml
-  └── model.bin
-----
-
-✓ GitOps application shows `Synced` and `Healthy`
-
-✓ MinIO pod shows `Running` with `1/1` ready
+✓ MinIO pod shows `Running` with `1/1` ready or `Completed`
 
 ✓ `inference` bucket exists with both model directories
 
@@ -246,13 +236,6 @@ time-to-failure/1/
 == Exercise 1.3: Model serving deployment
 
 The inference server loads AI models from MinIO and exposes REST API endpoints for real-time predictions. It uses KServe (part of Red Hat OpenShift AI) optimized for edge deployments.
-
-**Model Serving Architecture:**
-
-* **ServingRuntime:** Defines the model server container (OpenVINO Model Server)
-* **InferenceService:** Connects models from MinIO to the ServingRuntime
-* **Service Account:** Provides S3 credentials to access MinIO storage
-* **Routes:** Expose inference endpoints externally for API access
 
 === Deploy model serving using GitOps
 
@@ -284,9 +267,10 @@ EOF
 This deploys:
 
 * **Namespace** - `inference` namespace for model serving
-* **ServingRuntime** - OpenVINO Model Server with REST and gRPC support
+* **ServingRuntime** - Defines the model server container (OpenVINO Model Server)
+* **Service Account:** Provides S3 credentials to access MinIO storage
 * **Service & Routes** - External access to inference endpoints
-* **InferenceServices** (2):
+* **InferenceServices** (2): Connects models from MinIO to the ServingRuntime
 ** `stress-detection` - Loads stress detection model from MinIO
 ** `time-to-failure` - Loads time-to-failure model from MinIO
 
@@ -297,7 +281,7 @@ Watch the deployment:
 watch oc get pods -n inference
 ----
 
-Press `Ctrl+C` to exit when all pods show `Running` status.
+NOTE: Press `Ctrl+C` to exit when all pods show `Running` status.
 
 === Test inference endpoints
 
@@ -329,37 +313,7 @@ Expected output: `Predicted Time Before Failure: <number> hours`
 
 === Verify
 
-Check that all model serving pods are running:
-
-[source,bash]
-----
-oc get pods -n inference
-----
-
-Expected output:
-----
-NAME                                                      READY   STATUS    RESTARTS   AGE
-stress-detection-predictor-xxxxx-xxxxx                    2/2     Running   0          3m
-time-to-failure-predictor-xxxxx-xxxxx                     2/2     Running   0          3m
-----
-
-Verify InferenceServices are ready:
-
-[source,bash]
-----
-oc get inferenceservice -n inference
-----
-
-Expected output:
-----
-NAME                URL                                                        READY
-stress-detection    http://stress-detection.inference.svc.cluster.local        True
-time-to-failure     http://time-to-failure.inference.svc.cluster.local         True
-----
-
-✓ Both predictor pods show `2/2` ready and `Running` status
-
-✓ Both InferenceServices show `READY = True`
+✓ All model serving pods are `Running`:
 
 ✓ Models respond to test inference requests
 
@@ -371,11 +325,6 @@ time-to-failure     http://time-to-failure.inference.svc.cluster.local         T
 == Exercise 1.4: Battery monitoring system deployment
 
 The Battery Monitoring System (BMS) brings together all robot components to provide real-time battery health monitoring. It collects telemetry data, displays it on a dashboard, and uses the AI inference endpoints to generate predictions.
-
-**BMS Architecture:**
-
-* **Battery Simulator** → **MQTT Broker** → **Data Processors** → **InfluxDB** + **Dashboard**
-* **Dashboard** → **Inference APIs** → **AI Predictions** → **Alerting**
 
 === Deploy BMS using GitOps
 
@@ -437,7 +386,7 @@ Monitor the deployment:
 watch oc get pods -n battery-demo
 ----
 
-Press `Ctrl+C` to exit when all pods show `Running` status.
+NOTE: Press `Ctrl+C` to exit when all pods show `Running` status.
 
 === Access the BMS dashboard
 
@@ -448,16 +397,13 @@ Open the Battery Monitoring System dashboard:
 https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
 ----
 
-The dashboard displays:
-
-* **Real-time telemetry** - Voltage, temperature, charge level, operational metrics
-* **AI predictions** - Stress detection status (NORMAL/STRESSED)
-* **Time-to-failure estimates** - Predicted hours until battery failure
-* **Alerts** - Notifications when stress is detected or failure is imminent
+The dashboard will display real-time battery telemetry data, AI predictions for stress detection and time-to-failure, and provide alerting capabilities for battery health monitoring.
 
 image::2-4_bms-dashboard.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
 
 === Verify data in InfluxDB
+
+Also you can access the InfluxDB dashboard where the sensor data es collected and prepared to be sent to the BMS dashbaord.
 
 Access the InfluxDB dashboard to see historical sensor data:
 
@@ -487,29 +433,7 @@ image::2-4_influxdb-telemetry.png[InfluxDB dashboard showing battery telemetry t
 
 === Verify
 
-Check that all BMS pods are running:
-
-[source,bash]
-----
-oc get pods -n battery-demo
-----
-
-Expected output:
-----
-NAME                                  READY   STATUS    RESTARTS   AGE
-battery-simulation-xxxxx-xxxxx        1/1     Running   0          2m
-bms-dashboard-xxxxx-xxxxx             1/1     Running   0          2m
-data-ingester-xxxxx-xxxxx             1/1     Running   0          2m
-influxdb-xxxxx-xxxxx                  1/1     Running   0          2m
-mosquitto-mqtt-broker-xxxxx-xxxxx     1/1     Running   0          2m
-mqtt2ws-xxxxx-xxxxx                   1/1     Running   0          2m
-----
-
-Verify dashboard functionality:
-
 ✓ All 6 BMS pods show `1/1` ready and `Running` status
-
-✓ GitOps application shows `Synced` and `Healthy`
 
 ✓ BMS dashboard loads successfully in browser
 
@@ -522,91 +446,6 @@ Verify dashboard functionality:
 ✓ InfluxDB contains `bms` bucket with `battery_data` measurement
 
 ✓ Time-series graphs display sensor values
-
-[#troubleshooting]
-== Troubleshooting
-
-**Issue**: GitOps application stuck in "Progressing" state
-
-**Solution**:
-
-. Check application status: `oc describe application <app-name> -n openshift-gitops`
-. Review sync errors in status section
-. Verify Git repository is accessible
-. Common fix: Delete and recreate the application
-
-**Issue**: MinIO pods in "CrashLoopBackOff" state
-
-**Solution**:
-
-. Check pod logs: `oc logs <pod-name> -n minio`
-. Verify PersistentVolumeClaim is bound: `oc get pvc -n minio`
-. Check storage class availability: `oc get storageclass`
-. If PVC pending, check node storage capacity
-
-**Issue**: Inference pods fail to start with "ImagePullBackOff"
-
-**Solution**:
-
-. Verify pod status: `oc describe pod <pod-name> -n inference`
-. Check image name in ServingRuntime configuration
-. Ensure network connectivity for image registry
-. Common fix: Wait for automatic retry or restart deployment
-
-**Issue**: BMS dashboard shows "Connection Failed" or no data
-
-**Solution**:
-
-. Verify all battery-demo pods are running: `oc get pods -n battery-demo`
-. Check WebSocket endpoint accessibility
-. Verify inference endpoints are reachable from dashboard pod
-. Test inference endpoints manually using curl commands from Exercise 1.3
-. Check ConfigMap has correct endpoint URLs: `oc get cm bms-dashboard-config -n battery-demo -o yaml`
-
-**Issue**: InfluxDB shows no data in query results
-
-**Solution**:
-
-. Verify data-ingester pod is running: `oc get pod -n battery-demo | grep data-ingester`
-. Check data-ingester logs for errors: `oc logs -n battery-demo -l app=data-ingester`
-. Verify MQTT broker is receiving data: `oc logs -n battery-demo -l app=mosquitto-mqtt-broker`
-. Ensure battery-simulation pod is generating data: `oc logs -n battery-demo -l app=battery-simulation`
-
-[#learning-outcomes]
-== Learning outcomes
-
-Before moving to the next module, verify you understand:
-
-**Concepts you should now understand:**
-
-* How MicroShift provides lightweight Kubernetes for edge devices with minimal resource footprint
-* Why GitOps automation is critical for managing distributed edge deployments at scale
-* How S3-compatible object storage (MinIO) enables AI model distribution to edge devices
-* The architecture of KServe-based model serving and the KServe v2 inference protocol
-* How MQTT messaging enables real-time data collection from IoT sensors
-* The role of time-series databases (InfluxDB) in storing and analyzing sensor telemetry
-* How AI inference integrates into monitoring dashboards to provide actionable insights
-
-**Tasks you should be able to perform:**
-
-* Connect to edge infrastructure via bastion host and SSH tunneling
-* Deploy applications using GitOps (Argo CD) with Application custom resources
-* Verify Kubernetes resource status (pods, services, routes, custom resources)
-* Access and navigate S3-compatible object storage dashboards
-* Test inference endpoints using curl and the KServe v2 protocol
-* Interpret AI model predictions from REST API responses
-* Access and query time-series data in InfluxDB
-* Monitor real-time telemetry data in web-based dashboards
-
-**Key questions to ask yourself:**
-
-. What makes MicroShift suitable for edge deployments compared to full OpenShift? (Answer: Minimal footprint, single-node operation, embedded capabilities)
-. How does GitOps ensure consistency across a fleet of edge devices? (Answer: Declarative configuration in Git, automated sync, self-healing)
-. Why are models stored in versioned directories like `/stress-detection/1/`? (Answer: Enables model versioning, A/B testing, rollback capabilities)
-. What is the purpose of the KServe v2 protocol? (Answer: Standardized inference API for model serving across different frameworks)
-. How does the BMS dashboard obtain AI predictions? (Answer: Sends telemetry data to inference endpoints via HTTP POST, receives predictions in response)
-
-If you can answer these questions confidently, you're ready to proceed to the next module!
 
 [#summary]
 == Summary
