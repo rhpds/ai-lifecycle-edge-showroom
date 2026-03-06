@@ -19,8 +19,8 @@
 ** xref:05-module-03-model-training.adoc#train-models[3.3 Train Models]
 
 * xref:06-module-04-model-serving.adoc[Module 4: Model Serving]
-** xref:06-module-04-model-serving.adoc#stress-detection-server[4.1 Stress Detection Server]
-** xref:06-module-04-model-serving.adoc#ttf-server[4.2 Time to Failure Server]
+** xref:06-module-04-model-serving.adoc#create-stress-server[4.1 Stress Detection Server]
+** xref:06-module-04-model-serving.adoc#create-ttf-server[4.2 Time to Failure Server]
 ** xref:06-module-04-model-serving.adoc#query-endpoints[4.3 Query Endpoints]
 
 * xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline Automation]
