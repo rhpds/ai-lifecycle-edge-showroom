@@ -34,7 +34,7 @@ Although models run on robots for production inference, the SNO environment also
 . Click the **Deployments** tab
 . Click **Deploy model**
 +
-image::5-1_create-serving.png[Single Model Serving selection,link=self,window=blank,width=700]
+image::06-module-04_create-serving.png[Single Model Serving selection,link=self,window=blank,width=700]
 
 +
 . Complete the deployment form with the following configuration:
@@ -72,7 +72,7 @@ NOTE: OpenVINO is optimized for Intel architectures and provides excellent perfo
 . Once the Status shows `Running`, check the **Internal Enpoint**
 
 +
-image::5-1_stress-detection.png[Stress Detection model server endpoint,link=self,window=blank,width=700]
+image::06-module-04_stress-detection.png[Stress Detection model server endpoint,link=self,window=blank,width=700]
 
 === Verify
 
@@ -123,7 +123,7 @@ NOTE: This path is different from `stress-detection`. Both models use the same M
 . Once the Status shows `Running`, check the **Internal Enpoint**
 
 +
-image::5-2_time-to-failure.png[Time to Failure model server endpoint,link=self,window=blank,width=700]
+image::06-module-04_time-to-failure.png[Time to Failure model server endpoint,link=self,window=blank,width=700]
 
 Both models share the same infrastructure (runtime and connection) but maintain independent configurations and storage paths.
 
@@ -146,7 +146,7 @@ Test the model inference endpoints to verify they respond correctly to predictio
 2. Navigate to `ai-lifecycle-edge-automation/notebooks/serving/`
 3. Open the `query_models.ipynb` notebook
 
-image::5-3_query-models.png[JupyterLab showing query_models.ipynb notebook in the serving folder,link=self,window=blank,width=700]
+image::06-module-04_query-models.png[JupyterLab showing query_models.ipynb notebook in the serving folder,link=self,window=blank,width=700]
 
 === Query Stress Detection model
 

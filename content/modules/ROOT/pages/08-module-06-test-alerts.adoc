@@ -50,7 +50,7 @@ The dashboard displays:
 * **Alert Indicators** - Visual warnings when risks detected
 * **Auto-Inference Toggle** - Enable/disable automatic prediction updates
 
-image::2-4_bms-dashboard.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
+image::03-module-01_bms-dashboard.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
 
 === Enable automatic inference
 

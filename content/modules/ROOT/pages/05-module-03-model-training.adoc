@@ -24,7 +24,7 @@ Red Hat OpenShift AI provides Jupyter workbench environments for data scientists
 . Locate the `model-training` workbench
 . Click on the **three vertical dots** on the right and click **Edit workbench**
 
-image::4-1_workbench.png[Workbenches tab showing model-training workbench,link=self,window=blank,width=700]
+image::05-module-03_workbench.png[Workbenches tab showing model-training workbench,link=self,window=blank,width=700]
 
 === Understand Workbench configuration
 
@@ -47,7 +47,7 @@ Conect the Workbench to the existing DataConnection that contains the credential
 
 . Click **model-training** to launch JupyterLab
 
-image::4-1_jupyterlab.png[JupyterLab dashboard,link=self,window=blank,width=700]
+image::05-module-03_jupyterlab.png[JupyterLab dashboard,link=self,window=blank,width=700]
 
 === Verify
 
@@ -69,7 +69,7 @@ The training notebooks are stored in a Git repository. You'll clone the reposito
 . In JupyterLab, click the **Git** icon in the left sidebar (looks like a branching diagram)
 . Click **Clone a Repository**
 +
-image::4-2_git-import.png[JupyterLab Git clone option,link=self,window=blank,width=700]
+image::05-module-03_git-import.png[JupyterLab Git clone option,link=self,window=blank,width=700]
 
 . Enter the repository URL:
 +
@@ -82,7 +82,7 @@ https://github.com/rhpds/ai-lifecycle-edge-automation.git
 
 JupyterLab clones the repository and creates an `ai-lifecycle-edge-automation` folder in your workspace.
 
-image::4-2_imported-folder.png[The ai-lifecycle-edge-automation folder is imported,link=self,window=blank,width=700]
+image::05-module-03_imported-folder.png[The ai-lifecycle-edge-automation folder is imported,link=self,window=blank,width=700]
 
 === Verify
 
@@ -113,7 +113,7 @@ Run the training notebooks to train both battery health prediction models. The n
 
 . Open in order each file and press the **Play** button at the top to manually run each cell or the **Double Play** icon to run the entire file
 
-image::4-3_run-notebooks.png[Play and Double Play buttons to run the Notebook,link=self,window=blank,width=700]
+image::05-module-03_run-notebooks.png[Play and Double Play buttons to run the Notebook,link=self,window=blank,width=700]
 
 At this point, you can follow the instructions contained in each Notebook. Those will explain each step in detail. Pay attention to some of the variables used during the execution. You will need to replace some of them based on your environment. For example, in the first notebook you will need to replace the InfluxDB URL with yours:
 

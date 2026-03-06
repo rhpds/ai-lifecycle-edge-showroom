@@ -35,13 +35,13 @@ Access the RHOAI web interface:
 . In the OpenShift Console, click the **application launcher** icon (9 squares) in the top-right corner
 . Select **Red Hat OpenShift AI** from the dropdown
 +
-image::3-1_rhoai-access.png[RHOAI Dashboard access menu,link=self,window=blank,width=700]
+image::04-module-02_rhoai-access.png[RHOAI Dashboard access menu,link=self,window=blank,width=700]
 
 . A new tab opens. Log in with OpenShift credentials if prompted
 . Click **Allow selected permissions** if prompted
 . You'll see the RHOAI landing page
 
-image::3-1_rhoai-landing.png[RHOAI Dashboard landing page showing Data Science Projects and other sections,link=self,window=blank,width=700]
+image::04-module-02_rhoai-landing.png[RHOAI Dashboard landing page showing Data Science Projects and other sections,link=self,window=blank,width=700]
 
 === Verify
 
@@ -60,7 +60,7 @@ Data Science Projects in RHOAI organize users and AI/ML resources in a single na
 . Click **Projects** in the left navigation
 . Locate and click on `ai-edge-project` that has been pre-created
 
-image::3-2_project.png[AI & Edge Data Science Project,link=self,window=blank,width=700]
+image::04-module-02_project.png[AI & Edge Data Science Project,link=self,window=blank,width=700]
 
 The project dashboard shows multiple tabs for managing AI/ML resources.
 
@@ -106,7 +106,7 @@ The connection bridges the SNO training environment and robot's edge storage.
 . Locate the existing connection: `vehicle-models`
 . Click on the **three vertical dots** on the right and click **Edit**
 +
-image::3-3_connection.png[Connections tab showing vehicle-models DataConnection,link=self,window=blank,width=700]
+image::04-module-02_connection.png[Connections tab showing vehicle-models DataConnection,link=self,window=blank,width=700]
 
 === Understand connection parameters
 

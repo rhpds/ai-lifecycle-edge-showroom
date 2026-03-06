@@ -57,7 +57,7 @@ Components on the SNO server:
 
 Sometimes, a picture is worth a thousand words. Below, you will find a diagram illustrating the main components involved in our solution:
 
-image::1-3_diagram.png[AI lifecycle edge architecture diagram showing MicroShift robots with MinIO and model serving connecting to SNO training server with RHOAI pipelines and automated model retraining workflow,link=self,window=blank,width=700]
+image::02-details_diagram.png[AI lifecycle edge architecture diagram showing MicroShift robots with MinIO and model serving connecting to SNO training server with RHOAI pipelines and automated model retraining workflow,link=self,window=blank,width=700]
 
 1. Our environment comes with 2 base AI models stored in the _inference_ MinIO bucket. The first one called **Stress Detection** will be able to identify early signs of battery stress - conditions that may lead to degradation or failure. The second one - **Time to Failure** - uses sensor data to provide an estimate of the remaining time until a potential battery failure.
 

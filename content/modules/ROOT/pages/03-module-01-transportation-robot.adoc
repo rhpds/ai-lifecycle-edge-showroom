@@ -222,7 +222,7 @@ https://minio-microshift-001.{openshift_cluster_ingress_domain}
 * `stress-detection/1/` - Baseline Stress Detection model files (`.xml`, `.bin`)
 * `time-to-failure/1/` - Baseline Time to Failure model files (`.xml`, `.bin`)
 
-image::2-2_minio-inference.png[MinIO dashboard showing inference bucket with model directories,link=self,window=blank,width=700]
+image::03-module-01_minio-inference.png[MinIO dashboard showing inference bucket with model directories,link=self,window=blank,width=700]
 
 === Verify
 
@@ -399,7 +399,7 @@ https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
 
 The dashboard will display real-time battery telemetry data, AI predictions for stress detection and time-to-failure, and provide alerting capabilities for battery health monitoring.
 
-image::2-4_bms-dashboard.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
+image::03-module-01_bms-dashboard.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
 
 === Verify data in InfluxDB
 
@@ -429,7 +429,7 @@ https://influx-db-microshift-001.{openshift_cluster_ingress_domain}
 
 Adjust the time interval (e.g., "Past 5 minutes") to see recent data.
 
-image::2-4_influxdb-telemetry.png[InfluxDB dashboard showing battery telemetry time-series data,link=self,window=blank,width=700]
+image::03-module-01_influxdb-telemetry.png[InfluxDB dashboard showing battery telemetry time-series data,link=self,window=blank,width=700]
 
 === Verify
 

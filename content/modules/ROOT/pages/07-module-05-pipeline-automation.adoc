@@ -37,13 +37,6 @@ Pipelines automate this workflow, ensuring:
 * **Scalability** - Handles increasing data volumes
 * **Reliability** - Automatic retries on failures
 
-**Pipeline Components:**
-
-* **Pipeline Server** - Orchestrates workflow execution
-* **Artifact Storage** - Stores pipeline outputs and metadata
-* **Database** - Tracks runs, experiments, and metrics
-* **UI** - RHOAI Dashboard integration for monitoring
-
 === Review pipeline server deployment
 
 . In the **Red Hat OpenShift AI (RHOAI) Dashboard**, navigate to the `ai-edge-project` project
