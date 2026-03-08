@@ -1,4 +1,4 @@
-= AI/ML Lifecycle Automation at the Edge
+= {lab_name}
 
 Welcome to the AI/ML Lifecycle Automation at the Edge workshop!
 

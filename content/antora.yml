@@ -7,7 +7,7 @@ nav:
 
 asciidoc:
   attributes:
-    lab_name: "ai-ml-lifecycle-automation-at-the-edge"
+    lab_name: "AI/ML Lifecycle Automation at the Edge"
     rhel_version: "9.6"
     release-version: master
     page-pagination: true
