@@ -36,7 +36,7 @@ The Workbench is configured with:
 
 === Attach DataConnection
 
-Conect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot.
+Connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot.
 
 . Select **Attach existing connections**
 . Verify that the `vehicle-models` connection is selected
@@ -105,9 +105,9 @@ Run the training notebooks to train both battery health prediction models. The n
 +
 1. **retrieve-influx-data.ipynb** - Retrieve battery telemetry from InfluxDB on robots
 2. **prepare-data.ipynb** - Clean, normalize, and prepare training datasets
-3. **bms-stress-training.ipynb** - Trains the Stress Detection model and saves it localy
-4. **predict-stress.ipynb** - Validates the Stres Detection model performance with new data
-5. **bms-ttf-training.ipynb** - Trains the Time to Failure model and saves it localy
+3. **bms-stress-training.ipynb** - Trains the Stress Detection model and saves it locally
+4. **predict-stress.ipynb** - Validates the Stress Detection model performance with new data
+5. **bms-ttf-training.ipynb** - Trains the Time to Failure model and saves it locally
 6. **predict-ttf.ipynb** - Validates the Time to Failure model performance with new data
 7. **save-models.ipynb** - Store in MinIO instance in MicroShift for distribution to robots
 

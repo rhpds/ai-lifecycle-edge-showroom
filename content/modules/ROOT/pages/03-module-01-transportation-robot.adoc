@@ -59,7 +59,7 @@ Expected output should show `active (running)`:
      Active: active (running) since ...
 ----
 
-Additionaly you can check if all the MicroShift pods are Running:
+Additionally you can check if all the MicroShift pods are Running:
 
 [source,bash]
 ----
@@ -403,7 +403,7 @@ image::03-module-01_bms-dashboard.png[BMS dashboard showing real-time telemetry 
 
 === Verify data in InfluxDB
 
-Also you can access the InfluxDB dashboard where the sensor data es collected and prepared to be sent to the BMS dashbaord.
+Also you can access the InfluxDB dashboard where the sensor data is collected and prepared to be sent to the BMS dashbaord.
 
 Access the InfluxDB dashboard to see historical sensor data:
 

@@ -35,7 +35,7 @@ Components that will be manually deployed on each robot:
 * **Model Serving** - KServe/ModelMesh for loading and serving models via API
 * **Battery Monitoring System (BMS) app** - Dashboard showing real-time telemetry and AI predictions, making use of:
 
-** Simuated data coming from sensors
+** Simulated data coming from sensors
 ** InfluxDB to store the collected data
 ** Inference Services to interact with 2 AI models
 

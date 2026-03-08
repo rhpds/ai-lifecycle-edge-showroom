@@ -71,7 +71,7 @@ Review the project dashboard tabs:
 * **Overview** - Project details and quick access to resources
 * **Workbenches** - JupyterLab development environments
 * **Pipelines** - Automated ML workflows
-* **Deployents** - Deployed model servers for inference
+* **Deployments** - Deployed model servers for inference
 * **Connections** - External storage and data sources
 * **Permissions** - User access control
 
@@ -83,7 +83,7 @@ Confirm the project is properly configured:
 
 ✓ `ai-edge-project` appears in Data Science Projects list
 
-✓ Project dashboard shows all tabs (Overview, Workbenches, Pipelines, Deployents, Connections)
+✓ Project dashboard shows all tabs (Overview, Workbenches, Pipelines, Deployments, Connections)
 
 
 [#review-dataconnection]
@@ -114,7 +114,7 @@ The `vehicle-models` connection is configured with:
 
 * **Connection type**: S3 compatible object storage - v1 (standard S3 protocol compatible with MinIO)
 * **Connection name**: `vehicle-models`
-* **Endpoint**: `\http://minio-microshift-vm.microshift-001.svc.cluster.local:30000` (Robot's MinIO storage)
+* **Endpoint**: `http://minio-microshift-vm.microshift-001.svc.cluster.local:30000` (Robot's MinIO storage)
 * **Region**: `us-east-1` (default S3 region, required but unused by MinIO)
 * **Bucket**: `inference` (contains AI models in the robot)
 

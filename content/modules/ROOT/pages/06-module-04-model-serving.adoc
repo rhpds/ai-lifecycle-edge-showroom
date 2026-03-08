@@ -69,7 +69,7 @@ NOTE: OpenVINO is optimized for Intel architectures and provides excellent perfo
 
 +
 . Click on **Next** to jump to the *Review* section and then select **Deploy model**
-. Once the Status shows `Running`, check the **Internal Enpoint**
+. Once the Status shows `Running`, check the **Internal Endpoint**
 
 +
 image::06-module-04_stress-detection.png[Stress Detection model server endpoint,link=self,window=blank,width=700]
@@ -120,7 +120,7 @@ NOTE: This path is different from `stress-detection`. Both models use the same M
 
 +
 . Click on **Next** to jump to the *Review* section and then select **Deploy model**
-. Once the Status shows `Running`, check the **Internal Enpoint**
+. Once the Status shows `Running`, check the **Internal Endpoint**
 
 +
 image::06-module-04_time-to-failure.png[Time to Failure model server endpoint,link=self,window=blank,width=700]
