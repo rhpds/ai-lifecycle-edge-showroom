@@ -41,70 +41,35 @@ Pipelines automate this workflow, ensuring:
 
 . In the **Red Hat OpenShift AI (RHOAI) Dashboard**, navigate to the `ai-edge-project` project
 . Click the **Pipelines** tab
-. Verify the pipeline server is configured and accessible
+. Verify the pipeline server is pre-configured and shows _Import pipeline_
+
+image::07-module-05_import-pipeline.png[Pipeline server pre-configured,link=self,window=blank,width=700]
 
 The pipeline server was automatically deployed when the project was created with pipeline support enabled.
 
-=== Examine pipeline custom resource
+=== Verify pipeline server configuration
 
-Switch to the **OpenShift Web Console** to examine the underlying configuration.
-
-. Navigate to **Search** in the left navigation
-. In the **Resources** dropdown, search for `DataSciencePipelineApplication`
-. Ensure you're in the `ai-edge-project` namespace
-. Click on the pipeline application to view the YAML
-
-The DataSciencePipelineApplication custom resource defines:
-
-* **Pipeline server** - Workflow orchestration engine
-* **Database** - MariaDB or MySQL for metadata storage
-* **Object storage** - S3-compatible storage for artifacts
-* **API server** - REST API for pipeline management
-
-=== Verify pipeline server pods
-
-. Navigate to **Workloads** → **Pods**
-. Ensure you're in the `ai-edge-project` namespace
-. Locate pods related to pipelines:
+. In the upper right corner, click on the **three vertical dots**
+. In the drop down menu, select **Manage pipeline server configuration**
 +
-* `ds-pipeline-<xxx>` - Main pipeline server
-* `mariadb-<xxx>` - Database for pipeline metadata
-* `ds-pipeline-persistenceagent-<xxx>` - Artifact persistence
-* `ds-pipeline-scheduledworkflow-<xxx>` - Schedule management
 
-All pods should show `Running` status.
+image::07-module-05_pipeline-server-config.png[Review pipeline server configuration,link=self,window=blank,width=700]
++
+. Review the Pipeline server configuration
+* **Access key** - `minio` (SNO MinIO user)
+* **Secret key** - `minio123` (SNO MinIO password)
+* **Endpoint** - `\http://minio-service.minio.svc.cluster.local:9000` (SNO MinIO endpoint)
+* **Bucket** - `pipeline` (bucket to store pipeline artifacts)
 
 === Verify
-
-Confirm the pipeline infrastructure is operational:
-
-**RHOAI Dashboard:**
 
 ✓ **Pipelines** tab is accessible in `ai-edge-project`
 
 ✓ Pipeline server shows as configured
 
-✓ Can access pipeline management interface
+✓ Pipeline server allows to import pipelines
 
-**Custom Resources:**
-
-✓ `DataSciencePipelineApplication` exists in `ai-edge-project`
-
-✓ Configuration specifies database and storage
-
-✓ API server endpoint is defined
-
-**Pods:**
-
-✓ `ds-pipeline-<xxx>` pod shows `Running` status
-
-✓ `mariadb-<xxx>` pod shows `Running` status
-
-✓ `ds-pipeline-persistenceagent-<xxx>` pod shows `Running` status
-
-✓ `ds-pipeline-scheduledworkflow-<xxx>` pod shows `Running` status
-
-✓ All pods show `1/1` or `2/2` ready
+✓ Can access pipeline server configuration 
 
 [#execute-pipeline]
 == Exercise 5.2: Execute retraining pipeline
@@ -133,9 +98,10 @@ Instead of creating the pipeline from scratch, import a pre-built definition.
 . Navigate to `ai-lifecycle-edge-gitops/notebooks/pipelines/`
 . Locate the `model-retraining.yaml` file
 . **Right-click** on it, select **Download**
++
+image::07-module-05_pipeline-download.png[JupyterLab right-click context menu showing Download option for model-retraining.yaml,link=self,window=blank,width=700]
 
-IMAGE_HERE: JupyterLab right-click context menu showing Download option for model-retraining.yaml
-
++
 . Save the file to your laptop
 
 **Import Pipeline:**
@@ -154,7 +120,7 @@ IMAGE_HERE: JupyterLab right-click context menu showing Download option for mode
 
 The pipeline graph displays, showing nodes and their connections.
 
-IMAGE_HERE: Pipeline graph view showing data retrieval, preparation, parallel training, validation, and deployment nodes
+image::07-module-05_pipeline-imported.png[Pipeline graph view showing data retrieval, preparation, parallel training, validation, and deployment nodes,link=self,window=blank,width=700]
 
 === Create a pipeline run
 
@@ -172,7 +138,7 @@ Execute the pipeline manually to test the automation workflow.
 * **Pipeline version**: `Model retraining` (pre-filled)
 
 . Review pipeline parameters (scroll down):
-
++
 [cols="2,3",options="header"]
 |===
 | Parameter | Value
@@ -201,9 +167,9 @@ Execute the pipeline manually to test the automation workflow.
 | `influxdb_url`
 | `https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
 |===
-
++
 NOTE: Update `influxdb_url` if your environment uses a different domain.
-
++
 . Click **Create run**
 
 === Monitor pipeline execution
@@ -218,41 +184,11 @@ Watch the pipeline execute in real-time.
 4. **Model Validation** - New models evaluated against existing models
 5. **Conditional Deployment** - If new models outperform, upload to MinIO
 
-**Node Status Colors:**
-
-* **Blue** - Currently executing
-* **Green checkmark** - Successfully completed
-* **Red X** - Failed (if any)
-
 Wait for all nodes to complete.
 
-IMAGE_HERE: Completed pipeline run with all nodes showing green checkmarks
+image::07-module-05_pipeline-complete.png[Completed pipeline run with all nodes showing green checkmarks,link=self,window=blank,width=700]
 
-=== Verify pipeline success
-
-After execution completes, verify the pipeline ran successfully.
-
-**Check Pipeline Status:**
-
-✓ All nodes show **green checkmarks** (successful completion)
-
-✓ No nodes show **red X** (failed status)
-
-✓ Pipeline run shows "Succeeded" status in the Runs tab
-
-✓ Run duration is reasonable (typically 5-15 minutes)
-
-**View Execution Logs:**
-
-✓ Can click any node in graph to view execution logs
-
-✓ Logs show detailed execution steps for that stage
-
-✓ No error messages in critical stages (training, validation, deployment)
-
-✓ Each stage reports successful completion
-
-**Check Model Deployment (if models improved):**
+=== Check new models
 
 If new models outperformed existing ones, verify they were uploaded to MinIO:
 
@@ -260,48 +196,15 @@ If new models outperformed existing ones, verify they were uploaded to MinIO:
 . Login: `minio` / `minio123`
 . Navigate to `inference` bucket
 . Check model files in `stress-detection/1/` and `time-to-failure/1/`
-
-✓ Model files (`model.xml`, `model.bin`) exist
-
-✓ File timestamps show recent updates (within last few minutes)
-
-✓ Both model directories updated if retraining improved both models
-
-✓ Deployment node in pipeline shows successful upload
-
-**If models did NOT improve:**
-- Deployment node may show "No deployment needed"
-- This is expected and correct behavior (keep existing better models)
+. File timestamps show recent updates (within last few minutes)
 
 === Verify
 
-Confirm the pipeline executed successfully:
+✓ All nodes show **green checkmarks** (successful completion)
 
-**Pipeline Import:**
+✓ Pipeline run shows "Succeeded" status in the Runs tab
 
-✓ Pipeline import completes without errors
-
-✓ `Model retraining` pipeline appears in Pipelines list
-
-✓ **Pipeline graph** displays with connected nodes
-
-✓ Graph shows expected stages (data retrieval, preparation, training, validation, deployment)
-
-**Pipeline Run:**
-
-✓ **Create run** dialog accepts all parameters
-
-✓ Run name is set to `First run`
-
-✓ Pipeline run begins executing immediately
-
-✓ Pipeline graph shows live execution status
-
-✓ Currently executing nodes highlighted in **blue**
-
-✓ Completed nodes show **green checkmarks**
-
-✓ Overall run status shows "Succeeded"
+✓ Run duration is reasonable (typically ~3-5 minutes)
 
 [#schedule-automation]
 == Exercise 5.3: Schedule pipeline automation
@@ -323,18 +226,19 @@ Machine learning models drift over time as operational conditions change:
 * **Ensures reliability** - Predictive accuracy maintained over time
 * **Enables true edge AI** - Autonomous systems that self-improve
 
-For our 18-robot fleet operating 24/7, automation is essential.
+For our robot fleet operating 24/7, automation is essential.
 
 === Create a scheduled pipeline run
 
 Configure the pipeline to execute automatically every 10 minutes.
 
-. In the **Red Hat OpenShift AI (RHOAI) Dashboard**, navigate to the **Pipelines** tab in `ai-edge-project`
+. In the **Red Hat OpenShift AI (RHOAI) Dashboard**, navigate to the **Pipeline definitions** tab
 . Locate the `Model Retraining` pipeline
 . Click the **three dots** (⋮) at the far right of the pipeline row
++
+image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for Model Retraining pipeline,link=self,window=blank,width=700]
 
-IMAGE_HERE: Pipeline list with three-dot menu for Model Retraining pipeline
-
++
 . Select **Create schedule** from the dropdown
 
 . Fill in the schedule configuration:
@@ -346,7 +250,7 @@ IMAGE_HERE: Pipeline list with three-dot menu for Model Retraining pipeline
 . Scroll down to verify the **Model Retraining** pipeline is automatically selected
 
 . Review parameters (same as manual run):
-
++
 [cols="2,3",options="header"]
 |===
 | Parameter | Value
@@ -375,37 +279,8 @@ IMAGE_HERE: Pipeline list with three-dot menu for Model Retraining pipeline
 | `influxdb_url`
 | `https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
 |===
-
++
 . Click **Create schedule**
-
-=== Monitor scheduled runs
-
-Verify the schedule is active and pipelines execute automatically.
-
-**View Schedule Configuration:**
-
-. In the **Pipelines** tab, click the **Schedules** sub-tab
-. Locate the `Scheduled run` schedule
-. Verify details:
-+
-* **Trigger type**: Periodic
-* **Schedule**: Every 10 minutes
-* **Status**: Enabled
-
-IMAGE_HERE: Schedules tab showing Scheduled run with Periodic trigger and Enabled status
-
-**View Automated Runs:**
-
-. Click the **Runs** sub-tab
-. After 10 minutes, a new run appears automatically
-. Each run shows:
-+
-* **Name**: Auto-generated timestamp
-* **Pipeline**: Model retraining
-* **Status**: Running → Succeeded (when complete)
-* **Trigger**: Scheduled (vs. Manual for your first run)
-
-=== Understanding the automated workflow
 
 Every 10 minutes, the scheduled pipeline:
 
@@ -418,187 +293,13 @@ Every 10 minutes, the scheduled pipeline:
 
 This creates a **self-improving system** where models get better over time without human intervention.
 
-=== Pause or disable schedule (optional)
-
-If needed, temporarily pause scheduled runs:
-
-. Navigate to the **Schedules** sub-tab
-. Find the `Scheduled run` schedule
-. Click the **toggle switch** to disable
-. To re-enable, click the toggle again
-
-The schedule configuration is preserved when disabled.
-
-=== Verify automation is working
-
-Confirm the complete pipeline automation system is operational.
-
-**End-to-end automation check:**
-
-✓ **Schedule exists**: Appears in Schedules tab with "Enabled" status
-
-✓ **Configuration correct**: Trigger type "Periodic", interval "Every 10 minutes"
-
-✓ **Automatic execution**: New runs appear automatically every 10 minutes (check Runs tab)
-
-✓ **Successful runs**: Scheduled runs show green checkmarks (Succeeded status)
-
-✓ **Continuous improvement**: Models update with fresh data from robots
-
-✓ **No manual intervention needed**: System operates autonomously
-
-**Observe over time:**
-
-- **Runs tab** shows increasing number of scheduled runs
-- Each run has timestamp-based auto-generated name
-- **Trigger** column consistently shows "Scheduled"
-- Run history provides complete audit trail
-- MinIO models update when new versions outperform existing ones
-
-**This confirms:**
-✅ Automation is working correctly
-✅ System is self-sustaining
-✅ Models continuously improve without human oversight
-
 === Verify
 
-Confirm scheduled automation is operational:
-
-**Schedule Creation:**
-
-✓ **Create schedule** dialog accepts all parameters
-
-✓ Schedule name set to `Scheduled run`
-
-✓ **Trigger type** is Periodic
+✓ Schedule can be created
 
 ✓ **Run every** is set to `10 minutes`
 
-✓ Click **Create schedule** completes without errors
-
-✓ Redirected to Schedules tab showing new schedule
-
-**Schedule Status:**
-
-✓ **Schedules** tab shows `Scheduled run` entry
-
-✓ **Trigger type**: Periodic
-
-✓ **Schedule**: Every 10 minutes
-
-✓ **Status**: Enabled (toggle switch is ON)
-
-**Automated Runs:**
-
-Wait 10 minutes, then verify:
-
-✓ **Runs** tab shows new automatically created run
-
-✓ Run name is auto-generated with timestamp
-
-✓ **Trigger** column shows "Scheduled" (not "Manual")
-
-✓ **Pipeline** column shows "Model retraining"
-
 ✓ Run executes and completes successfully
-
-**Schedule Control:**
-
-✓ Toggle switch in Schedules tab is accessible
-
-✓ Clicking toggle changes status from "Enabled" to "Disabled"
-
-✓ Disabled schedule stops creating new runs
-
-✓ Re-enabling the toggle resumes automated execution
-
-✓ Schedule parameters remain unchanged when toggled
-
-[#troubleshooting]
-== Troubleshooting
-
-**Issue**: Pipeline import fails with "Invalid YAML" error
-
-**Solution**:
-
-. Verify downloaded file is complete (not truncated)
-. Check file extension is `.yaml` not `.yaml.txt`
-. Open file in text editor to verify YAML structure
-. Common fix: Re-download file from JupyterLab
-
-**Issue**: Pipeline run fails at data retrieval stage
-
-**Solution**:
-
-. Verify InfluxDB is accessible from pipeline pods
-. Check InfluxDB credentials in pipeline parameters
-. Confirm battery simulation is generating data on robot
-. Verify `influxdb_url` parameter matches actual endpoint
-. Common fix: Update `influxdb_url` to correct domain
-
-**Issue**: Pipeline run fails at model upload stage
-
-**Solution**:
-
-. Verify MinIO is accessible from pipeline pods
-. Check MinIO credentials in pipeline parameters (`aws_access_key_id`, `aws_secret_access_key`)
-. Confirm `inference` bucket exists in MinIO
-. Verify `aws_s3_endpoint` parameter is correct
-. Common fix: Test MinIO connectivity from pipeline pod
-
-**Issue**: Schedule creates runs but they don't execute
-
-**Solution**:
-
-. Check pipeline server pods are running: `oc get pods -n ai-edge-project | grep ds-pipeline`
-. Verify scheduledworkflow pod is operational: `oc logs ds-pipeline-scheduledworkflow-<xxx> -n ai-edge-project`
-. Check resource quotas: `oc get resourcequota -n ai-edge-project`
-. Common fix: Restart pipeline server pods
-
-**Issue**: Pipeline validation fails (models not deployed)
-
-**Solution**:
-
-. This is expected behavior when new models don't outperform existing ones
-. Check validation logs to see performance comparison
-. If models should have improved, verify training data quality
-. Ensure test dataset is representative
-. Common fix: Run training notebooks manually to verify model quality
-
-[#learning-outcomes]
-== Learning outcomes
-
-Before moving to the next module, verify you understand:
-
-**Concepts you should now understand:**
-
-* How Kubeflow Pipelines automate ML workflows end-to-end
-* The architecture of pipeline server, database, and artifact storage
-* Why conditional deployment prevents inferior models from being deployed
-* How scheduled pipelines enable self-improving AI systems
-* The importance of model validation in automated retraining
-* How pipelines provide complete audit trails for MLOps compliance
-
-**Tasks you should be able to perform:**
-
-* Review pipeline infrastructure in RHOAI Dashboard
-* Import pipeline definitions from YAML files
-* Configure and execute pipeline runs manually
-* Monitor pipeline execution in real-time
-* Interpret pipeline node status (executing, succeeded, failed)
-* Create scheduled pipeline runs with periodic triggers
-* Enable/disable pipeline schedules as needed
-* Verify automated runs are executing on schedule
-
-**Key questions to ask yourself:**
-
-. What is the purpose of the DataSciencePipelineApplication custom resource? (Answer: Defines pipeline infrastructure including server, database, and storage)
-. Why run pipelines every 10 minutes instead of less frequently? (Answer: Ensures models stay current with rapidly changing battery conditions, enables quick response to new patterns)
-. How does conditional deployment work? (Answer: Validation stage compares new model performance against existing models, only deploys if improvement detected)
-. What happens if a pipeline run fails? (Answer: Existing models remain in production, failure is logged for investigation, next scheduled run will retry)
-. Why is pipeline scheduling critical for edge AI? (Answer: Enables autonomous model improvement without human oversight, essential for distributed fleet management)
-
-If you can answer these questions confidently, you're ready to proceed to the next module!
 
 [#summary]
 == Summary
@@ -623,13 +324,6 @@ You have configured fully automated pipeline scheduling for continuous model ret
 * Scheduled pipeline configuration for automation
 * Conditional deployment logic to prevent model degradation
 * Complete MLOps workflow from training to deployment
-
-**The Foundation of Edge AI Automation:**
-
-* **Self-improving models** - Accuracy improves as robots generate more data
-* **Zero human oversight** - Operates autonomously once configured
-* **Resilient** - Handles failures gracefully (failed runs logged, not deployed)
-* **Auditable** - Complete history of all training runs and deployments
 
 Next, you'll explore the alerting and monitoring system to ensure automated models remain fair and accurate over time.
 
