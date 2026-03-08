@@ -108,7 +108,7 @@ virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/la
 
 Available Dashboards:
 
-[cols="2,3,2",options="header"]
+[cols="2,3,2",options="header",subs="attributes+"]
 |===
 | Dashboard | URL | Credentials
 
