@@ -15,4 +15,4 @@ tabs:
     path: /wetty
     port: 443
   - name: OpenShift AI Dashboard
-    url: 'https://rhods-dashboard-redhat-ods-applications.${DOMAIN}'
+    url: 'https://data-science-gateway.${DOMAIN}'
