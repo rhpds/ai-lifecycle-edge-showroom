@@ -1,0 +1,168 @@
+= Module 2: RHOAI Configuration
+
+Red Hat OpenShift AI (RHOAI) running on Single Node OpenShift provides the complete AI/ML platform for model training, serving, pipelines, and monitoring. This module reviews the pre-configured RHOAI environment optimized for edge deployments.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Access the OpenShift Console and RHOAI Dashboard
+* Verify RHOAI operator installation and DataScienceCluster configuration
+* Navigate data science projects and understand how they organize AI/ML resources
+* Review DataConnections linking RHOAI to robot storage
+
+[#access-openshift]
+== Exercise 2.1: Review RHOAI installation
+
+Log in to the Single Node OpenShift cluster and verify RHOAI is installed.
+
+=== Access the OpenShift console
+
+[source,bash,subs="attributes+"]
+----
+{openshift_cluster_console_url}
+----
+
+**Credentials:**
+
+* Username: `{openshift_cluster_admin_username}`
+* Password: `{openshift_cluster_admin_password}`
+
+=== Access the RHOAI dashboard
+
+Access the RHOAI web interface:
+
+. In the OpenShift Console, click the **application launcher** icon (9 squares) in the top-right corner
+. Select **Red Hat OpenShift AI** from the dropdown
++
+image::04-module-02_rhoai-access.png[RHOAI Dashboard access menu,link=self,window=blank,width=700]
+
+. A new tab opens. Log in with OpenShift credentials if prompted
+. Click **Allow selected permissions** if prompted
+. You'll see the RHOAI landing page
+
+image::04-module-02_rhoai-landing.png[RHOAI Dashboard landing page showing Data Science Projects and other sections,link=self,window=blank,width=700]
+
+=== Verify
+
+✓ OpenShift Console loads successfully
+
+✓ RHOAI Dashboard loads successfully
+
+[#review-project]
+== Exercise 2.2: Review data science project
+
+Data Science Projects in RHOAI organize users and AI/ML resources in a single namespace. For our battery monitoring solution, the `ai-edge-project` contains all necessary components: workbenches, data connections, model servers, and pipelines.
+
+=== Access the ai-edge-project
+
+. Ensure you're in the **Red Hat OpenShift AI Dashboard**
+. Click **Projects** in the left navigation
+. Locate and click on `ai-edge-project` that has been pre-created
+
+image::04-module-02_project.png[AI & Edge Data Science Project,link=self,window=blank,width=700]
+
+The project dashboard shows multiple tabs for managing AI/ML resources.
+
+=== Explore project components
+
+Review the project dashboard tabs:
+
+* **Overview** - Project details and quick access to resources
+* **Workbenches** - JupyterLab development environments
+* **Pipelines** - Automated ML workflows
+* **Deployments** - Deployed model servers for inference
+* **Connections** - External storage and data sources
+* **Permissions** - User access control
+
+These tabs organize all resources for the battery monitoring AI solution.
+
+=== Verify
+
+Confirm the project is properly configured:
+
+✓ `ai-edge-project` appears in Data Science Projects list
+
+✓ Project dashboard shows all tabs (Overview, Workbenches, Pipelines, Deployments, Connections)
+
+
+[#review-dataconnection]
+== Exercise 2.3: Review DataConnection
+
+DataConnections link RHOAI to external object storage. The `vehicle-models` connection provides access to the robot's MinIO storage where AI models and training data are stored.
+
+**DataConnections enable:**
+
+* **Workbenches** - Access training data from robot storage
+* **Model Servers** - Load models for validation
+* **Pipelines** - Read input data and write trained models
+
+The connection bridges the SNO training environment and robot's edge storage.
+
+=== Review the vehicle-models DataConnection
+
+. Ensure you're in the **RHOAI Dashboard** inside the `ai-edge-project` project
+. Navigate to the **Connections** tab
+. Locate the existing connection: `vehicle-models`
+. Click on the **three vertical dots** on the right and click **Edit**
++
+image::04-module-02_connection.png[Connections tab showing vehicle-models DataConnection,link=self,window=blank,width=700]
+
+=== Understand connection parameters
+
+The `vehicle-models` connection is configured with:
+
+* **Connection type**: S3 compatible object storage - v1 (standard S3 protocol compatible with MinIO)
+* **Connection name**: `vehicle-models`
+* **Endpoint**: `http://minio-microshift-vm.microshift-001.svc.cluster.local:30000` (Robot's MinIO storage)
+* **Region**: `us-east-1` (default S3 region, required but unused by MinIO)
+* **Bucket**: `inference` (contains AI models in the robot)
+
+=== Verify the underlying secret
+
+DataConnections are stored as Kubernetes Secrets. The secret contains base64-encoded S3 credentials:
+
+* `AWS_ACCESS_KEY_ID` - MinIO username
+* `AWS_SECRET_ACCESS_KEY` - MinIO password
+* `AWS_S3_ENDPOINT` - MinIO API endpoint
+* `AWS_DEFAULT_REGION` - S3 region
+* `AWS_S3_BUCKET` - Target bucket name
+
+NOTE: All values are base64-encoded for security. RHOAI components automatically decode them when using the connection.
+
+=== Verify
+
+Confirm the DataConnection is properly configured:
+
+✓ `vehicle-models` connection appears in Connections tab
+
+✓ **Endpoint**: Points to MicroShift MinIO service
+
+✓ **Bucket**: `inference`
+
+[#summary]
+== Summary
+
+You have reviewed the pre-configured Red Hat OpenShift AI environment on Single Node OpenShift:
+
+**✓ RHOAI Operator** - Manages all AI/ML components with status **Succeeded**
+
+**✓ RHOAI Dashboard** - Web interface accessible and operational
+
+**✓ ai-edge-project** - Data Science Project organizing all battery monitoring AI resources
+
+**✓ vehicle-models DataConnection** - S3 connection linking SNO to robot's MinIO storage
+
+**What You've Learned:**
+
+* RHOAI provides a complete AI/ML platform on SNO
+* Data Science Projects organize resources in namespaces
+* DataConnections link RHOAI to external storage (robot's MinIO)
+* Secrets store S3 credentials securely
+* The SNO server can access robot storage over the factory network
+
+**The RHOAI environment is ready for model training and automated retraining workflows.**
+
+Next, you'll explore the pre-configured workbench where data scientists train battery health prediction models.
+
+Navigate to xref:05-module-03-model-training.adoc[Module 3: Model Training].

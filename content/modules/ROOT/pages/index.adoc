@@ -1,58 +1,111 @@
 = {lab_name}
 
-== Lab overview
+Welcome to the AI/ML Lifecycle Automation at the Edge workshop!
 
-This project showcases how the integration of AI and edge computing can effectively address specific customer use cases and fit seamlessly into various real-world scenarios. The demo will highlight the practical application of AI in resource-constrained environments, making it essential to use lightweight topologies and platforms such as Single Node OpenShift (SNO) and Red Hat Device Edge.
+Explore how AI and edge computing work together to solve real-world industrial automation challenges with Red Hat's edge platforms and AI/ML technologies.
 
-During the demo, we will develop a robust solution for the automotive industry, highlighting the importance of automation, as dedicated teams are not feasible at the edge. To address this challenge, our solution incorporates key components within Red Hat OpenShift AI to support the entire AI/ML lifecycle at the edge, including model training, data science pipelines, model serving, and model monitoring.
+[#about-this-lab]
+== About this workshop
 
-== Lab contents
+This hands-on workshop demonstrates an end-to-end AI solution for battery health monitoring in autonomous transportation robots operating in industrial facilities. You'll explore **Red Hat Device Edge (MicroShift)**, **Single Node OpenShift (SNO)**, and **Red Hat OpenShift AI (RHOAI)** working together to enable intelligent automation at the edge.
 
-To bring this demo to life, several technologies will be used and covered during this lab. Below is a summary of the materials that will be covered:
+The lab covers GitOps deployment, AI inference, model serving and automated model training via pipelines. You'll see how AI models can run at the edge while continuously improving without manual intervention.
 
-[width="100%",cols="6,^4,7",options="header"]
-|===
-| Chapter | Duration | Contents
+NOTE: Part of the infrastructure is pre-configured. You'll review configurations and execute hands-on tasks to understand the complete AI/ML lifecycle.
 
-| AI & Edge Use case | 10min 
-a|- Understanding our case
-- Essentials of Edge
-- Explore our design
+== Who this is for
 
-| Dashboards Control Center | 1min 
-a|- Control center access
+This workshop is designed for **platform engineers, ML engineers, DevOps teams, and data scientists** who want to:
 
-| Autonomous Vehicle | 15min 
-a|- Understand the vehicle infrastructure
-- Deplying MinIO storage and models
-- Deplying Inference servers
-- Deploying the Battery Monitoring System
+* Deploy AI/ML workloads on edge platforms with limited resources
+* Implement automated MLOps workflows for continuous model improvement
+* Work with Kubernetes-based edge infrastructure (MicroShift, Single Node OpenShift)
+* Use Red Hat OpenShift AI for the complete ML lifecycle
+* Build solutions for IoT, industrial automation, or edge AI use cases
 
-| RHOAI configuration | 15min 
-a|- RHOAI installation
-- Datascience projects
-- DataConnections
+== What you'll learn
 
-| Model Re-training | 15min 
-a|- Workbenches
-- Import Notebooks
-- Training our models
+By the end of this workshop, you will understand how to:
 
-| Model Serving | 10min 
-a|- Stress Detection serving
-- Time to Failure serving
-- Querying endpoints
+* Deploy AI/ML workloads on edge platforms (MicroShift, SNO)
+* Use Red Hat OpenShift AI components (workbenches, model serving, pipelines)
+* Implement automated MLOps workflows for continuous model improvement
+* Configure model serving architectures for edge inference
+* Enable pipeline automation for hands-off model retraining
+* Configure alerting and monitoring for critical edge components
 
-| Pipelines Automation | 5min 
-a|- Pipeline server
-- Pipelines execution
-- Pipelines scheduled automation
+== Prerequisites
 
-| Model Monitoring | 5min 
-a|- TrustyAI
-- Bias detection
-- Data drift
+Before starting this workshop, you should have:
 
-| Battery Monitoring System | 15min 
-a|- Test alerting system
-|===
+* Basic Kubernetes/OpenShift concepts (pods, deployments, services)
+* Basic Python and Jupyter notebooks knowledge
+* Basic machine learning concepts (training, inference, model validation)
+* Experience with command-line tools (ssh, oc)
+
+== Workshop environment
+
+Your lab environment includes:
+
+* **Red Hat Device Edge (MicroShift)** - Running on an autonomous transportation robot
+* **Single Node OpenShift (SNO)** - Plant edge server for model training
+* **Red Hat OpenShift AI** - Complete AI/ML platform on SNO
+
+Access credentials will be provided dynamically for your deployment.
+
+== Lab modules
+
+This workshop consists of 6 hands-on modules:
+
+**xref:01-overview.adoc[Introduction]** - Business scenario and solution architecture
+
+**xref:02-details.adoc[Technical Details]** - Environment specs and lab access
+
+**xref:03-module-01-transportation-robot.adoc[Module 1: Transportation Robot]**
+
+* Robot infrastructure setup
+* MinIO storage deployment
+* Model serving deployment
+* Battery monitoring system deployment
+
+**xref:04-module-02-rhoai-configuration.adoc[Module 2: RHOAI Configuration]**
+
+* Review RHOAI installation
+* Review DataScience project
+* Review DataConnection to robot storage
+
+**xref:05-module-03-model-training.adoc[Module 3: Model Training]**
+
+* Review training workbench
+* Import training notebooks
+* Train battery health models
+
+**xref:06-module-04-model-serving.adoc[Module 4: Model Serving]**
+
+* Deploy stress detection model server
+* Deploy time-to-failure model server
+* Query inference endpoints
+
+**xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline Automation]**
+
+* Review pipeline server
+* Execute automated retraining pipeline
+* Schedule continuous automation
+
+**xref:08-module-06-test-alerts.adoc[Module 6: Test Alerts]**
+
+* Test battery health alerts and dashboard
+* Monitor real-time inference execution
+* Verify model performance and latency
+
+**xref:09-conclusion.adoc[Conclusion]** - Summary and next steps
+
+== Estimated time
+
+**Total duration**: Approximately 1 hour
+
+== Let's get started!
+
+Ready to explore AI/ML automation at the edge?
+
+**Navigate to xref:01-overview.adoc[Introduction] to begin the workshop.**

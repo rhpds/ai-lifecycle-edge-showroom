@@ -1,12 +1,14 @@
 name: modules
 title: AI/ML Lifecycle Automation at the Edge
 version: master
+start_page: index.adoc
 nav:
   - modules/ROOT/nav.adoc
 
 asciidoc:
   attributes:
     lab_name: "AI/ML Lifecycle Automation at the Edge"
+    rhel_version: "9.6"
     release-version: master
     page-pagination: true
     my_var: "foo"
@@ -14,6 +16,12 @@ asciidoc:
     ssh_user: devops
     ssh_password: devops
     ssh_command: ssh someone@example.com
+    bastion_ssh_command: "ssh lab-user@bastion.example.com"
+    bastion_ssh_password: "password"
+    openshift_cluster_ingress_domain: "apps.cluster.example.com"
+    openshift_cluster_console_url: "https://console-openshift-console.apps.cluster.example.com"
+    openshift_cluster_admin_username: "admin"
+    openshift_cluster_admin_password: "password"
     page-links:
     - url: https://redhat.com
       text: Red Hat

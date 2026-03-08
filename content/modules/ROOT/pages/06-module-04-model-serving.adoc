@@ -1,0 +1,235 @@
+= Module 4: Model Serving
+
+This module explores the model serving infrastructure that provides real-time inference capabilities. You'll create two complementary model servers, configure their endpoints, and test inference to verify predictions.
+
+== Learning objectives
+
+By the end of this module, you will be able to:
+
+* Understand model serving architecture using KServe and OpenVINO
+* Deploy single-model serving platforms in Red Hat OpenShift AI
+* Create and configure Stress Detection and Time to Failure model servers
+* Query model endpoints using REST API protocol
+* Interpret model predictions (stress scores and time estimates)
+* Understand why SNO model servers validate before robot deployment
+
+[#create-stress-server]
+== Exercise 4.1: Deploy Stress Detection model server
+
+Model servers provide real-time inference capabilities by loading trained models and exposing REST API endpoints. You'll deploy the Stress Detection server to validate newly trained models before deployment to robots.
+
+=== Understanding model serving in RHOAI
+
+**Why Model Serving on SNO?**
+
+Although models run on robots for production inference, the SNO environment also serves models for:
+
+* **Validation** - Test newly trained models before deploying to robots
+* **Comparison** - Benchmark new models against existing ones
+* **Development** - Quick testing during model development
+
+=== Configure the Stress Detection model server
+
+. Ensure you're in the `ai-edge-project` project in the **Red Hat OpenShift AI Dashboard**
+. Click the **Deployments** tab
+. Click **Deploy model**
++
+image::06-module-04_create-serving.png[Single Model Serving selection,link=self,window=blank,width=700]
+
++
+. Complete the deployment form with the following configuration:
++
+
+* **Model location**: `Existing connection` (the Robot MinIO DataConnection will be used)
+* **Path**: `stress-detection`
++
+NOTE: You don't need to specify the full path with `/1/`. KServe automatically pulls models from the `/1/` subdirectory to follow standard model versioning conventions.
+
++
+* **Model type**: `Predictive model`
+
++
+. Click on **Next** to jump to the *Model deployment* section
++
+* **Model deployment name**: `Stress Detection`
+* **Model framework (name - version)**: `openvino_ir - opset13` (this matches the format used when exporting the model during training)
+
++
+NOTE: OpenVINO is optimized for Intel architectures and provides excellent performance on edge devices.
+
++
+* **Serving runtime**: `OpenVINO Model Server` (this will be automatically selected with the *Auto-select the best runtime* option)
+* **Number of replicas to deploy**: `1` (for testing purpose is sufficient) 
+
++
+. Click on **Next** to jump to the *Advanced settings* section
+
++
+* **Deployment strategy**: `Rolling update` (should be already selected)
+
++
+. Click on **Next** to jump to the *Review* section and then select **Deploy model**
+. Once the Status shows `Running`, check the **Internal Endpoint**
+
++
+image::06-module-04_stress-detection.png[Stress Detection model server endpoint,link=self,window=blank,width=700]
+
+=== Verify
+
+✓ `Stress Detection` model deployment appears in **Deployments** tab
+
+✓ **Status** shows `Running`
+
+✓ Endpoint URL is displayed: `\http://stress-detection-predictor.ai-edge-project.svc.cluster.local`
+
+[#create-ttf-server]
+== Exercise 4.2: Deploy Time to Failure model server
+
+The Time to Failure server predicts the remaining operational life of robot batteries. You'll deploy this second model server using the same process, demonstrating how multiple models can share infrastructure while maintaining independent configurations.
+
+=== Configure the Time to Failure model server
+
+. Ensure you're in the **Deployments** tab
+. Click **Deploy model** to add a second model server
+. Complete the deployment form with the following configuration:
++
+
+* **Model location**: `Existing connection` (the Robot MinIO DataConnection will be used)
+* **Path**: `time-to-failure`
++
+NOTE: This path is different from `stress-detection`. Both models use the same MinIO connection but are stored in separate directories for organization and independent versioning.
+
++
+* **Model type**: `Predictive model`
+
++
+. Click on **Next** to jump to the *Model deployment* section
++
+* **Model deployment name**: `Time to Failure`
+* **Model framework (name - version)**: `openvino_ir - opset13` (same format as the first model)
+
++
+* **Serving runtime**: `OpenVINO Model Server` (this will be automatically selected with the *Auto-select the best runtime* option)
+* **Number of replicas to deploy**: `1` (for testing purpose is sufficient)
+
++
+. Click on **Next** to jump to the *Advanced settings* section
+
++
+* **Deployment strategy**: `Rolling update` (should be already selected)
+
++
+. Click on **Next** to jump to the *Review* section and then select **Deploy model**
+. Once the Status shows `Running`, check the **Internal Endpoint**
+
++
+image::06-module-04_time-to-failure.png[Time to Failure model server endpoint,link=self,window=blank,width=700]
+
+Both models share the same infrastructure (runtime and connection) but maintain independent configurations and storage paths.
+
+=== Verify
+
+✓ **Deployments** tab shows two deployments: `Stress Detection` and `Time to Failure`
+
+✓ Both deployments show **Status** `Running`
+
+✓ Time to Failure endpoint URL is displayed: `\http://time-to-failure-predictor.ai-edge-project.svc.cluster.local`
+
+[#query-endpoints]
+== Exercise 4.3: Query model endpoints
+
+Test the model inference endpoints to verify they respond correctly to prediction requests. You'll use a Jupyter notebook to send test data and receive predictions.
+
+=== Access the query notebook
+
+1. Return to the **JupyterLab** environment (model-training workbench)
+2. Navigate to `ai-lifecycle-edge-automation/notebooks/serving/`
+3. Open the `query_models.ipynb` notebook
+
+image::06-module-04_query-models.png[JupyterLab showing query_models.ipynb notebook in the serving folder,link=self,window=blank,width=700]
+
+=== Query Stress Detection model
+
+The notebook contains code to test the Stress Detection endpoint.
+
+**Verify the endpoint URL in the first cell:**
+
+[source,python]
+----
+BASE_URL = "http://stress-detection-predictor.ai-edge-project.svc.cluster.local:8888"
+----
+
+**Execute the cells to:**
+
+. Define the inference endpoint
+. Prepare test input data (9 normalized feature values)
+. Send POST request with test data
+. Receive and display prediction
+
+**Expected Response:**
+
+The model returns a stress score between 0 and 1. The notebook interprets:
+
+* Score > 0.5 → **STRESSED**
+* Score ≤ 0.5 → **NORMAL**
+
+=== Query Time to Failure model
+
+Scroll down in the notebook to the Time to Failure section.
+
+**Verify the endpoint URL:**
+
+[source,python]
+----
+BASE_URL = "http://time-to-failure-predictor.ai-edge-project.svc.cluster.local:8888"
+----
+
+**Execute the cells to:**
+
+. Define the TTF inference endpoint
+. Prepare test input data (5 feature values)
+. Send POST request
+. Receive and display time-to-failure prediction
+
+**Expected Response:**
+
+The model returns the predicted number of hours until battery failure.
+
+=== Verify
+
+✓ **Stress Detection endpoint** responds successfully
+
+✓ **Time to Failure endpoint** responds successfully
+
+✓ Both predictions return valid numeric values
+
+[#summary]
+== Summary
+
+You have successfully deployed and tested the model serving infrastructure:
+
+**✓ Stress Detection Server** - Deployed OpenVINO Model Server for stress detection inference
+
+**✓ Time to Failure Server** - Deployed complementary model server with separate storage path
+
+**✓ Single-Model Serving** - Configured two independent model servers sharing infrastructure
+
+**✓ Inference Endpoints** - Tested both models using KServe v2 REST API protocol
+
+**✓ Predictions Verified** - Confirmed stress scores and time estimates are valid
+
+**What You've Learned:**
+
+* How to deploy single-model serving platforms in RHOAI
+* Configuring model servers with OpenVINO runtime for edge-optimized inference
+* Using DataConnections to link model servers to S3-compatible storage
+* RawDeployment mode for predictable resources in edge environments
+* KServe v2 protocol for REST API inference
+* How to query model endpoints with JSON payloads
+* Interpreting model outputs (classification scores and regression predictions)
+
+**The model serving infrastructure is fully operational and validated.**
+
+Next, you'll explore the automated pipeline system that retrains models every 10 minutes using fresh data from the robot fleet.
+
+Navigate to xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline Automation].
