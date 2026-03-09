@@ -12,29 +12,10 @@ By the end of this module, you will be able to:
 * Monitor real-time inference execution on the robot edge devices
 * Understand the complete data flow from sensors through AI to alerting
 
-[#test-alerts]
-== Exercise 6.1: Test battery health alerts
+[#bms-dashboard]
+== Exercise 6.1: Review the BMS dashboard
 
-The Battery Monitoring System dashboard integrates AI predictions with real-time telemetry to provide actionable alerts. Test the alert system by simulating battery stress conditions.
-
-=== Understanding the alerting architecture
-
-**Data Flow:**
-
-1. **Battery Simulator** → Generates realistic telemetry (voltage, temperature, charge level)
-2. **MQTT Broker** → Central messaging hub for sensor data
-3. **Data Processors** → Route data to storage (InfluxDB) and visualization (WebSocket)
-4. **BMS Dashboard** → Displays real-time telemetry and triggers AI inference
-5. **Model Servers** → Receive telemetry, return predictions
-6. **Alert System** → Notifications when stress detected or failure imminent
-
-**Alert Triggers:**
-
-* **Stress Detection** - Score > 0.5 indicates STRESSED battery (immediate risk)
-* **Time to Failure** - Prediction < 48 hours triggers preventive maintenance alert
-* **Telemetry Thresholds** - Voltage, temperature, or charge level outside safe ranges
-
-=== Access the BMS dashboard
+The Battery Monitoring System (BMS) dashboard provides a comprehensive view of battery health through real-time telemetry visualization and AI-powered predictions. This exercise explores the key components of the dashboard interface.
 
 Open the Battery Monitoring System dashboard:
 
@@ -43,487 +24,193 @@ Open the Battery Monitoring System dashboard:
 https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
 ----
 
-The dashboard displays:
+The dashboard displays three main panels:
 
-* **Real-time Telemetry** - Voltage, temperature, state of charge graphs
-* **AI Prediction Panel** - Stress detection status and time-to-failure estimate
-* **Alert Indicators** - Visual warnings when risks detected
-* **Auto-Inference Toggle** - Enable/disable automatic prediction updates
+* **Alerts** - Real-time AI inference results from both models
+* **Actions** - Control panel for battery stress simulation and to manually trigger inference
+* **Battery Telemetry** - Live voltage, temperature, state of charge graphs, etc
 
-image::03-module-01_bms-dashboard.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
+image::08-module-06_bms.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
 
-=== Enable automatic inference
+=== Alerts panel
 
-Configure the dashboard to continuously query the inference endpoints:
+The Alerts panel displays real-time inference results from both AI models running on the robot edge devices. Every few seconds, the dashboard automatically sends current battery telemetry to the inference endpoints and displays the prediction results.
 
-. Locate the **Auto-Inference** toggle in the AI Prediction Panel
-. Ensure it is **enabled** (toggle should be ON)
-. Verify **Interval**: 30 seconds (configurable)
+image::08-module-06_alerts-panel.png[Alerts panel showing real-time inference results from both AI models,link=self,window=blank,width=700]
 
-When enabled, the dashboard automatically:
+The dashboard continuously queries both model serving endpoints running in the Microshift robot:
 
-* Sends current telemetry to both inference endpoints every 30 seconds
-* Receives stress detection score and time-to-failure prediction
-* Updates the prediction panel with latest results
-* Triggers alerts if thresholds are exceeded
+* **Stress Detection endpoint**
+* **Time to Failure endpoint** 
 
-=== Simulate battery stress
+Each inference request sends current battery telemetry as a JSON payload to the model endpoints.
 
-The battery simulator allows you to manually trigger stress conditions for testing:
+For **Stress Detection** the Alerts panel shows entries like:
 
-**Option 1: Via Dashboard Controls (if available)**
+----
+09/03/2026 05:27:52: Stress detection completed.
+Result: {"model_name":"stress-detection","model_version":"1",
+        "outputs":[{"name":"output_0","shape":[1,1],
+                   "datatype":"FP32","data":[1]}]}
+----
 
-. Locate battery simulation controls in the dashboard
-. Adjust parameters to create stress conditions:
+**Interpreting the response:**
+
+* `model_name: "stress-detection"` - Confirms which model processed the request
+* `model_version: "1"` - Indicates the model version currently deployed (increments after retraining)
+* `outputs[0].shape: [1,1]` - Single prediction value returned
+* `outputs[0].datatype: "FP32"` - 32-bit floating point number
+* `outputs[0].data: [1]` - **Stress score prediction**
+
+**Stress score interpretation:**
+
+* **Value 0** - Battery operating normally, no stress detected
+* **Value 1** - Battery under stress, immediate attention required
+
+
+In the example above, `data:[1]` indicates **maximum stress detected** - the battery is experiencing critical stress conditions that require immediate investigation.
+
+For **Time to Failure** the Alerts panel shows entries like:
+
+----
+09/03/2026 05:28:22: Time to failure prediction completed.
+Result: {"model_name":"time-to-failure","model_version":"1",
+        "outputs":[{"name":"output_0","shape":[1,1],
+                   "datatype":"FP32","data":[64.732421875]}]}
+----
+
+* `model_name: "time-to-failure"` - Confirms the time-to-failure prediction model
+* `model_version: "1"` - Model version currently deployed
+* `outputs[0].shape: [1,1]` - Single prediction value
+* `outputs[0].datatype: "FP32"` - 32-bit floating point number
+* `outputs[0].data: [64.732421875]` - **Predicted hours until battery failure**
+
+**Time to failure interpretation:**
+
+* **Value**: Number of hours the battery can continue operating before failure
+* **Example:** `64.732421875` hours = approximately **2.7 days** of remaining operational life
+
+=== Actions panel
+
+While inference execution and battery data generation occur automatically in the background, the Actions panel provides manual controls for testing and simulating specific battery conditions. This panel allows operators to trigger on-demand inference requests and simulate temperature anomalies for testing purposes.
+
+image::08-module-06_actions-panel.png[Actions panel with manual inference triggers and temperature anomaly controls,link=self,window=blank,width=700]
+
+The Actions panel includes two buttons for manually triggering inference requests:
+
+* **Battery Stress Detection** - Sends an immediate inference request to the Stress Detection model
+* **Battery Time to Failure** - Sends an immediate inference request to the Time to Failure model
+
+The Actions panel also includes controls for simulating temperature anomalies in the battery system:
+
+* **Enable Temperature Anomaly** - Injects a temperature spike into the battery simulation
+* **Disable Temperature Anomaly** - Returns battery temperature to normal simulation parameters
+
+The Actions panel complements the automatic inference system by providing immediate feedback and enabling controlled testing scenarios without waiting for the automatic inference interval.
+
+=== Battery Telemetry panel
+
+The Battery Telemetry panel displays real-time graphs of critical battery metrics collected from the robot sensors. These visualizations provide operators with immediate insight into battery performance and operating conditions. The telemetry data shown in these graphs is also sent to the AI models for inference.
+
+image::08-module-06_battery-telemetry.png[Battery Telemetry panel showing real-time graphs of battery metrics,link=self,window=blank,width=700]
+
+**State of Charge & State of Health:**
+
+* **State of Charge (SoC)** - Represents the current battery charge level as a percentage (0-1 range)
+* **State of Health (SoH)** - Indicates overall battery health as a percentage
+
+These metrics work together to assess battery condition. A robot with low SoC (needs charging) but high SoH (battery still healthy) simply needs recharging. However, a battery with declining SoH requires eventual replacement regardless of charge level. The AI models use both values to predict stress and time-to-failure.
+
+**Battery Current & Speed:**
+
+* **Battery Current** - Current flowing from the battery (positive = discharging, negative = charging)
+* **Speed** - Robot's current movement speed in meters per second (km/h)
+
+Higher robot speeds require more power, resulting in higher battery current draw. When speed increases, current draw typically increases proportionally. Observing this correlation helps validate sensor accuracy and identify anomalies (e.g., high current with low speed might indicate mechanical resistance or motor issues). This relationship is important for the AI models to understand normal vs. stressed battery behavior.
+
+**Battery Temperature & Ambient Temperature:**
+
+* **Battery Temp** - Internal battery temperature (°C)
+* **Ambient Temp** - Environmental temperature around the robot (°C)
+
+Battery temperature should remain within safe limits regardless of ambient conditions. A large temperature difference between battery and ambient indicates the battery is generating heat (normal during discharge) or external heating systems are active. If battery temperature rises significantly above ambient during light use, this could indicate internal stress or degradation that the AI models should detect.
+
+**Other parameters:**
+
+* **Voltage** - Current battery voltage (V)
 +
-* Increase **Temperature** above 45°C
-* Decrease **Voltage** below 3.0V
-* Set **Discharge Rate** to high values
-* Increase **Cycle Count** to simulate aging battery
+Voltage drops under load indicate battery health; rapid voltage drops suggest degradation.
 
-**Option 2: Via Battery Simulation API**
-
-Access the battery simulation control endpoint:
-
-[source,bash,subs="attributes+"]
-----
-https://battery-simulation-microshift-001.{openshift_cluster_ingress_domain}
-----
-
-Use the API to adjust simulation parameters:
-
-[source,bash]
-----
-curl -X POST https://battery-simulation-microshift-001.{openshift_cluster_ingress_domain}/api/scenario \
-  -H "Content-Type: application/json" \
-  -d '{
-    "temperature": 50,
-    "voltage": 2.8,
-    "stateOfCharge": 15,
-    "dischargeRate": 2.5
-  }'
-----
-
-These values simulate a battery under extreme stress.
-
-=== Observe stress detection alert
-
-After simulating stress conditions, watch the dashboard:
-
-. **Telemetry Graphs** - Should show stressed values (high temperature, low voltage)
-. **AI Prediction Panel** - Updates after next inference cycle (within 30 seconds)
-. **Stress Detection Status** - Changes from "NORMAL" to "STRESSED"
-. **Stress Score** - Displays value > 0.5
-. **Alert Indicator** - Visual warning appears (red icon or notification)
-
-Expected alert message:
-----
-⚠️ BATTERY STRESS DETECTED
-Stress Score: 0.87
-Action: Investigate battery condition immediately
-----
-
-=== Observe time-to-failure prediction
-
-Continue monitoring the dashboard:
-
-. **Time to Failure Panel** - Updates with prediction
-. **Estimated Hours** - Shows remaining operational life
-. **Alert Threshold** - If < 48 hours, maintenance alert appears
-
-Expected prediction display:
-----
-Predicted Time Before Failure: 12.3 hours
-Battery should be replaced within: 0.5 days
-⚠️ MAINTENANCE REQUIRED SOON
-----
-
-=== Reset simulation to normal
-
-Return the battery to normal operating conditions:
-
-[source,bash]
-----
-curl -X POST https://battery-simulation-microshift-001.{openshift_cluster_ingress_domain}/api/scenario \
-  -H "Content-Type: application/json" \
-  -d '{
-    "temperature": 25,
-    "voltage": 3.7,
-    "stateOfCharge": 80,
-    "dischargeRate": 0.5
-  }'
-----
-
-Observe the dashboard:
-
-. **Telemetry Graphs** - Return to normal values
-. **Stress Detection Status** - Changes from "STRESSED" to "NORMAL"
-. **Stress Score** - Drops below 0.5
-. **Alert Indicators** - Warnings clear
-. **Time to Failure** - Prediction increases (more hours remaining)
-
-=== Verify inference endpoints are responding
-
-Check that both model servers are processing requests:
-
-**Via Dashboard Developer Console:**
-
-. Open browser developer tools (F12)
-. Navigate to **Network** tab
-. Watch for POST requests to:
+* **Driving Distance** - Total accumulated distance traveled by the robot (km)
 +
-* `stress-detection-predictor-microshift-001.{openshift_cluster_ingress_domain}`
-* `time-to-failure-predictor-microshift-001.{openshift_cluster_ingress_domain}`
+Combined with battery metrics, helps predict when maintenance is needed based on usage patterns
 
-. Verify responses return HTTP 200 with JSON predictions
-
-**Via Robot Model Server Pods:**
-
-. SSH to robot VM (via bastion host)
-. Check inference pod logs:
-+
-[source,bash]
-----
-oc logs -n inference -l app=isvc.stress-detection-predictor --tail=20
-----
-
-Expected log output:
-----
-[INFO] Inference request received
-[INFO] Input shape: [1, 9]
-[INFO] Prediction: 0.87
-[INFO] Response sent successfully
-----
+When you observe unusual patterns in these graphs (e.g., rapid voltage drops, temperature spikes, erratic current draw), the AI models analyze the same data and generate alerts visible in the Alerts panel. The Telemetry panel provides the visual context to understand why AI models generate specific predictions.
 
 === Verify
-
-Confirm the alerting system is operational:
-
-**Dashboard Access:**
 
 ✓ BMS dashboard loads successfully in browser
 
+✓ All three panels (Alerts, Actions, Battery Telemetry) are visible
+
 ✓ Real-time telemetry graphs display live updates
 
-✓ AI Prediction panel is visible
+[#test-alerts]
+== Exercise 6.2: Test battery health alerts
 
-✓ Auto-inference toggle is accessible and functional
+In this section, we will make use of the Actions panel to simulate a stressed battery.
 
-**Stress Detection Alerts:**
+=== Simulate temperature anomaly
 
-✓ Simulating stress conditions triggers prediction update
+The battery simulator allows you to manually trigger stress conditions for testing:
 
-✓ Stress score updates to value > 0.5
+. Locate the **Actions** panel
+. Press the **Enable temperature anomaly** button
+. Observe the battery temperature increasing dramatically
++ 
+image::08-module-06_temperature.png[Battery Telemetry shows increased battery temperature,link=self,window=blank,width=700]
 
-✓ Status changes from "NORMAL" to "STRESSED"
-
-✓ Visual alert indicator appears (icon or notification)
-
-✓ Alert message provides actionable guidance
-
-**Time to Failure Predictions:**
-
-✓ Time-to-failure prediction displays in hours
-
-✓ Prediction updates based on current telemetry
-
-✓ Low values (< 48 hours) trigger maintenance alerts
-
-✓ Prediction increases when conditions improve
-
-**Inference Endpoints:**
-
-✓ Dashboard successfully sends POST requests to both endpoints
-
-✓ Both endpoints return HTTP 200 responses
-
-✓ Responses contain valid JSON predictions
-
-✓ Inference pod logs show successful request processing
-
-**Simulation Control:**
-
-✓ Can adjust battery parameters via API or dashboard
-
-✓ Telemetry graphs reflect simulated values
-
-✓ Can reset to normal conditions
-
-✓ System responds appropriately to different scenarios
-
-[#monitor-inference]
-== Exercise 6.2: Monitor real-time inference execution
-
-Observe how the robot's model servers process inference requests in real-time. This exercise demonstrates the behind-the-scenes AI inference operations that power the dashboard predictions.
-
-=== Understanding inference monitoring
-
-**Why Monitor Inference Logs:**
-
-* **Performance analysis** - Track inference latency and throughput
-* **Debugging** - Identify issues with model loading or predictions
-* **Validation** - Confirm models are receiving correct input data
-* **Audit trail** - Maintain records of AI decision-making for compliance
-
-Model server logs show:
-
-* Incoming inference requests with input tensors
-* Model execution and prediction generation
-* Response payload with prediction results
-* Request timing and performance metrics
-
-=== Access robot model server logs
-
-Connect to the robot and view stress detection model server logs:
-
-. SSH to bastion host:
 +
-[source,bash,subs="attributes+"]
-----
-{bastion_ssh_command}
-----
+. At some point, you should see an alert popping up:
 +
-**Password:** `{bastion_ssh_password}`
+image::08-module-06_alert.png[Battery temperature alert pops up,link=self,window=blank,width=700]
 
-. Connect to robot VM:
+
+=== Trigger manual inference
+
+. In the **Actions** panel, press the **Battery Stress Detection** button
+. Check the **Alerts** panel and locate the latest `Stress detection completed` alert
 +
-[source,bash,subs="attributes+"]
 ----
-virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
+09/03/2026 06:20:47: Stress detection completed.
+Result: {"model_name":"stress-detection","model_version":"1",
+        "outputs":[{"name":"output_0","shape":[1,1],
+                   "datatype":"FP32","data":[1]}]}
 ----
-
-. View stress detection inference logs:
+. Verify the `outputs[0].data` field shows `1`, meaning the battery is under stress conditions
+. In the **Actions** panel, press the **Battery Time to Failure** button
+. Check the **Alerts** panel and locate the latest `Time to failure prediction completed` alert
 +
-[source,bash]
 ----
-oc logs -n inference -l app=isvc.stress-detection-predictor --tail=50 -f
+09/03/2026 06:21:52: Time to failure prediction completed.
+Result: {"model_name":"time-to-failure","model_version":"1",
+        "outputs":[{"name":"output_0","shape":[1,1],
+                   "datatype":"FP32","data":[15.579248022]}]}
 ----
-
-The `-f` flag streams logs in real-time (similar to `tail -f`).
-
-=== Trigger inference requests
-
-Keep the log stream open. In a separate browser window, access the BMS dashboard and enable auto-inference (if not already enabled):
-
-[source,bash,subs="attributes+"]
-----
-https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
-----
-
-Ensure **Auto-Inference** toggle is ON with 30-second interval.
-
-=== Observe inference request processing
-
-Watch the log stream for inference activity. You should see entries every 30 seconds:
-
-**Expected log patterns:**
-
-----
-[INFO] Received inference request
-[INFO] Model: stress-detection, Version: 1
-[INFO] Input tensor shape: [1, 9], datatype: FP32
-[INFO] Input data: [0.52, 0.48, 0.65, 0.42, 0.55, 0.38, 0.50, 0.61, 0.44]
-[INFO] Inference execution started
-[INFO] Prediction completed in 12ms
-[INFO] Output: [0.32]
-[INFO] Response sent successfully
-----
-
-**Key information to observe:**
-
-* **Request frequency** - Should match auto-inference interval (every 30 seconds)
-* **Input shape** - `[1, 9]` (1 sample, 9 features for stress detection)
-* **Input values** - Normalized feature values (0-1 range)
-* **Inference latency** - Typical: 10-50ms for edge inference
-* **Prediction output** - Single value (stress score between 0 and 1)
-
-=== Monitor time-to-failure model
-
-Press `Ctrl+C` to stop the stress detection log stream.
-
-View time-to-failure model logs:
-
-[source,bash]
-----
-oc logs -n inference -l app=isvc.time-to-failure-predictor --tail=50 -f
-----
-
-Expected patterns:
-
-----
-[INFO] Received inference request
-[INFO] Model: time-to-failure, Version: 1
-[INFO] Input tensor shape: [1, 5], datatype: FP32
-[INFO] Input data: [40.0, 48.0, 162.5, -2.0, -18.0]
-[INFO] Inference execution started
-[INFO] Prediction completed in 15ms
-[INFO] Output: [42.5]
-[INFO] Response sent successfully
-----
-
-**Differences from stress detection:**
-
-* **Input shape** - `[1, 5]` (5 features for time-to-failure)
-* **Input values** - Different feature ranges (some negative, larger magnitudes)
-* **Output interpretation** - Predicted hours until failure
-
-=== Compare baseline vs retrained model performance
-
-If automated pipeline retraining has been running (from Module 5), compare inference latency before and after model updates.
-
-**Check model version:**
-
-[source,bash]
-----
-oc exec -n inference $(oc get pod -n inference -l app=isvc.stress-detection-predictor -o jsonpath='{.items[0].metadata.name}') -c kserve-container -- ls -lh /mnt/models/stress-detection/
-----
-
-Expected output shows versioned model directories:
-
-----
-drwxr-xr-x 2 root root 4.0K Feb 10 14:32 1
-----
-
-**Baseline models** (version 1) typically show consistent inference latency.
-
-**Retrained models** may show:
-
-* Improved accuracy (check predictions match expected stress levels)
-* Similar or better latency (OpenVINO optimization maintains performance)
-* Updated file timestamps in MinIO bucket
+. Verify the `outputs[0].data` field shows a lower time to battery failure (compared to normal conditions)
+. Finally, click **Disable Temperature Anomaly** to return the battery to normal operating conditions
 
 === Verify
 
-Confirm you can monitor inference execution:
+✓ Telemetry graphs reflect simulated values
 
-**Log Access:**
+✓ Stress Detection `outputs[0].data` shows value of `1` (stressed)
 
-✓ SSH connection to robot VM established
+✓ Time to Failure `outputs[0].data` shows decreased hours remaining
 
-✓ Can access inference namespace pods
+✓ Visual alert indicator appears
 
-✓ Log streaming shows real-time updates with `-f` flag
-
-✓ Can switch between stress-detection and time-to-failure logs
-
-**Inference Request Patterns:**
-
-✓ Logs show inference requests arriving every 30 seconds
-
-✓ Input tensor shapes are correct (9 features for stress, 5 for TTF)
-
-✓ Input values are normalized appropriately
-
-✓ Predictions complete successfully
-
-**Performance Metrics:**
-
-✓ Inference latency is reasonable (typically 10-50ms)
-
-✓ No error messages in model server logs
-
-✓ Response payloads contain valid predictions
-
-✓ Request/response cycle completes without timeouts
-
-**Model Versioning:**
-
-✓ Can identify model version directory structure
-
-✓ Models load from versioned paths (`/1/`, `/2/`, etc.)
-
-✓ File timestamps indicate when models were last updated
-
-✓ Retrained models show updated timestamps after pipeline runs
-
-[#troubleshooting]
-== Troubleshooting
-
-**Issue**: Dashboard shows "Connection Failed" or no real-time data
-
-**Solution**:
-
-. Verify all battery-demo pods are running: `oc get pods -n battery-demo`
-. Check WebSocket endpoint accessibility from browser
-. Verify MQTT broker is operational: `oc logs -n battery-demo -l app=mosquitto-mqtt-broker`
-. Check battery-simulation pod is generating data: `oc logs -n battery-demo -l app=battery-simulation`
-. Common fix: Restart battery-demo pods: `oc rollout restart deployment -n battery-demo`
-
-**Issue**: Auto-inference not updating predictions
-
-**Solution**:
-
-. Verify auto-inference toggle is enabled in dashboard
-. Check browser console for JavaScript errors (F12 → Console)
-. Verify inference endpoints are accessible from browser
-. Test endpoints manually using curl from your laptop
-. Common fix: Clear browser cache and reload dashboard
-
-**Issue**: Inference endpoints return 404 or timeout errors
-
-**Solution**:
-
-. Verify model server pods are running: `oc get pods -n inference`
-. Check routes exist: `oc get routes -n inference`
-. Verify route URLs match dashboard configuration
-. Test internal endpoint from workbench: `curl http://stress-detection-predictor.ai-edge-project.svc.cluster.local:8888/v2/models/stress-detection`
-. Common fix: Recreate routes or check network policies
-
-**Issue**: Predictions always return same value regardless of input
-
-**Solution**:
-
-. Verify models are loaded correctly in server pods
-. Check model server logs for errors: `oc logs -n inference <pod-name>`
-. Ensure input features are properly normalized (0-1 range)
-. Verify telemetry data has reasonable variation
-. Common fix: Retrain models with fresh data
-
-**Issue**: Battery simulation API returns errors
-
-**Solution**:
-
-. Verify battery-simulation pod is running: `oc get pods -n battery-demo | grep battery-simulation`
-. Check pod logs for errors: `oc logs -n battery-demo -l app=battery-simulation`
-. Verify route exists: `oc get route battery-simulation -n battery-demo`
-. Test API endpoint accessibility: `curl https://battery-simulation-microshift-001.{openshift_cluster_ingress_domain}/api/health`
-. Common fix: Restart battery-simulation deployment
-
-[#learning-outcomes]
-== Learning outcomes
-
-Before completing the workshop, verify you understand:
-
-**Concepts you should now understand:**
-
-* How MQTT messaging enables real-time data flow from sensors to dashboard
-* The architecture of WebSocket connections for live telemetry visualization
-* How AI inference integrates into monitoring dashboards to provide actionable insights
-* The importance of alert thresholds in preventing battery failures
-* How simulation enables testing without physical battery stress
-* The complete end-to-end flow: sensors → MQTT → processing → storage → dashboard → inference → alerts
-
-**Tasks you should be able to perform:**
-
-* Access and navigate the Battery Monitoring System dashboard
-* Enable and configure automatic inference updates
-* Simulate battery stress conditions for testing
-* Interpret AI predictions (stress scores and time estimates)
-* Verify inference endpoints are responding correctly
-* Monitor model server logs to observe real-time inference execution
-* Compare inference performance before and after model retraining
-* Troubleshoot dashboard connectivity and inference issues
-* Monitor real-time telemetry and prediction updates
-
-**Key questions to ask yourself:**
-
-. Why use MQTT for sensor data instead of HTTP? (Answer: Lightweight, publish-subscribe pattern ideal for IoT, handles intermittent connectivity)
-. How does the dashboard know when to trigger inference? (Answer: Auto-inference timer sends current telemetry to endpoints at configured intervals)
-. What prevents false alerts from transient sensor spikes? (Answer: Models trained on historical patterns, averaging windows in data processing, threshold tuning)
-. Why run inference on SNO and on robots? (Answer: SNO validates new models before deployment, robots run production inference for low latency)
-. How does the system handle inference endpoint failures? (Answer: Dashboard shows connection errors, last known prediction retained, automated pipeline continues retraining)
-
-If you can answer these questions confidently, you have completed the workshop successfully!
+✓ Can reset to normal conditions
 
 [#summary]
 == Summary
@@ -532,7 +219,7 @@ You have successfully tested the complete AI-powered battery monitoring and aler
 
 **✓ Dashboard Access** - Accessed BMS dashboard with real-time telemetry visualization
 
-**✓ Auto-Inference** - Enabled automatic prediction updates every 30 seconds
+**✓ Auto-Inference** - Verified automatic prediction updates every few seconds
 
 **✓ Stress Alerts** - Simulated battery stress and verified alert triggers
 
@@ -544,17 +231,13 @@ You have successfully tested the complete AI-powered battery monitoring and aler
 
 **✓ Inference Log Monitoring** - Observed real-time model server inference execution
 
-**✓ Performance Analysis** - Reviewed inference latency and request processing patterns
-
 **What You've Learned:**
 
 * Complete architecture of AI-powered monitoring system
 * Real-time inference log monitoring and performance analysis
-* MQTT and WebSocket for real-time data flow
 * Integration of AI inference into operational dashboards
-* Alert configuration and threshold management
+* Alert configuration at the edge
 * End-to-end testing with battery simulation
-* Troubleshooting inference and connectivity issues
 
 **The Complete AI Lifecycle at the Edge:**
 

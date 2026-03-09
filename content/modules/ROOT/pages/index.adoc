@@ -88,7 +88,8 @@ This workshop consists of 6 hands-on modules:
 
 **xref:08-module-06-test-alerts.adoc[Module 6: Test Alerts]**
 
-* Test battery health alerts and dashboard
+* Review BMS dashboard
+* Test battery health alerts
 
 **xref:09-conclusion.adoc[Conclusion]** - Summary and next steps
 
