@@ -420,7 +420,7 @@ image::03-module-01_bms-dashboard.png[BMS dashboard showing real-time telemetry 
 
 === Check data in InfluxDB
 
-Also you can access the InfluxDB dashboard where the sensor data is collected and prepared to be sent to the BMS dashbaord.
+Also you can access the InfluxDB dashboard where the sensor data is collected and prepared to be sent to the BMS dashboard.
 
 Access the InfluxDB dashboard to see historical sensor data:
 

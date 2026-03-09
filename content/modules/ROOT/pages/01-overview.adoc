@@ -40,7 +40,7 @@ AI models must stay accurate as battery behavior evolves over time. However, rob
 
 * Collects new data every 10 minutes from the robot
 * Trains 2 AI models using the new data
-* Serve both models to test performace
+* Serve both models to test performance
 * Runs a fully automated pipeline: data collection → model training → validation → deployment
 * Automatically deploys improved models back to robots if they outperform existing ones
 
