@@ -29,7 +29,7 @@
 ** xref:07-module-05-pipeline-automation.adoc#schedule-automation[5.3 Schedule Automation]
 
 * xref:08-module-06-test-alerts.adoc[Module 6: Test Alerts]
-** xref:08-module-06-test-alerts.adoc#bms-dashbaord[6.1 Review BMS dashboard]
+** xref:08-module-06-test-alerts.adoc#bms-dashboard[6.1 Review BMS dashboard]
 ** xref:08-module-06-test-alerts.adoc#test-alerts[6.2 Test Battery Health Alerts]
 
 * xref:09-conclusion.adoc[Conclusion and Next Steps]
