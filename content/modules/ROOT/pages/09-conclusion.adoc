@@ -40,8 +40,6 @@ Congratulations! You've completed the AI Lifecycle at the Edge workshop. You've 
 * Tested battery health alerts dashboard
 * Verified auto-inference and AI predictions
 * Simulated battery stress scenarios
-* Monitored real-time inference execution in model server logs
-* Analyzed inference performance and latency metrics
 * Confirmed alerting system functionality
 
 == What you've learned
