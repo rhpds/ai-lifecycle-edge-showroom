@@ -16,7 +16,7 @@ By the end of this module, you will be able to:
 
 Access the robot infrastructure and verify MicroShift is running.
 
-=== Connect to bastion host
+=== Connect to transportation robot
 
 Establish an SSH connection to the bastion host:
 
@@ -33,7 +33,7 @@ Establish an SSH connection to the bastion host:
 | `{bastion_ssh_password}`
 |===
 
-=== Connect to robot VM
+NOTE: If a message regarding the authenticity of the host is displayed, type `yes` to establish the connection.
 
 Once connected to the bastion, access the transportation robot's MicroShift VM:
 
@@ -42,7 +42,7 @@ Once connected to the bastion, access the transportation robot's MicroShift VM:
 virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
 
-=== Verify MicroShift is running
+=== Check MicroShift is running
 
 Check that MicroShift is running:
 
@@ -125,10 +125,21 @@ Beyond the core MicroShift functionality, we can see that additional services ar
 | Runs the KServe controller manager, which provides AI/ML model serving capabilities. Essential for deploying and managing AI models for stress detection and time-to-failure prediction.
 |===
 
+=== Verify 
+
+✓ The transportation robot machine is accessible
+
+✓ MicroShift service is enabled and active
+
+✓ All Microshift pods are running
+
 [#deploy-minio]
 == Exercise 1.2: MinIO storage deployment
 
-MinIO provides S3-compatible object storage for AI models on the robot. The `inference` bucket stores 2 AI models: **Stress Detection** (identifies battery stress conditions) and **Time to Failure** (predicts remaining battery life).
+MinIO provides S3-compatible object storage for AI models on the robot. The `inference` bucket stores 2 AI models: 
+
+* **Stress Detection** - identifies battery stress conditions
+* **Time to Failure** - predicts remaining battery life
 
 Both models are stored in OpenVINO IR format (`.xml` and `.bin` files) in versioned directories.
 
@@ -205,17 +216,23 @@ NOTE: Press `Ctrl+C` to exit when pods show `Running` and `Completed` status.
 
 Once deployed, access the MinIO web console:
 
-. Open the MinIO dashboard:
+. Open the MinIO dashboard and login with credential:
 +
 [source,bash,subs="attributes+"]
 ----
 https://minio-microshift-001.{openshift_cluster_ingress_domain}
 ----
-
-. Login with credentials:
 +
-* Username: `minio`
-* Password: `minio123`
+[cols="1,2"]
+|===
+| Credential | Value
+
+| Username
+| `minio`
+
+| Password
+| `minio123`
+|===
 
 . Verify the `inference` bucket contains 2 directories:
 +
@@ -235,7 +252,7 @@ image::03-module-01_minio-inference.png[MinIO dashboard showing inference bucket
 [#deploy-model-serving]
 == Exercise 1.3: Model serving deployment
 
-The inference server loads AI models from MinIO and exposes REST API endpoints for real-time predictions. It uses KServe (part of Red Hat OpenShift AI) optimized for edge deployments.
+The inference server loads AI models from MinIO and exposes REST API endpoints for real-time predictions. It uses KServe optimized for edge deployments.
 
 === Deploy model serving using GitOps
 
@@ -401,23 +418,29 @@ The dashboard will display real-time battery telemetry data, AI predictions for 
 
 image::03-module-01_bms-dashboard.png[BMS dashboard showing real-time telemetry graphs and AI prediction indicators,link=self,window=blank,width=700]
 
-=== Verify data in InfluxDB
+=== Check data in InfluxDB
 
 Also you can access the InfluxDB dashboard where the sensor data is collected and prepared to be sent to the BMS dashbaord.
 
 Access the InfluxDB dashboard to see historical sensor data:
 
-. Open the InfluxDB dashboard:
+. Open the InfluxDB dashboard and login with credentials:
 +
 [source,bash,subs="attributes+"]
 ----
 https://influx-db-microshift-001.{openshift_cluster_ingress_domain}
 ----
-
-. Login with credentials:
 +
-* Username: `admin`
-* Password: `password`
+[cols="1,2"]
+|===
+| Credential | Value
+
+| Username
+| `admin`
+
+| Password
+| `password`
+|===
 
 . Navigate to **Explore** in the left menu
 
@@ -426,14 +449,13 @@ https://influx-db-microshift-001.{openshift_cluster_ingress_domain}
 .. Select the `bms` bucket from the dropdown
 .. Choose `battery_data` measurement
 .. Click **Submit** to execute the query
-
-Adjust the time interval (e.g., "Past 5 minutes") to see recent data.
+.. Adjust the time interval (e.g., "Past 5 minutes") to see recent data.
 
 image::03-module-01_influxdb-telemetry.png[InfluxDB dashboard showing battery telemetry time-series data,link=self,window=blank,width=700]
 
 === Verify
 
-✓ All 6 BMS pods show `1/1` ready and `Running` status
+✓ All 7 BMS pods show `1/1` ready and `Running` status
 
 ✓ BMS dashboard loads successfully in browser
 
@@ -458,7 +480,7 @@ You have successfully deployed the complete transportation robot infrastructure 
 
 **✓ Model Serving** - OpenVINO inference servers for Stress Detection and Time to Failure models
 
-**✓ Battery Monitoring System** - Complete telemetry collection, visualization, and AI prediction pipeline
+**✓ Battery Monitoring System** - Complete telemetry collection, visualization, and AI prediction
 
 **What You've Learned:**
 

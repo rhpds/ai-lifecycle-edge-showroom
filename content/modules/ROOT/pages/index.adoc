@@ -7,7 +7,11 @@ Explore how AI and edge computing work together to solve real-world industrial a
 [#about-this-lab]
 == About this workshop
 
-This hands-on workshop demonstrates an end-to-end AI solution for battery health monitoring in autonomous transportation robots operating in industrial facilities. You'll explore **Red Hat Device Edge (MicroShift)**, **Single Node OpenShift (SNO)**, and **Red Hat OpenShift AI (RHOAI)** working together to enable intelligent automation at the edge.
+This hands-on workshop demonstrates an end-to-end AI solution for battery health monitoring in autonomous transportation robots operating in industrial facilities. You'll explore the following technologies working together to enable intelligent automation at the edge:
+
+* **Red Hat Device Edge (MicroShift)** - Running on an autonomous transportation robot
+* **Single Node OpenShift (SNO)** - Plant edge server for model training
+* **Red Hat OpenShift AI (RHOAI)** - Complete AI/ML platform on SNO
 
 The lab covers GitOps deployment, AI inference, model serving and automated model training via pipelines. You'll see how AI models can run at the edge while continuously improving without manual intervention.
 
@@ -42,16 +46,6 @@ Before starting this workshop, you should have:
 * Basic Python and Jupyter notebooks knowledge
 * Basic machine learning concepts (training, inference, model validation)
 * Experience with command-line tools (ssh, oc)
-
-== Workshop environment
-
-Your lab environment includes:
-
-* **Red Hat Device Edge (MicroShift)** - Running on an autonomous transportation robot
-* **Single Node OpenShift (SNO)** - Plant edge server for model training
-* **Red Hat OpenShift AI** - Complete AI/ML platform on SNO
-
-Access credentials will be provided dynamically for your deployment.
 
 == Lab modules
 
@@ -95,8 +89,6 @@ This workshop consists of 6 hands-on modules:
 **xref:08-module-06-test-alerts.adoc[Module 6: Test Alerts]**
 
 * Test battery health alerts and dashboard
-* Monitor real-time inference execution
-* Verify model performance and latency
 
 **xref:09-conclusion.adoc[Conclusion]** - Summary and next steps
 
