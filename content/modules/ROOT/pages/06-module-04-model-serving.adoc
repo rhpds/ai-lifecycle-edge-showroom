@@ -18,10 +18,6 @@ By the end of this module, you will be able to:
 
 Model servers provide real-time inference capabilities by loading trained models and exposing REST API endpoints. You'll deploy the Stress Detection server to validate newly trained models before deployment to robots.
 
-=== Understanding model serving in RHOAI
-
-**Why Model Serving on SNO?**
-
 Although models run on robots for production inference, the SNO environment also serves models for:
 
 * **Validation** - Test newly trained models before deploying to robots
@@ -36,36 +32,49 @@ Although models run on robots for production inference, the SNO environment also
 +
 image::06-module-04_create-serving.png[Single Model Serving selection,link=self,window=blank,width=700]
 
+. Complete the deployment form with the following configuration (click **Next** between sections to complete the entire form):
 +
-. Complete the deployment form with the following configuration:
-+
+.Stress Detection model deployment configuration
+[cols="1,2,2"]
+|===
+| Parameter | Value | Purpose
 
-* **Model location**: `Existing connection` (the Robot MinIO DataConnection will be used)
-* **Path**: `stress-detection`
-+
-NOTE: You don't need to specify the full path with `/1/`. KServe automatically pulls models from the `/1/` subdirectory to follow standard model versioning conventions.
+| Model location
+| `Existing connection`
+| Uses the Robot MinIO DataConnection
 
-+
-* **Model type**: `Predictive model`
+| Connection
+| `vehicle-models`
+| Should be detected automatically
 
-+
-. Click on **Next** to jump to the *Model deployment* section
-+
-* **Model deployment name**: `Stress Detection`
-* **Model framework (name - version)**: `openvino_ir - opset13` (this matches the format used when exporting the model during training)
+| Path
+| `stress-detection`
+| Model directory (KServe auto-detects `/1/` subdirectory)
 
-+
-NOTE: OpenVINO is optimized for Intel architectures and provides excellent performance on edge devices.
+| Model type
+| `Predictive model`
+| Standard inference model type
 
-+
-* **Serving runtime**: `OpenVINO Model Server` (this will be automatically selected with the *Auto-select the best runtime* option)
-* **Number of replicas to deploy**: `1` (for testing purpose is sufficient) 
+| Model deployment name
+| `Stress Detection`
+| Identifier for the deployed model
 
-+
-. Click on **Next** to jump to the *Advanced settings* section
+| Model framework
+| `openvino_ir - opset13`
+| Matches exported model format from training
 
-+
-* **Deployment strategy**: `Rolling update` (should be already selected)
+| Serving runtime
+| `OpenVINO Model Server`
+| Optimized for Intel architectures and edge devices
+
+| Number of replicas
+| `1`
+| Single instance for testing purposes
+
+| Deployment strategy
+| `Rolling update`
+| Zero-downtime deployment updates
+|===
 
 +
 . Click on **Next** to jump to the *Review* section and then select **Deploy model**
@@ -91,32 +100,49 @@ The Time to Failure server predicts the remaining operational life of robot batt
 
 . Ensure you're in the **Deployments** tab
 . Click **Deploy model** to add a second model server
-. Complete the deployment form with the following configuration:
+. Complete the deployment form with the following configuration (click **Next** between sections to complete the entire form):
 +
+.Time to Failure model deployment configuration
+[cols="1,2,2"]
+|===
+| Parameter | Value | Purpose
 
-* **Model location**: `Existing connection` (the Robot MinIO DataConnection will be used)
-* **Path**: `time-to-failure`
-+
-NOTE: This path is different from `stress-detection`. Both models use the same MinIO connection but are stored in separate directories for organization and independent versioning.
+| Model location
+| `Existing connection`
+| Uses the Robot MinIO DataConnection
 
-+
-* **Model type**: `Predictive model`
+| Connection
+| `vehicle-models`
+| Should be detected automatically
 
-+
-. Click on **Next** to jump to the *Model deployment* section
-+
-* **Model deployment name**: `Time to Failure`
-* **Model framework (name - version)**: `openvino_ir - opset13` (same format as the first model)
+| Path
+| `time-to-failure`
+| Different path for independent versioning
 
-+
-* **Serving runtime**: `OpenVINO Model Server` (this will be automatically selected with the *Auto-select the best runtime* option)
-* **Number of replicas to deploy**: `1` (for testing purpose is sufficient)
+| Model type
+| `Predictive model`
+| Standard inference model type
 
-+
-. Click on **Next** to jump to the *Advanced settings* section
+| Model deployment name
+| `Time to Failure`
+| Identifier for the deployed model
 
-+
-* **Deployment strategy**: `Rolling update` (should be already selected)
+| Model framework
+| `openvino_ir - opset13`
+| Same format as Stress Detection model
+
+| Serving runtime
+| `OpenVINO Model Server`
+| Optimized for Intel architectures and edge devices
+
+| Number of replicas
+| `1`
+| Single instance for testing purposes
+
+| Deployment strategy
+| `Rolling update`
+| Zero-downtime deployment updates
+|===
 
 +
 . Click on **Next** to jump to the *Review* section and then select **Deploy model**
@@ -152,24 +178,23 @@ image::06-module-04_query-models.png[JupyterLab showing query_models.ipynb noteb
 
 The notebook contains code to test the Stress Detection endpoint.
 
-**Verify the endpoint URL in the first cell:**
-
+. Verify the endpoint URL in the first cell**
++
 [source,python]
 ----
 BASE_URL = "http://stress-detection-predictor.ai-edge-project.svc.cluster.local:8888"
 ----
++
+. Execute the cells to:
 
-**Execute the cells to:**
+.. Define the inference endpoint
+.. Prepare test input data (9 normalized feature values)
+.. Send POST request with test data
+.. Receive and display prediction
 
-. Define the inference endpoint
-. Prepare test input data (9 normalized feature values)
-. Send POST request with test data
-. Receive and display prediction
-
-**Expected Response:**
-
-The model returns a stress score between 0 and 1. The notebook interprets:
-
++
+. The model returns a stress score between 0 and 1. The notebook interprets:
++
 * Score > 0.5 → **STRESSED**
 * Score ≤ 0.5 → **NORMAL**
 
@@ -177,23 +202,22 @@ The model returns a stress score between 0 and 1. The notebook interprets:
 
 Scroll down in the notebook to the Time to Failure section.
 
-**Verify the endpoint URL:**
-
+. Verify the Time to Failure endpoint URL
++
 [source,python]
 ----
 BASE_URL = "http://time-to-failure-predictor.ai-edge-project.svc.cluster.local:8888"
 ----
++
+. Execute the cells to:
 
-**Execute the cells to:**
+.. Define the TTF inference endpoint
+.. Prepare test input data (5 feature values)
+.. Send POST request
+.. Receive and display time-to-failure prediction
 
-. Define the TTF inference endpoint
-. Prepare test input data (5 feature values)
-. Send POST request
-. Receive and display time-to-failure prediction
-
-**Expected Response:**
-
-The model returns the predicted number of hours until battery failure.
++
+. The model returns the **predicted number of hours** until battery failure.
 
 === Verify
 
