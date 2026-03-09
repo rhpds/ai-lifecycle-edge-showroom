@@ -16,11 +16,7 @@ By the end of this module, you will be able to:
 [#review-pipeline-server]
 == Exercise 5.1: Review pipeline infrastructure
 
-Kubeflow Pipelines provides workflow automation for machine learning. The pipeline server orchestrates the complete model lifecycle from data collection through deployment.
-
-=== Understanding pipeline architecture
-
-**Why Pipelines Matter:**
+Kubeflow Pipelines provides workflow automation for machine learning. The pipeline server orchestrates the complete model lifecycle from data collection through deployment, ensuring Consistency, Auditability, Scalability and Reliability.
 
 Machine learning workflows involve multiple steps that must execute in sequence:
 
@@ -29,13 +25,6 @@ Machine learning workflows involve multiple steps that must execute in sequence:
 3. **Model Training** - Train models using updated data
 4. **Model Validation** - Compare new models against existing ones
 5. **Conditional Deployment** - Deploy only if new models outperform
-
-Pipelines automate this workflow, ensuring:
-
-* **Consistency** - Same process every time
-* **Auditability** - Complete execution history
-* **Scalability** - Handles increasing data volumes
-* **Reliability** - Automatic retries on failures
 
 === Review pipeline server deployment
 
@@ -47,19 +36,39 @@ image::07-module-05_import-pipeline.png[Pipeline server pre-configured,link=self
 
 The pipeline server was automatically deployed when the project was created with pipeline support enabled.
 
-=== Verify pipeline server configuration
+=== Understand pipeline server configuration
 
-. In the upper right corner, click on the **three vertical dots**
+. In the upper right corner, click on the **three vertical dots** (⋮)
 . In the drop down menu, select **Manage pipeline server configuration**
 +
 
 image::07-module-05_pipeline-server-config.png[Review pipeline server configuration,link=self,window=blank,width=700]
 +
 . Review the Pipeline server configuration
-* **Access key** - `minio` (SNO MinIO user)
-* **Secret key** - `minio123` (SNO MinIO password)
-* **Endpoint** - `\http://minio-service.minio.svc.cluster.local:9000` (SNO MinIO endpoint)
-* **Bucket** - `pipeline` (bucket to store pipeline artifacts)
++
+.Pipeline server configuration
+[cols="1,2,2",options="header"]
+|===
+| Parameter | Value | Purpose
+
+| Access key
+| `minio`
+| SNO MinIO user credential
+
+| Secret key
+| `minio123`
+| SNO MinIO password
+
+| Endpoint
+| `\http://minio-service.minio.svc.cluster.local:9000`
+| SNO MinIO service endpoint
+
+| Bucket
+| `pipeline`
+| Stores pipeline artifacts and execution metadata
+|===
+
+**Close** (x) the configuration view 
 
 === Verify
 
@@ -74,48 +83,34 @@ image::07-module-05_pipeline-server-config.png[Review pipeline server configurat
 [#execute-pipeline]
 == Exercise 5.2: Execute retraining pipeline
 
-The retraining pipeline automates the complete model lifecycle: data collection → preprocessing → training → validation → conditional deployment. Execute the pipeline manually to understand the automated workflow.
-
-=== Understanding the retraining pipeline
-
-The pipeline automates:
-
-1. **Data Collection** - Retrieve fresh battery telemetry from InfluxDB on robots
-2. **Data Preparation** - Process and normalize data for training
-3. **Model Training** - Train Stress Detection and Time-to-Failure models in parallel
-4. **Model Validation** - Compare new models against existing models using test data
-5. **Conditional Deployment** - If new models outperform existing ones, upload to robot storage
-
-This workflow ensures models stay accurate as robot battery behavior evolves.
+The retraining pipeline automates the complete model lifecycle: data collection → preprocessing → training → validation → conditional deployment. This workflow ensures models stay accurate as robot battery behavior evolves.
 
 === Import the retraining pipeline
 
 Instead of creating the pipeline from scratch, import a pre-built definition.
 
-**Download Pipeline Definition:**
-
-. Open the **JupyterLab** workbench (model-training)
-. Navigate to `ai-lifecycle-edge-gitops/notebooks/pipelines/`
-. Locate the `model-retraining.yaml` file
-. **Right-click** on it, select **Download**
-+
-image::07-module-05_pipeline-download.png[JupyterLab right-click context menu showing Download option for model-retraining.yaml,link=self,window=blank,width=700]
-
-+
-. Save the file to your laptop
-
-**Import Pipeline:**
-
-. Switch to the **RHOAI Dashboard**
-. Navigate to the **Pipelines** tab in `ai-edge-project`
+. Ensure you're in the **Pipelines** tab in `ai-edge-project`
 . Click **Import pipeline**
 . Fill in the form:
 +
-* **Project**: `ai-edge-project` (pre-selected)
-* **Pipeline name**: `Model retraining`
-* **Upload a file**: Ensure this option is checked
-* Click **Upload**, select the `model-retraining.yaml` file from your laptop
+.Pipeline import configuration
+[cols="1,2,2",options="header"]
+|===
+| Parameter | Value | Purpose
 
+| Pipeline name
+| `Model retraining`
+| Identifier for the pipeline definition
+
+| Import by URL
+| Ensure this option is checked
+| Import from GitHub repository
+
+| URL
+| `https://raw.githubusercontent.com/rhpds/ai-lifecycle-edge-automation/refs/heads/main/notebooks/pipelines/model-retraining.yaml`
+| Direct link to pipeline YAML file
+|===
++
 . Click **Import pipeline**
 
 The pipeline graph displays, showing nodes and their connections.
@@ -131,60 +126,77 @@ Execute the pipeline manually to test the automation workflow.
 
 . Configure the pipeline run:
 +
-* **Project**: `ai-edge-project` (verify selected)
-* **Experiment**: `Default` (keep default)
-* **Name**: `First run`
-* **Pipeline**: `Model retraining` (pre-selected)
-* **Pipeline version**: `Model retraining` (pre-filled)
+.Pipeline run configuration
+[cols="1,2,2",options="header"]
+|===
+| Parameter | Value | Purpose
+
+| Project
+| `ai-edge-project`
+| Target project for pipeline execution
+
+| Experiment
+| `Default`
+| Groups related pipeline runs together
+
+| Name
+| `First run`
+| Identifier for this specific execution
+
+| Pipeline
+| `Model retraining`
+| Pipeline definition to execute
+
+| Pipeline version
+| `Model retraining`
+| Specific version of the pipeline
+|===
 
 . Review pipeline parameters (scroll down):
 +
-[cols="2,3",options="header"]
+.Pipeline execution parameters
+[cols="1,2,2",options="header"]
 |===
-| Parameter | Value
+| Parameter | Value | Purpose
 
 | `aws_access_key_id`
 | `minio`
+| Robot MinIO access credential
 
 | `aws_s3_bucket`
 | `inference`
+| Bucket where trained models are deployed
 
 | `aws_s3_endpoint`
-| `http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
+| `\http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
+| Robot's MinIO service URL
 
 | `aws_secret_access_key`
 | `minio123`
+| Robot MinIO password
 
 | `influxdb_bucket`
 | `bms`
+| InfluxDB bucket containing battery telemetry
 
 | `influxdb_org`
 | `redhat`
+| InfluxDB organization identifier
 
 | `influxdb_token`
 | `admin_token`
+| Authentication token for InfluxDB
 
 | `influxdb_url`
-| `https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
+| `\https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
+| Robot's InfluxDB endpoint URL
 |===
 +
-NOTE: Update `influxdb_url` if your environment uses a different domain.
+NOTE: You will only need to update the `influxdb_url` value.
 +
 . Click **Create run**
 
-=== Monitor pipeline execution
-
-Watch the pipeline execute in real-time.
-
-**Pipeline Stages:**
-
-1. **Data Retrieval** - Fetches battery telemetry from InfluxDB on robots
-2. **Data Processing** - Prepares and normalizes data
-3. **Parallel Training** - Both models train simultaneously
-4. **Model Validation** - New models evaluated against existing models
-5. **Conditional Deployment** - If new models outperform, upload to MinIO
-
-Wait for all nodes to complete.
+Watch the pipeline execute in real-time and wait for all nodes to complete.
 
 image::07-module-05_pipeline-complete.png[Completed pipeline run with all nodes showing green checkmarks,link=self,window=blank,width=700]
 
@@ -192,9 +204,25 @@ image::07-module-05_pipeline-complete.png[Completed pipeline run with all nodes 
 
 If new models outperformed existing ones, verify they were uploaded to MinIO:
 
-. Open MinIO dashboard: `https://minio-microshift-001.{openshift_cluster_ingress_domain}`
-. Login: `minio` / `minio123`
-. Navigate to `inference` bucket
+. Open the MinIO dashboard and login with credential:
++
+[source,bash,subs="attributes+"]
+----
+https://minio-microshift-001.{openshift_cluster_ingress_domain}
+----
++
+[cols="1,2"]
+|===
+| Credential | Value
+
+| Username
+| `minio`
+
+| Password
+| `minio123`
+|===
++
+. Navigate to the `inference` bucket
 . Check model files in `stress-detection/1/` and `time-to-failure/1/`
 . File timestamps show recent updates (within last few minutes)
 
@@ -209,24 +237,7 @@ If new models outperformed existing ones, verify they were uploaded to MinIO:
 [#schedule-automation]
 == Exercise 5.3: Schedule pipeline automation
 
-Scheduled pipelines enable fully automated model retraining. Configure the pipeline to run every 10 minutes, ensuring models continuously improve without manual intervention.
-
-=== Why scheduled automation matters
-
-Machine learning models drift over time as operational conditions change:
-
-* **Battery aging** - Performance degrades as batteries wear
-* **Temperature variations** - Seasonal changes affect battery behavior
-* **Workload patterns** - Different operational routes stress batteries differently
-
-**Scheduled Retraining Benefits:**
-
-* **Eliminates manual intervention** - No human involvement required
-* **Reduces model drift** - Models stay accurate with fresh data
-* **Ensures reliability** - Predictive accuracy maintained over time
-* **Enables true edge AI** - Autonomous systems that self-improve
-
-For our robot fleet operating 24/7, automation is essential.
+Scheduled pipelines enable fully automated model retraining. Configure the pipeline to run every 10 minutes, ensuring models continuously improve without manual intervention, reducing model drift and reliability.
 
 === Create a scheduled pipeline run
 
@@ -243,55 +254,81 @@ image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for
 
 . Fill in the schedule configuration:
 +
-* **Name**: `Scheduled run`
-* **Trigger type**: Select **Periodic**
-* **Run every**: `10` `minutes`
-
-. Scroll down to verify the **Model Retraining** pipeline is automatically selected
-
-. Review parameters (same as manual run):
-+
-[cols="2,3",options="header"]
+.Pipeline schedule configuration
+[cols="1,2,2",options="header"]
 |===
-| Parameter | Value
+| Parameter | Value | Purpose
+
+| Experiment
+| `Default`
+| Groups related scheduled runs together
+
+| Name
+| `Scheduled run`
+| Identifier for this schedule
+
+| Trigger type
+| Select **Periodic**
+| Runs at regular intervals
+
+| Run every
+| `10` `minutes`
+| Frequency of automated execution
+
+| Maximum concurrent runs
+| `10`
+| Maximum simultaneous pipeline executions (selected by default)
+
+| Pipeline
+| `Model Retraining`
+| Pipeline definition to schedule (automatically selected)
+|===
+
+. Scroll down to verify the pipeline parameters (same as manual run):
++
+.Scheduled pipeline parameters
+[cols="1,2,2",options="header"]
+|===
+| Parameter | Value | Purpose
 
 | `aws_access_key_id`
 | `minio`
+| Robot MinIO access credential
 
 | `aws_s3_bucket`
 | `inference`
+| Bucket where trained models are deployed
 
 | `aws_s3_endpoint`
 | `http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
+| Robot's MinIO service URL
 
 | `aws_secret_access_key`
 | `minio123`
+| Robot MinIO password
 
 | `influxdb_bucket`
 | `bms`
+| InfluxDB bucket containing battery telemetry
 
 | `influxdb_org`
 | `redhat`
+| InfluxDB organization identifier
 
 | `influxdb_token`
 | `admin_token`
+| Authentication token for InfluxDB
 
 | `influxdb_url`
 | `https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
+| Robot's InfluxDB endpoint URL
 |===
++
+NOTE: Again, you will only need to update the `influxdb_url` value.
 +
 . Click **Create schedule**
 
-Every 10 minutes, the scheduled pipeline:
-
-. **Retrieves** - Fresh battery telemetry from factory robots (last hour of data)
-. **Processes** - Normalizes and prepares training datasets
-. **Trains** - New Stress Detection and Time-to-Failure models
-. **Validates** - Compares new models against existing models
-. **Deploys** - Uploads improved models to robot storage (if they outperform)
-. **Repeats** - Cycle continues every 10 minutes
-
-This creates a **self-improving system** where models get better over time without human intervention.
+Every 10 minutes, the scheduled pipeline runs.This creates a **self-improving system** where models get better over time without human intervention.
 
 === Verify
 
@@ -325,6 +362,6 @@ You have configured fully automated pipeline scheduling for continuous model ret
 * Conditional deployment logic to prevent model degradation
 * Complete MLOps workflow from training to deployment
 
-Next, you'll explore the alerting and monitoring system to ensure automated models remain fair and accurate over time.
+Next, you'll explore the alerting and monitoring system to ensure battery health is good.
 
 Navigate to xref:08-module-06-test-alerts.adoc[Module 6: Test Alerts].
