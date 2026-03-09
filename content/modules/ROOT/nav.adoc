@@ -9,7 +9,7 @@
 ** xref:03-module-01-transportation-robot.adoc#deploy-bms[1.4 Battery Monitoring System]
 
 * xref:04-module-02-rhoai-configuration.adoc[Module 2: RHOAI Configuration]
-** xref:04-module-02-rhoai-configuration.adoc#access-openshift[2.1 Review RHOAI]
+** xref:04-module-02-rhoai-configuration.adoc#access-openshift[2.1 Access RHOAI]
 ** xref:04-module-02-rhoai-configuration.adoc#review-project[2.2 Review Project]
 ** xref:04-module-02-rhoai-configuration.adoc#review-dataconnection[2.3 Review DataConnection]
 

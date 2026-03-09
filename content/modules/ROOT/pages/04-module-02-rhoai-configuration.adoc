@@ -13,7 +13,7 @@ By the end of this module, you will be able to:
 [#access-openshift]
 == Exercise 2.1: Access the RHOAI web interface:
 
-Log in to the Single Node OpenShift cluster and verify RHOAI is installed.
+The Red Hat OpenShift AI operator is installed and pre-configured in the Single Node OpenShift cluster.
 
 === Access the RHOAI console
 
@@ -136,6 +136,8 @@ The `vehicle-models` connection is configured with:
 | `inference`
 | Contains AI models in the robot
 |===
+
+**Close** (x) the configuration view 
 
 DataConnections are stored as Kubernetes Secrets. The secret contains base64-encoded S3 credentials:
 

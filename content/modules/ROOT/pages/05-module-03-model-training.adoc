@@ -13,7 +13,7 @@ By the end of this module, you will be able to:
 * Export trained models to OpenVINO format for edge deployment
 
 [#review-workbench]
-== Exercise 3.1: Review workbench configuration
+== Exercise 3.1: Review and access workbench
 
 Red Hat OpenShift AI provides Jupyter workbench environments for data scientists to develop and train machine learning models. The workbench includes pre-configured runtimes with necessary libraries and tools.
 
@@ -22,7 +22,7 @@ Red Hat OpenShift AI provides Jupyter workbench environments for data scientists
 . Ensure you're in the `ai-edge-project` project in the **Red Hat OpenShift AI Dashboard**
 . Navigate to the **Workbenches** tab
 . Locate the `model-training` workbench
-. Click on the **three vertical dots** on the right and click **Edit workbench**
+. Click on the **three vertical dots** (⋮) on the right and click **Edit workbench**
 
 image::05-module-03_workbench.png[Workbenches tab showing model-training workbench,link=self,window=blank,width=700]
 
@@ -30,9 +30,27 @@ image::05-module-03_workbench.png[Workbenches tab showing model-training workben
 
 The Workbench is configured with:
 
-* **Image selection**: `Jupyter | TensorFlow | CUDA | Python 3.12`
-* **Version selection**: `2025.2` (latest version available)
-* **Hardware profile**: `default-profile` (2 CPUs and 4 GiB of memory)
+.Workbench configuration
+[cols="1,2,2"]
+|===
+| Parameter | Value | Purpose
+
+| Name
+| `model-training`
+| Workbench identifier for model training
+
+| Image selection
+| `Jupyter \| TensorFlow \| CUDA \| Python 3.12`
+| Development environment with ML frameworks
+
+| Version selection
+| `2025.2`
+| Latest version available
+
+| Hardware profile
+| `default-profile`
+| 2 CPUs and 4 GiB of memory
+|===
 
 === Attach DataConnection
 
@@ -129,6 +147,17 @@ Once you have run all of them, the new AI models should have been uploaded to th
 After all notebooks complete, check that models were exported to OpenVINO format and MinIO contains updated models:
 
 . Open MinIO dashboard: `https://minio-microshift-001.{openshift_cluster_ingress_domain}`
++
+[cols="1,2"]
+|===
+| Credential | Value
+
+| Username
+| `minio`
+
+| Password
+| `minio123`
+|===
 . Navigate to `inference` bucket
 . Verify `stress-detection/1/` contains `model.xml` and `model.bin`
 . Verify `time-to-failure/1/` contains `model.xml` and `model.bin`
