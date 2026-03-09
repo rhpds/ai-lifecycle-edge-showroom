@@ -11,7 +11,7 @@ This hands-on workshop demonstrates an end-to-end AI solution for battery health
 
 * **Red Hat Device Edge (MicroShift)** - Running on an autonomous transportation robot
 * **Single Node OpenShift (SNO)** - Plant edge server for model training
-* **Red Hat OpenShift AI (RHOAI)** - Complete AI/ML platform on SNO
+* **Red Hat OpenShift AI** - Complete AI/ML platform on SNO
 
 The lab covers GitOps deployment, AI inference, model serving and automated model training via pipelines. You'll see how AI models can run at the edge while continuously improving without manual intervention.
 
@@ -62,36 +62,36 @@ This workshop consists of 6 hands-on modules:
 * Model serving deployment
 * Battery monitoring system deployment
 
-**xref:04-module-02-rhoai-configuration.adoc[Module 2: RHOAI Configuration]**
+**xref:04-module-02-rhoai-configuration.adoc[Module 2: Red Hat OpenShift AI configuration]**
 
-* Review RHOAI installation
-* Review DataScience project
-* Review DataConnection to robot storage
+* Review Red Hat OpenShift AI installation
+* Review data science project
+* Review data connection to robot storage
 
-**xref:05-module-03-model-training.adoc[Module 3: Model Training]**
+**xref:05-module-03-model-training.adoc[Module 3: Model training]**
 
 * Review training workbench
 * Import training notebooks
 * Train battery health models
 
-**xref:06-module-04-model-serving.adoc[Module 4: Model Serving]**
+**xref:06-module-04-model-serving.adoc[Module 4: Model serving]**
 
 * Deploy stress detection model server
 * Deploy time-to-failure model server
 * Query inference endpoints
 
-**xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline Automation]**
+**xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline automation]**
 
 * Review pipeline server
 * Execute automated retraining pipeline
 * Schedule continuous automation
 
-**xref:08-module-06-test-alerts.adoc[Module 6: Test Alerts]**
+**xref:08-module-06-test-alerts.adoc[Module 6: Test alerts]**
 
 * Review BMS dashboard
 * Test battery health alerts
 
-**xref:09-conclusion.adoc[Conclusion]** - Summary and next steps
+**xref:09-conclusion.adoc[Conclusion and next steps]** - Summary and next steps
 
 == Estimated time
 

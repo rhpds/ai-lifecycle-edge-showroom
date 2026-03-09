@@ -1,4 +1,4 @@
-= Module 4: Model Serving
+= Module 4: Model serving
 
 This module explores the model serving infrastructure that provides real-time inference capabilities. You'll create two complementary model servers, configure their endpoints, and test inference to verify predictions.
 
@@ -244,9 +244,9 @@ You have successfully deployed and tested the model serving infrastructure:
 
 **What You've Learned:**
 
-* How to deploy single-model serving platforms in RHOAI
+* How to deploy single-model serving platforms in Red Hat OpenShift AI
 * Configuring model servers with OpenVINO runtime for edge-optimized inference
-* Using DataConnections to link model servers to S3-compatible storage
+* Using data connections to link model servers to S3-compatible storage
 * RawDeployment mode for predictable resources in edge environments
 * KServe v2 protocol for REST API inference
 * How to query model endpoints with JSON payloads
@@ -256,4 +256,4 @@ You have successfully deployed and tested the model serving infrastructure:
 
 Next, you'll explore the automated pipeline system that retrains models every 10 minutes using fresh data from the robot fleet.
 
-Navigate to xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline Automation].
+Navigate to xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline automation].

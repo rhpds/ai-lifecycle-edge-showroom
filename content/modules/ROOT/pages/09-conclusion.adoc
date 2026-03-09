@@ -1,48 +1,48 @@
 = Conclusion and Next Steps
 
-== What you've accomplished
+== What You've Accomplished
 
 Congratulations! You've completed the AI Lifecycle at the Edge workshop. You've explored a complete solution spanning edge devices and cloud-like infrastructure:
 
-**Module 1 - Transportation Robot:**
+**Module 1 - Transportation robot:**
 
 * Connected to robot infrastructure via MicroShift
 * Deployed MinIO object storage for AI models
 * Configured model serving with KServe/OpenVINO
 * Deployed Battery Monitoring System with real-time predictions
 
-**Module 2 - Red Hat OpenShift AI (RHOAI) Configuration:**
+**Module 2 - Red Hat OpenShift AI Configuration:**
 
-* Reviewed Red Hat OpenShift AI (RHOAI) installation optimized for edge
+* Reviewed Red Hat OpenShift AI installation optimized for edge
 * Explored data science project organization
-* Examined DataConnections linking SNO to robot storage
+* Examined data connections linking SNO to robot storage
 
-**Module 3 - Model Training:**
+**Module 3 - Model training:**
 
 * Reviewed JupyterLab workbench configuration
 * Imported training notebooks from GitHub
 * Trained Stress Detection and Time-to-Failure models
 
-**Module 4 - Model Serving:**
+**Module 4 - Model serving:**
 
 * Reviewed OpenVINO model servers on SNO
 * Understood KServe v2 inference API protocol
 * Queried endpoints to validate predictions
 
-**Module 5 - Pipeline Automation:**
+**Module 5 - Pipeline automation:**
 
 * Reviewed pipeline server architecture
 * Executed automated retraining pipeline
 * Scheduled pipelines for continuous model improvement
 
-**Module 6 - Test Alerts:**
+**Module 6 - Test alerts:**
 
 * Tested battery health alerts dashboard
 * Verified auto-inference and AI predictions
 * Simulated battery stress scenarios
 * Confirmed alerting system functionality
 
-== What you've learned
+== What You've Learned
 
 ✓ **Edge AI is practical** - MicroShift and SNO enable AI at resource-constrained locations
 

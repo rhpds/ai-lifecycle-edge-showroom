@@ -1,4 +1,4 @@
-= Module 3: Model Training
+= Module 3: Model training
 
 This module explores the model training infrastructure on the Single Node OpenShift (SNO) server. You'll access a Jupyter notebook environment, import training notebooks from Git, and execute the complete model training workflow for battery health prediction models.
 
@@ -61,7 +61,7 @@ Connect the Workbench to the existing DataConnection that contains the credentia
 . Click **Attach**
 . To apply the configuration, click **Update workbench**
 
-=== Access the model-training workbench
+=== Access the model training workbench
 
 . Click **model-training** to launch JupyterLab
 
@@ -211,4 +211,4 @@ You have successfully trained battery health prediction models using Red Hat Ope
 
 Next, you'll explore the model serving infrastructure that loads these models and exposes inference endpoints for real-time predictions.
 
-Navigate to xref:06-module-04-model-serving.adoc[Module 4: Model Serving].
+Navigate to xref:06-module-04-model-serving.adoc[Module 4: Model serving].

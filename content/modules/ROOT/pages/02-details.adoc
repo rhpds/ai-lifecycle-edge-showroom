@@ -156,4 +156,4 @@ Password: `minio123`
 
 Now that you understand the technical architecture and have access to all dashboards, you're ready to begin the hands-on modules.
 
-**Begin the hands-on exercises:** xref:03-module-01-transportation-robot.adoc[Module 1: Transportation Robot]
+**Begin the hands-on exercises:** xref:03-module-01-transportation-robot.adoc[Module 1: Transportation robot]

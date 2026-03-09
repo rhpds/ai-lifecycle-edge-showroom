@@ -1,4 +1,4 @@
-= Module 6: Test Alerts
+= Module 6: Test alerts
 
 This module explores the alerting and monitoring infrastructure that ensures AI models continue to perform accurately over time. You'll test the battery monitoring system alerts and understand how real-time predictions trigger notifications.
 
@@ -243,17 +243,17 @@ You have successfully tested the complete AI-powered battery monitoring and aler
 
 Throughout this workshop, you've explored:
 
-**Module 1: Transportation Robot** - Deployed MicroShift, MinIO, model serving, and BMS on edge devices
+**Module 1: Transportation robot** - Deployed MicroShift, MinIO, model serving, and BMS on edge devices
 
-**Module 2: RHOAI Configuration** - Configured Red Hat OpenShift AI for ML workloads
+**Module 2: Red Hat OpenShift AI configuration** - Configured Red Hat OpenShift AI for ML workloads
 
-**Module 3: Model Training** - Trained battery health prediction models in Jupyter notebooks
+**Module 3: Model training** - Trained battery health prediction models in Jupyter notebooks
 
-**Module 4: Model Serving** - Deployed and tested inference endpoints for real-time predictions
+**Module 4: Model serving** - Deployed and tested inference endpoints for real-time predictions
 
-**Module 5: Pipeline Automation** - Configured automated retraining every 10 minutes
+**Module 5: Pipeline automation** - Configured automated retraining every 10 minutes
 
-**Module 6: Test Alerts** - Verified end-to-end monitoring and alerting system
+**Module 6: Test alerts** - Verified end-to-end monitoring and alerting system
 
 **You now understand how to build, deploy, and maintain self-improving AI systems at the edge.**
 

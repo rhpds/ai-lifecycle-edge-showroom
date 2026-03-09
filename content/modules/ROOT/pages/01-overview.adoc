@@ -36,7 +36,7 @@ To support this containerized solution on each robot, we use **Red Hat Device Ed
 
 === Automated model re-training at the edge
 
-AI models must stay accurate as battery behavior evolves over time. However, robots generate massive amounts of telemetry data, making it impractical to continuously upload all data over the factory network. Our solution uses **Red Hat OpenShift AI (RHOAI)** for the entire AI/ML lifecycle:
+AI models must stay accurate as battery behavior evolves over time. However, robots generate massive amounts of telemetry data, making it impractical to continuously upload all data over the factory network. Our solution uses **Red Hat OpenShift AI** for the entire AI/ML lifecycle:
 
 * Collects new data every 10 minutes from the robot
 * Trains 2 AI models using the new data
@@ -44,7 +44,7 @@ AI models must stay accurate as battery behavior evolves over time. However, rob
 * Runs a fully automated pipeline: data collection → model training → validation → deployment
 * Automatically deploys improved models back to robots if they outperform existing ones
 
-This RHOAI operator is deployed on a **Single Node OpenShift** instance with greater compute capacity at the plant. SNO is optimized for edge locations providing enterprise Kubernetes features in a single-node deployment.
+This Red Hat OpenShift AI operator is deployed on a **Single Node OpenShift** instance with greater compute capacity at the plant. SNO is optimized for edge locations providing enterprise Kubernetes features in a single-node deployment.
 
 [#get-started]
 == Get started

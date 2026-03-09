@@ -1,4 +1,4 @@
-= Module 5: Pipeline Automation
+= Module 5: Pipeline automation
 
 This module explores the automated pipeline system that continuously retrains machine learning models. You'll review the pipeline infrastructure, execute a manual pipeline run, and configure scheduled automation to enable self-improving AI models.
 
@@ -364,4 +364,4 @@ You have configured fully automated pipeline scheduling for continuous model ret
 
 Next, you'll explore the alerting and monitoring system to ensure battery health is good.
 
-Navigate to xref:08-module-06-test-alerts.adoc[Module 6: Test Alerts].
+Navigate to xref:08-module-06-test-alerts.adoc[Module 6: Test alerts].

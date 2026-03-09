@@ -1,6 +1,6 @@
-= Module 2: RHOAI Configuration
+= Module 2: Red Hat OpenShift AI configuration
 
-Red Hat OpenShift AI (RHOAI) running on Single Node OpenShift provides the complete AI/ML platform for model training, serving, pipelines, and monitoring. This module reviews the pre-configured RHOAI environment optimized for edge deployments.
+Red Hat OpenShift AI running on Single Node OpenShift provides the complete AI/ML platform for model training, serving, pipelines, and monitoring. This module reviews the pre-configured Red Hat OpenShift AI environment optimized for edge deployments.
 
 == Learning objectives
 
@@ -11,13 +11,13 @@ By the end of this module, you will be able to:
 * Review DataConnections linking RHOAI to robot storage
 
 [#access-openshift]
-== Exercise 2.1: Access the RHOAI web interface:
+== Exercise 2.1: Access the Red Hat OpenShift AI web interface
 
 The Red Hat OpenShift AI operator is installed and pre-configured in the Single Node OpenShift cluster.
 
-=== Access the RHOAI console
+=== Access the Red Hat OpenShift AI console
 
-Access the RHOAI dashbaord:
+Access the Red Hat OpenShift AI dashboard:
 
 . Open the RHOAI dashboard and login with credentials:
 +
@@ -44,14 +44,14 @@ image::04-module-02_rhoai-landing.png[RHOAI Dashboard landing page showing Data 
 
 === Verify
 
-✓ RHOAI Dashboard loads successfully
+✓ Red Hat OpenShift AI Dashboard loads successfully
 
 ✓ The landing page shows the `ai-edge-project` pre-created
 
 [#review-project]
 == Exercise 2.2: Review data science project
 
-Data Science Projects in RHOAI organize users and AI/ML resources in a single namespace. For our battery monitoring solution, the `ai-edge-project` contains all necessary components: workbenches, data connections, model servers, and pipelines.
+Data Science Projects in Red Hat OpenShift AI organize users and AI/ML resources in a single namespace. For our battery monitoring solution, the `ai-edge-project` contains all necessary components: workbenches, data connections, model servers, and pipelines.
 
 === Access the ai-edge-project
 
@@ -86,11 +86,11 @@ Confirm the project is properly configured:
 
 
 [#review-dataconnection]
-== Exercise 2.3: Review DataConnection
+== Exercise 2.3: Review data connection
 
-DataConnections link RHOAI to external object storage. The `vehicle-models` connection provides access to the robot's MinIO storage where AI models are stored. The connection bridges the SNO training environment and robot's edge storage.
+Data connections link Red Hat OpenShift AI to external object storage. The `vehicle-models` connection provides access to the robot's MinIO storage where AI models are stored. The connection bridges the SNO training environment and robot's edge storage.
 
-=== Review the vehicle-models DataConnection
+=== Review the vehicle-models data connection
 
 . Ensure you're in the **RHOAI Dashboard** inside the `ai-edge-project` project
 . Navigate to the **Connections** tab
@@ -103,7 +103,7 @@ image::04-module-02_connection.png[Connections tab showing vehicle-models DataCo
 
 The `vehicle-models` connection is configured with:
 
-.DataConnection configuration
+.Data connection configuration
 [cols="1,2,2"]
 |===
 | Parameter | Value | Purpose
@@ -137,9 +137,9 @@ The `vehicle-models` connection is configured with:
 | Contains AI models in the robot
 |===
 
-**Close** (x) the configuration view 
+**Close** (x) the configuration view
 
-DataConnections are stored as Kubernetes Secrets. The secret contains base64-encoded S3 credentials:
+Data connections are stored as Kubernetes Secrets. The secret contains base64-encoded S3 credentials:
 
 * `AWS_ACCESS_KEY_ID` - MinIO username
 * `AWS_SECRET_ACCESS_KEY` - MinIO password
@@ -147,37 +147,37 @@ DataConnections are stored as Kubernetes Secrets. The secret contains base64-enc
 * `AWS_DEFAULT_REGION` - S3 region
 * `AWS_S3_BUCKET` - Target bucket name
 
-NOTE: All values are base64-encoded for security. RHOAI components automatically decode them when using the connection.
+NOTE: All values are base64-encoded for security. Red Hat OpenShift AI components automatically decode them when using the connection.
 
 === Verify
 
 ✓ `vehicle-models` data connection appears in Connections tab
 
-✓ DataConnection points to MicroShift MinIO service
+✓ Data connection points to MicroShift MinIO service
 
-✓ DataConnection uses the `inference` bucket
+✓ Data connection uses the `inference` bucket
 
 [#summary]
 == Summary
 
 You have reviewed the pre-configured Red Hat OpenShift AI environment on Single Node OpenShift:
 
-**✓ RHOAI Dashboard** - Web interface accessible and operational
+**✓ Red Hat OpenShift AI Dashboard** - Web interface accessible and operational
 
 **✓ ai-edge-project** - Data Science Project organizing all battery monitoring AI resources
 
-**✓ vehicle-models DataConnection** - S3 connection linking SNO to robot's MinIO storage
+**✓ vehicle-models data connection** - S3 connection linking SNO to robot's MinIO storage
 
 **What You've Learned:**
 
-* RHOAI provides a complete AI/ML platform on SNO
+* Red Hat OpenShift AI provides a complete AI/ML platform on SNO
 * Data Science Projects organize resources in namespaces
-* DataConnections link RHOAI to external storage (robot's MinIO)
+* Data connections link Red Hat OpenShift AI to external storage (robot's MinIO)
 * Secrets store S3 credentials securely
 * The SNO server can access robot storage over the factory network
 
-**The RHOAI environment is ready for model training and automated retraining workflows.**
+**The Red Hat OpenShift AI environment is ready for model training and automated retraining workflows.**
 
 Next, you'll explore the pre-configured workbench where data scientists train battery health prediction models.
 
-Navigate to xref:05-module-03-model-training.adoc[Module 3: Model Training].
+Navigate to xref:05-module-03-model-training.adoc[Module 3: Model training].

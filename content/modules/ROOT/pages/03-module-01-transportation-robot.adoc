@@ -1,4 +1,4 @@
-= Module 1: Transportation Robot
+= Module 1: Transportation robot
 
 This module explores the complete infrastructure running on Red Bot Logistics' autonomous transportation robots. Each robot runs **Red Hat Device Edge (MicroShift)**, a lightweight Kubernetes platform optimized for resource-constrained environments.
 
@@ -496,4 +496,4 @@ You have successfully deployed the complete transportation robot infrastructure 
 
 Next, you'll explore the **Single Node OpenShift (SNO) retraining server** where AI models are automatically retrained every 10 minutes using fresh data from the robot fleet.
 
-Navigate to xref:04-module-02-rhoai-configuration.adoc[Module 2: RHOAI Configuration].
+Navigate to xref:04-module-02-rhoai-configuration.adoc[Module 2: Red Hat OpenShift AI configuration].
