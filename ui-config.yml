@@ -6,13 +6,13 @@ default_width: 30
 # Persist the URL state so browser refresh doesn't reset the UI
 persist_url_state: true
 
-view_switcher:
-  enabled: false
-  default_mode: split
+#view_switcher:
+#  enabled: true
+#  default_mode: split
 
 tabs:
-  - name: Bastion
-    path: /wetty
-    port: 443
-  - name: OpenShift AI Dashboard
-    url: 'https://data-science-gateway.${DOMAIN}'
+#  - name: Bastion
+#    path: /wetty
+#    port: 443
+#  - name: OpenShift AI Dashboard
+#    url: 'https://data-science-gateway.${DOMAIN}'
