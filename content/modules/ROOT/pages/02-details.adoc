@@ -65,7 +65,7 @@ image::02-details_diagram.png[AI lifecycle edge architecture diagram showing Mic
 
 3. The Battery simulator item is a Quarkus component that simulates the battery consumption of an operating transportation robot and sends telemetry data to the Mosquitto MQTT broker that acts as the central messaging hub, receiving the data coming from the emulated sensors.
 
-4. 2 different Camel Quarkus components are in charge of reading the data from Mosquitto and sending it to the Battery Monitoring System (BMS) app. The **mqtt2ws** exposes the data as WebSocket for the BMS Dashboard and the **data ingester** stores it in InfluxDB. 
+4. 2 different Camel Quarkus components are in charge of reading the data from Mosquitto and sending it to the Battery Monitoring System (BMS) app. The **mqtt2ws** exposes the data as WebSocket for the BMS Dashboard and the **data ingester** stores it in InfluxDB.
 
 5. The Battery Monitoring System application includes a component that retrieves real-time data from InfluxDB and sends it as queries to the 2 inference endpoints and receives the predictions from the AI models currently being served.
 
@@ -88,7 +88,7 @@ Access the robot infrastructure via bastion host:
 
 [source,bash,subs="attributes+"]
 ----
-{bastion_ssh_command}
+ssh {bastion_ssh_user_name}@{bastion_public_hostname} -p {bastion_ssh_port}
 ----
 
 [cols="1,2"]
