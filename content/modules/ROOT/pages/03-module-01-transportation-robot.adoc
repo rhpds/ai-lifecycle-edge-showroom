@@ -1,5 +1,7 @@
 = Module 1: Transportation robot
 
+include::vars.adoc[]
+
 This module explores the complete infrastructure running on Red Bot Logistics' autonomous transportation robots. Each robot runs **Red Hat Device Edge (MicroShift)**, a lightweight Kubernetes platform optimized for resource-constrained environments.
 
 == Learning objectives
@@ -22,14 +24,15 @@ Establish an SSH connection to the bastion host:
 
 [source,bash,subs="attributes+"]
 ----
-{bastion_ssh_command}
+ssh {bastion_ssh_user_name}@{bastion_public_hostname} -p {bastion_ssh_port}
 ----
 
 [cols="1,2"]
 |===
 | Credential | Value
-
-| Password
+| ssh user name
+| `{bastion_ssh_user_name}`
+| ssh password
 | `{bastion_ssh_password}`
 |===
 
@@ -125,7 +128,7 @@ Beyond the core MicroShift functionality, we can see that additional services ar
 | Runs the KServe controller manager, which provides AI/ML model serving capabilities. Essential for deploying and managing AI models for stress detection and time-to-failure prediction.
 |===
 
-=== Verify 
+=== Verify
 
 ✓ The transportation robot machine is accessible
 
@@ -136,7 +139,7 @@ Beyond the core MicroShift functionality, we can see that additional services ar
 [#deploy-minio]
 == Exercise 1.2: MinIO storage deployment
 
-MinIO provides S3-compatible object storage for AI models on the robot. The `inference` bucket stores 2 AI models: 
+MinIO provides S3-compatible object storage for AI models on the robot. The `inference` bucket stores 2 AI models:
 
 * **Stress Detection** - identifies battery stress conditions
 * **Time to Failure** - predicts remaining battery life
