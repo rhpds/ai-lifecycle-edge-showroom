@@ -1,5 +1,7 @@
 = Technical details
 
+include::vars.adoc[]
+
 This section provides the technical specifications, architecture, and access information for the AI Lifecycle at the Edge lab environment.
 
 [#edge-computing-essentials]
@@ -95,7 +97,9 @@ ssh {bastion_ssh_user_name}@{bastion_public_hostname} -p {bastion_ssh_port}
 |===
 | Credential | Value
 
-| Password
+| ssh user name
+| `{bastion_ssh_user_name}`
+| ssh password
 | `{bastion_ssh_password}`
 |===
 
@@ -136,12 +140,12 @@ Available Dashboards:
 | Dashboard | URL | Credentials
 
 | *OpenShift Web Console*
-| link:{openshift_cluster_console_url}[{openshift_cluster_console_url}^]
+| link:{openshift_console_url}[{openshift_console_url}^]
 | Username: `{openshift_cluster_admin_username}` +
 Password: `{openshift_cluster_admin_password}`
 
 | *OpenShift AI Dashboard*
-| link:https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}[https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}^]
+| link:https://data-science-gateway.{openshift_cluster_ingress_domain}[https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}^]
 | Username: `{openshift_cluster_admin_username}` +
 Password: `{openshift_cluster_admin_password}`
 
