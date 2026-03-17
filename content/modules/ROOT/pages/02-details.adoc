@@ -140,9 +140,9 @@ Available Dashboards:
 | Dashboard | URL | Credentials
 
 | *OpenShift Web Console*
-| {ai_edge_console_url}
-| Username: `{openshift_cluster_admin_username}` +
-Password: `{openshift_cluster_admin_password}`
+| {ai_edge_console_url_1}
+| Username: `{ai_edge_openshift_username}` +
+Password: `{ai_edge_openshift_password}`
 
 | *OpenShift AI Dashboard*
 | https://data-science-gateway.{ai_edge_apps_domain}
