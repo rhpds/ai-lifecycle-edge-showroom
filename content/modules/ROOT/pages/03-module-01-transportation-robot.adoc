@@ -22,7 +22,7 @@ Access the robot infrastructure and verify MicroShift is running.
 
 Establish an SSH connection to the bastion host:
 
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 ssh {bastion_ssh_user_name}@{bastion_public_hostname} -p {bastion_ssh_port}
 ----
@@ -40,7 +40,7 @@ NOTE: If a message regarding the authenticity of the host is displayed, type `ye
 
 Once connected to the bastion, access the transportation robot's MicroShift VM:
 
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
@@ -49,7 +49,7 @@ virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/la
 
 Check that MicroShift is running:
 
-[source,bash]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 sudo systemctl status microshift
 ----
@@ -64,7 +64,7 @@ Expected output should show `active (running)`:
 
 Additionally you can check if all the MicroShift pods are Running:
 
-[source,bash]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 oc get pods -A
 ----
@@ -208,7 +208,7 @@ This deploys:
 
 Watch the deployment:
 
-[source,bash]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 watch oc get pods -n minio
 ----
@@ -296,7 +296,7 @@ This deploys:
 
 Watch the deployment:
 
-[source,bash]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 watch oc get pods -n inference
 ----
@@ -309,7 +309,7 @@ Verify that models are loaded and responding to inference requests.
 
 **Test stress detection model:**
 
-[source,bash]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 curl -s -X POST http://$(oc get pod -n inference -l app=isvc.stress-detection-predictor -o jsonpath='{.items[0].status.podIP}'):8888/v2/models/stress-detection/infer \
      -H "Content-Type: application/json" \
@@ -321,7 +321,7 @@ Expected output: `STRESSED` or `NORMAL`
 
 **Test time to failure model:**
 
-[source,bash]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 curl -s -X POST http://$(oc get pod -n inference -l app=isvc.time-to-failure-predictor -o jsonpath='{.items[0].status.podIP}'):8888/v2/models/time-to-failure/infer \
      -H "Content-Type: application/json" \
@@ -401,7 +401,7 @@ This deploys:
 
 Monitor the deployment:
 
-[source,bash]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 watch oc get pods -n battery-demo
 ----
@@ -412,7 +412,7 @@ NOTE: Press `Ctrl+C` to exit when all pods show `Running` status.
 
 Open the Battery Monitoring System dashboard:
 
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
 ----
@@ -429,7 +429,7 @@ Access the InfluxDB dashboard to see historical sensor data:
 
 . Open the InfluxDB dashboard and login with credentials:
 +
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 https://influx-db-microshift-001.{openshift_cluster_ingress_domain}
 ----

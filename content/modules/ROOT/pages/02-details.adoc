@@ -105,7 +105,7 @@ ssh {ai_edge_bastion_username}@{ai_edge_bastion_hostname} -p {ai_edge_bastion_po
 
 Then connect to robot VM:
 
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
@@ -140,12 +140,12 @@ Available Dashboards:
 | Dashboard | URL | Credentials
 
 | *OpenShift Web Console*
-| link:{openshift_console_url}[{openshift_console_url}^]
+| {ai_edge_console_url}
 | Username: `{openshift_cluster_admin_username}` +
 Password: `{openshift_cluster_admin_password}`
 
 | *OpenShift AI Dashboard*
-| link:https://data-science-gateway.{openshift_cluster_ingress_domain}[https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}^]
+| https://data-science-gateway.{ai_edge_apps_domain}
 | Username: `{openshift_cluster_admin_username}` +
 Password: `{openshift_cluster_admin_password}`
 
