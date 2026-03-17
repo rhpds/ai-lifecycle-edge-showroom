@@ -88,9 +88,9 @@ NOTE: This section is provided for your convenience, allowing quick access to an
 
 Access the robot infrastructure via bastion host:
 
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname} -p {bastion_ssh_port}
+ssh {ai_edge_bastion_username}@{ai_edge_bastion_hostname} -p {ai_edge_bastion_port}
 ----
 
 [cols="1,2"]
@@ -98,9 +98,9 @@ ssh {bastion_ssh_user_name}@{bastion_public_hostname} -p {bastion_ssh_port}
 | Credential | Value
 
 | ssh user name
-| `{bastion_ssh_user_name}`
+| `{ai_edge_bastion_username}`
 | ssh password
-| `{bastion_ssh_password}`
+| `{ai_edge_bastion_password}`
 |===
 
 Then connect to robot VM:
