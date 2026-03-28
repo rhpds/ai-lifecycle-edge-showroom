@@ -16,12 +16,12 @@ asciidoc:
     ssh_user: devops
     ssh_password: devops
     ssh_command: ssh someone@example.com
-    bastion_ssh_command: "ssh lab-user@ssh.ocpv09.rhdp.net -p 31412"
-    bastion_ssh_password: "WVS077JNLGGz"
-    openshift_cluster_ingress_domain: "apps.cluster-nxx8l.dynamic.redhatworkshops.io"
-    openshift_cluster_console_url: "https://console-openshift-console.apps.cluster-nxx8l.dynamic.redhatworkshops.io"
+    bastion_ssh_command: "ssh lab-user@bastion.example.com"
+    bastion_ssh_password: "password"
+    openshift_cluster_ingress_domain: "apps.cluster.example.com"
+    openshift_cluster_console_url: "https://console-openshift-console.apps.cluster.example.com"
     openshift_cluster_admin_username: "admin"
-    openshift_cluster_admin_password: "DDWKhyEubuSogbeq"
+    openshift_cluster_admin_password: "password"
     page-links:
     - url: https://redhat.com
       text: Red Hat
