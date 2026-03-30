@@ -180,7 +180,7 @@ The notebook contains code to test the Stress Detection endpoint.
 
 . Verify the endpoint URL in the first cell**
 +
-[source,python]
+[source,python,options="wrap",role="execute",subs="attributes+"]
 ----
 BASE_URL = "http://stress-detection-predictor.ai-edge-project.svc.cluster.local:8888"
 ----
@@ -204,7 +204,7 @@ Scroll down in the notebook to the Time to Failure section.
 
 . Verify the Time to Failure endpoint URL
 +
-[source,python]
+[source,python,options="wrap",role="execute",subs="attributes+"]
 ----
 BASE_URL = "http://time-to-failure-predictor.ai-edge-project.svc.cluster.local:8888"
 ----

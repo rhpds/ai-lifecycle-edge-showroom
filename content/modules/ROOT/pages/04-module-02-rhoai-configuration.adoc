@@ -21,9 +21,9 @@ Access the Red Hat OpenShift AI dashboard:
 
 . Open the RHOAI dashboard and login with credentials:
 +
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
-https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}
+https://rhods-dashboard-redhat-ods-applications.{ai_edge_apps_domain}
 ----
 +
 [cols="1,2"]

@@ -117,16 +117,16 @@ Available Dashboards:
 | Dashboard | URL | Credentials
 
 | *Robot MinIO Storage*
-| link:https://minio-microshift-001.{openshift_cluster_ingress_domain}[https://minio-microshift-001.{openshift_cluster_ingress_domain}^]
+| link:https://minio-microshift-001.{ai_edge_apps_domain}[https://minio-microshift-001.{ai_edge_apps_domain}^]
 | Username: `minio` +
 Password: `minio123`
 
 | *BMS Dashboard*
-| link:https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}[https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}^]
+| link:https://bms-dashboard-microshift-001.{ai_edge_apps_domain}[https://bms-dashboard-microshift-001.{ai_edge_apps_domain}^]
 | No authentication required
 
 | *InfluxDB*
-| link:https://influx-db-microshift-001.{openshift_cluster_ingress_domain}[https://influx-db-microshift-001.{openshift_cluster_ingress_domain}^]
+| link:https://influx-db-microshift-001.{ai_edge_apps_domain}[https://influx-db-microshift-001.{ai_edge_apps_domain}^]
 | Username: `admin` +
 Password: `password`
 |===
@@ -140,17 +140,17 @@ Available Dashboards:
 | Dashboard | URL | Credentials
 
 | *OpenShift Web Console*
-| {ai_edge_console_url_1}
+| {ai_edge_openshift_console_url}
 | Username: `{ai_edge_openshift_username}` +
 Password: `{ai_edge_openshift_password}`
 
 | *OpenShift AI Dashboard*
 | https://data-science-gateway.{ai_edge_apps_domain}
-| Username: `{openshift_cluster_admin_username}` +
-Password: `{openshift_cluster_admin_password}`
+| Username: `{ai_edge_openshift_username}` +
+Password: `{ai_edge_openshift_password}`
 
 | *SNO MinIO Storage*
-| link:https://minio-ui-minio.{openshift_cluster_ingress_domain}[https://minio-ui-minio.{openshift_cluster_ingress_domain}^]
+| link:https://minio-ui-minio.{ai_edge_apps_domain}[https://minio-ui-minio.{ai_edge_apps_domain}^]
 | Username: `minio` +
 Password: `minio123`
 |===
