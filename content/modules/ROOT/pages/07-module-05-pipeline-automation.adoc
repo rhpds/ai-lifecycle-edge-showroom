@@ -68,7 +68,7 @@ image::07-module-05_pipeline-server-config.png[Review pipeline server configurat
 | Stores pipeline artifacts and execution metadata
 |===
 
-**Close** (x) the configuration view 
+**Close** (x) the configuration view
 
 === Verify
 
@@ -78,7 +78,7 @@ image::07-module-05_pipeline-server-config.png[Review pipeline server configurat
 
 ✓ Pipeline server allows to import pipelines
 
-✓ Can access pipeline server configuration 
+✓ Can access pipeline server configuration
 
 [#execute-pipeline]
 == Exercise 5.2: Execute retraining pipeline
@@ -188,7 +188,7 @@ Execute the pipeline manually to test the automation workflow.
 | Authentication token for InfluxDB
 
 | `influxdb_url`
-| `\https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
+| `\https://influx-db-microshift-001.{ai_edge_apps_domain}`
 | Robot's InfluxDB endpoint URL
 |===
 +
@@ -206,9 +206,9 @@ If new models outperformed existing ones, verify they were uploaded to MinIO:
 
 . Open the MinIO dashboard and login with credential:
 +
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
-https://minio-microshift-001.{openshift_cluster_ingress_domain}
+https://minio-microshift-001.{ai_edge_apps_domain}
 ----
 +
 [cols="1,2"]
@@ -320,7 +320,7 @@ image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for
 | Authentication token for InfluxDB
 
 | `influxdb_url`
-| `https://influx-db-microshift-001.{openshift_cluster_ingress_domain}`
+| `https://influx-db-microshift-001.{ai_edge_apps_domain}`
 | Robot's InfluxDB endpoint URL
 |===
 +

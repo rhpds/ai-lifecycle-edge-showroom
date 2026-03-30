@@ -19,9 +19,9 @@ The Battery Monitoring System (BMS) dashboard provides a comprehensive view of b
 
 Open the Battery Monitoring System dashboard:
 
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
-https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
+https://bms-dashboard-microshift-001.{ai_edge_apps_domain}
 ----
 
 The dashboard displays three main panels:
@@ -41,7 +41,7 @@ image::08-module-06_alerts-panel.png[Alerts panel showing real-time inference re
 The dashboard continuously queries both model serving endpoints running in the Microshift robot:
 
 * **Stress Detection endpoint**
-* **Time to Failure endpoint** 
+* **Time to Failure endpoint**
 
 Each inference request sends current battery telemetry as a JSON payload to the model endpoints.
 
@@ -167,7 +167,7 @@ The battery simulator allows you to manually trigger stress conditions for testi
 . Locate the **Actions** panel
 . Press the **Enable temperature anomaly** button
 . Observe the battery temperature increasing dramatically
-+ 
++
 image::08-module-06_temperature.png[Battery Telemetry shows increased battery temperature,link=self,window=blank,width=700]
 
 +

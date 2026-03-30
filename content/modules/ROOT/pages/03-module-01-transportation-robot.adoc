@@ -24,16 +24,16 @@ Establish an SSH connection to the bastion host:
 
 [source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname} -p {bastion_ssh_port}
+ssh {ai_edge_bastion_username}@{ai_edge_bastion_hostname} -p {ai_edge_bastion_port}
 ----
 
 [cols="1,2"]
 |===
 | Credential | Value
 | ssh user name
-| `{bastion_ssh_user_name}`
+| `{ai_edge_bastion_username}`
 | ssh password
-| `{bastion_ssh_password}`
+| `{ai_edge_bastion_password}`
 |===
 
 NOTE: If a message regarding the authenticity of the host is displayed, type `yes` to establish the connection.
@@ -148,9 +148,9 @@ Both models are stored in OpenVINO IR format (`.xml` and `.bin` files) in versio
 
 === Create GitOps application project
 
-Create the default project for GitOps applications:
+In the terminal, type the following to create the default project for GitOps applications:
 
-[source,yaml]
+[source,yaml, options="wrap",role="execute",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 kind: AppProject
@@ -172,9 +172,9 @@ EOF
 
 === Deploy MinIO using GitOps
 
-Deploy MinIO by creating a GitOps Application:
+In the terminal, type the following to deploy MinIO by creating a GitOps Application:
 
-[source,yaml]
+[source,yaml, options="wrap",role="execute",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -223,7 +223,7 @@ Once deployed, access the MinIO web console:
 +
 [source,bash,subs="attributes+"]
 ----
-https://minio-microshift-001.{openshift_cluster_ingress_domain}
+https://minio-microshift-001.{ai_edge_apps_domain}
 ----
 +
 [cols="1,2"]
@@ -259,9 +259,9 @@ The inference server loads AI models from MinIO and exposes REST API endpoints f
 
 === Deploy model serving using GitOps
 
-Deploy the inference server GitOps application:
+In the terminal, type the following to deploy the inference server GitOps application:
 
-[source,yaml]
+[source,yaml, options="wrap",role="execute",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -348,9 +348,9 @@ The Battery Monitoring System (BMS) brings together all robot components to prov
 
 === Deploy BMS using GitOps
 
-Deploy the complete Battery Monitoring System application:
+In the terminal, type the following to deploy the complete Battery Monitoring System application:
 
-[source,yaml,subs="attributes+"]
+[source,yaml, options="wrap",role="execute",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -376,11 +376,11 @@ spec:
               path: /data/config.json
               value: |
                 {
-                  "BATTERY_METRICS_WS_ENDPOINT": "wss://mqtt2ws-microshift-001.{openshift_cluster_ingress_domain}/battery/metrics/",
+                  "BATTERY_METRICS_WS_ENDPOINT": "wss://mqtt2ws-microshift-001.{ai_edge_apps_domain}/battery/metrics/",
                   "OPEN_AI_API_KEY": "my-key",
-                  "STRESS_DETECTION_AI_API_ENDPOINT": "https://stress-detection-predictor-microshift-001.{openshift_cluster_ingress_domain}/",
-                  "TIME_TO_FAILURE_AI_API_ENDPOINT": "https://time-to-failure-predictor-microshift-001.{openshift_cluster_ingress_domain}/",
-                  "BATTERY_SIMULATION_API_ENDPOINT": "https://battery-simulation-microshift-001.{openshift_cluster_ingress_domain}/",
+                  "STRESS_DETECTION_AI_API_ENDPOINT": "https://stress-detection-predictor-microshift-001.{ai_edge_apps_domain}/",
+                  "TIME_TO_FAILURE_AI_API_ENDPOINT": "https://time-to-failure-predictor-microshift-001.{ai_edge_apps_domain}/",
+                  "BATTERY_SIMULATION_API_ENDPOINT": "https://battery-simulation-microshift-001.{ai_edge_apps_domain}/",
                   "AUTO_INFERENCE_INTERVAL_MS": 30000
                 }
   project: default
@@ -414,7 +414,7 @@ Open the Battery Monitoring System dashboard:
 
 [source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
-https://bms-dashboard-microshift-001.{openshift_cluster_ingress_domain}
+https://bms-dashboard-microshift-001.{ai_edge_apps_domain}
 ----
 
 The dashboard will display real-time battery telemetry data, AI predictions for stress detection and time-to-failure, and provide alerting capabilities for battery health monitoring.
@@ -431,7 +431,7 @@ Access the InfluxDB dashboard to see historical sensor data:
 +
 [source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
-https://influx-db-microshift-001.{openshift_cluster_ingress_domain}
+https://influx-db-microshift-001.{ai_edge_apps_domain}
 ----
 +
 [cols="1,2"]
