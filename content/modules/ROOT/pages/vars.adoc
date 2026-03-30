@@ -1,6 +1,6 @@
 // Here are the variables used in the asciidoc / antora content.
 // They are defined here to decouple the vars injected in antora.yaml.
-:ai_edge_openshift_console_url: {openshift_console_url}
+:ai_edge_openshift_console_url: {openshift_cluster_console_url}
 :ai_edge_openshift_username: {openshift_cluster_admin_username}
 :ai_edge_openshift_password: {openshift_cluster_admin_password}
 :ai_edge_apps_domain: {openshift_cluster_ingress_domain}
@@ -12,4 +12,3 @@
 :ai_edge_bastion_username: {bastion_ssh_user_name}
 :ai_edge_bastion_password: {bastion_ssh_password}
 :ai_edge_bastion_port: {bastion_ssh_port}
-:ai_edge_console_url_1: {openshift_cluster_console_url}
