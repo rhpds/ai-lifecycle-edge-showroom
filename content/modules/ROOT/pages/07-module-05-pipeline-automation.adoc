@@ -188,7 +188,7 @@ Execute the pipeline manually to test the automation workflow.
 | Authentication token for InfluxDB
 
 | `influxdb_url`
-| `\https://influx-db-microshift-001.{ai_edge_apps_domain}`
+| https://influx-db-microshift-001.{ai_edge_apps_domain}
 | Robot's InfluxDB endpoint URL
 |===
 +
@@ -205,12 +205,9 @@ image::07-module-05_pipeline-complete.png[Completed pipeline run with all nodes 
 If new models outperformed existing ones, verify they were uploaded to MinIO:
 
 . Open the MinIO dashboard and login with credential:
-+
-[source,bash,options="wrap",role="execute",subs="attributes+"]
-----
+
 https://minio-microshift-001.{ai_edge_apps_domain}
-----
-+
+
 [cols="1,2"]
 |===
 | Credential | Value
@@ -320,7 +317,7 @@ image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for
 | Authentication token for InfluxDB
 
 | `influxdb_url`
-| `https://influx-db-microshift-001.{ai_edge_apps_domain}`
+| https://influx-db-microshift-001.{ai_edge_apps_domain}`\
 | Robot's InfluxDB endpoint URL
 |===
 +

@@ -20,21 +20,18 @@ The Red Hat OpenShift AI operator is installed and pre-configured in the Single 
 Access the Red Hat OpenShift AI dashboard:
 
 . Open the RHOAI dashboard and login with credentials:
-+
-[source,bash,options="wrap",role="execute",subs="attributes+"]
-----
-https://rhods-dashboard-redhat-ods-applications.{ai_edge_apps_domain}
-----
-+
+
+https://data-science-gateway.{ai_edge_apps_domain}
+
 [cols="1,2"]
 |===
 | Credential | Value
 
 | Username
-| `{openshift_cluster_admin_username}`
+| `{ai_edge_openshift_username}`
 
 | Password
-| `{openshift_cluster_admin_password}`
+| `{ai_edge_openshift_password}`
 |===
 
 . Click **Allow selected permissions** if prompted
