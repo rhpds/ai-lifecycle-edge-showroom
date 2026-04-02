@@ -135,10 +135,9 @@ image::05-module-03_run-notebooks.png[Play and Double Play buttons to run the No
 
 At this point, you can follow the instructions contained in each Notebook. Those will explain each step in detail. Pay attention to some of the variables used during the execution. You will need to replace some of them based on your environment. For example, in the first notebook you will need to replace the InfluxDB URL with yours:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
-----
+
 https://influx-db-microshift-001.{ai_edge_apps_domain}
-----
+
 
 Once you have run all of them, the new AI models should have been uploaded to the vehicle’s MinIO storage and are now being used by the Battery Monitoring System for real-time stress detection and time-to-failure predictions.
 
@@ -146,7 +145,8 @@ Once you have run all of them, the new AI models should have been uploaded to th
 
 After all notebooks complete, check that models were exported to OpenVINO format and MinIO contains updated models:
 
-. Open MinIO dashboard: `https://minio-microshift-001.{ai_edge_apps_domain}`
+. Open MinIO dashboard:
+https://minio-microshift-001.{ai_edge_apps_domain}
 +
 [cols="1,2"]
 |===
