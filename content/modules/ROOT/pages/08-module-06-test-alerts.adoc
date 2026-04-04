@@ -1,5 +1,7 @@
 = Module 6: Test alerts
 
+include::vars.adoc[]
+
 This module explores the alerting and monitoring infrastructure that ensures AI models continue to perform accurately over time. You'll test the battery monitoring system alerts and understand how real-time predictions trigger notifications.
 
 == Learning objectives
