@@ -221,7 +221,7 @@ Once deployed, access the MinIO web console:
 
 . Open the MinIO dashboard and login with credential:
 +
-[source,bash,subs="attributes+"]
+[source,bash,options="wrap",role="execute",subs="attributes+"]
 ----
 https://minio-microshift-001.{ai_edge_apps_domain}
 ----

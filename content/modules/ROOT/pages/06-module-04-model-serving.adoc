@@ -1,5 +1,7 @@
 = Module 4: Model serving
 
+include::vars.adoc[]
+
 This module explores the model serving infrastructure that provides real-time inference capabilities. You'll create two complementary model servers, configure their endpoints, and test inference to verify predictions.
 
 == Learning objectives

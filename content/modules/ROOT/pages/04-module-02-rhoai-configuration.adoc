@@ -1,5 +1,7 @@
 = Module 2: Red Hat OpenShift AI configuration
 
+include::vars.adoc[]
+
 Red Hat OpenShift AI running on Single Node OpenShift provides the complete AI/ML platform for model training, serving, pipelines, and monitoring. This module reviews the pre-configured Red Hat OpenShift AI environment optimized for edge deployments.
 
 == Learning objectives

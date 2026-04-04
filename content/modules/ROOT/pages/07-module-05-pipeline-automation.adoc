@@ -1,5 +1,7 @@
 = Module 5: Pipeline automation
 
+include::vars.adoc[]
+
 This module explores the automated pipeline system that continuously retrains machine learning models. You'll review the pipeline infrastructure, execute a manual pipeline run, and configure scheduled automation to enable self-improving AI models.
 
 == Learning objectives

@@ -1,5 +1,7 @@
 = Module 3: Model training
 
+include::vars.adoc[]
+
 This module explores the model training infrastructure on the Single Node OpenShift (SNO) server. You'll access a Jupyter notebook environment, import training notebooks from Git, and execute the complete model training workflow for battery health prediction models.
 
 == Learning objectives
