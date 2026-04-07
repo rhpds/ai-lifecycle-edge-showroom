@@ -1,0 +1,9 @@
+---
+# Module 4 - Validation
+- name: Validate Module 4
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Placeholder - to be implemented
+      ansible.builtin.debug:
+        msg: "Module 4 validation - to be generated"
