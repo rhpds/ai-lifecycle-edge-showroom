@@ -1,0 +1,9 @@
+---
+# Module 1: Transportation robot - Solve
+- name: Solve Module 1
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Placeholder - to be implemented
+      ansible.builtin.debug:
+        msg: "Module 1 solve - to be generated"
