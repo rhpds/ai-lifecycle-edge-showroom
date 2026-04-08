@@ -1,9 +1,149 @@
 ---
-# Module 2 - Validation
+# Module 2: Red Hat OpenShift AI configuration - Validation
 - name: Validate Module 2
   hosts: localhost
   gather_facts: false
+  vars:
+    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
+
   tasks:
-    - name: Placeholder - to be implemented
+    # ========================================
+    # Exercise 2.1: Access RHOAI Dashboard
+    # ========================================
+    - name: "✓ Check RHOAI operator is installed"
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: rhods-operator
+        namespace: redhat-ods-operator
+      register: r_rhoai_operator
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_rhoai_operator.resources | length > 0) and (r_rhoai_operator.resources[0].status.readyReplicas | default(0) > 0) }}"
+        pass_msg: "✅ RHOAI operator is installed and running"
+        error_msg: "❌ RHOAI operator not found or not ready"
+
+    - name: "✓ Check DataScienceCluster exists"
+      kubernetes.core.k8s_info:
+        api_version: datasciencecluster.opendatahub.io/v1
+        kind: DataScienceCluster
+      register: r_dsc
+      failed_when: false
+
+    - validation_check:
+        check: "{{ r_dsc.resources | length > 0 }}"
+        pass_msg: "✅ DataScienceCluster is configured"
+        error_msg: "❌ DataScienceCluster not found"
+
+    - name: "⚠️ Manual: Access RHOAI Dashboard"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Access RHOAI Dashboard
+            URL: https://data-science-gateway.{{ apps_domain }}
+            Credentials: Use OpenShift login
+            Verify: Dashboard loads, shows ai-edge-project
+        warning: true
+
+    # ========================================
+    # Exercise 2.2: Review data science project
+    # ========================================
+    - name: "✓ Check ai-edge-project namespace exists"
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Namespace
+        name: ai-edge-project
+      register: r_project_ns
+      failed_when: false
+
+    - validation_check:
+        check: "{{ r_project_ns.resources | length > 0 }}"
+        pass_msg: "✅ ai-edge-project namespace exists"
+        error_msg: "❌ ai-edge-project namespace not found"
+
+    - name: "✓ Check DSPApplication exists in ai-edge-project"
+      kubernetes.core.k8s_info:
+        api_version: datasciencepipelinesapplications.opendatahub.io/v1alpha1
+        kind: DataSciencePipelinesApplication
+        namespace: ai-edge-project
+      register: r_dsp
+      failed_when: false
+
+    - validation_check:
+        check: "{{ r_dsp.resources | length > 0 }}"
+        pass_msg: "✅ Data Science Pipelines configured in ai-edge-project ({{ r_dsp.resources | length }} pipeline(s))"
+        error_msg: "❌ Data Science Pipelines not configured in ai-edge-project"
+
+    - name: "⚠️ Manual: Review project dashboard tabs"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Navigate RHOAI Dashboard
+            - Click Projects → ai-edge-project
+            - Verify tabs exist: Overview, Workbenches, Pipelines, Deployments, Connections, Permissions
+        warning: true
+
+    # ========================================
+    # Exercise 2.3: Review data connection
+    # ========================================
+    - name: "✓ Check vehicle-models Secret exists"
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: vehicle-models
+        namespace: ai-edge-project
+      register: r_dataconn
+      failed_when: false
+
+    - validation_check:
+        check: "{{ r_dataconn.resources | length > 0 }}"
+        pass_msg: "✅ vehicle-models data connection Secret exists"
+        error_msg: "❌ vehicle-models Secret not found in ai-edge-project"
+
+    - name: "✓ Validate S3 credentials in vehicle-models Secret"
+      ansible.builtin.set_fact:
+        s3_endpoint: "{{ r_dataconn.resources[0].data.AWS_S3_ENDPOINT | b64decode }}"
+        s3_bucket: "{{ r_dataconn.resources[0].data.AWS_S3_BUCKET | b64decode }}"
+        s3_access_key: "{{ r_dataconn.resources[0].data.AWS_ACCESS_KEY_ID | b64decode }}"
+      when: r_dataconn.resources | length > 0
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_dataconn.resources | length > 0) and (s3_bucket | default('') == 'inference') }}"
+        pass_msg: "✅ vehicle-models points to 'inference' bucket (endpoint: {{ s3_endpoint | default('unknown') }})"
+        error_msg: "❌ vehicle-models bucket mismatch (expected: inference, found: {{ s3_bucket | default('missing') }})"
+      when: r_dataconn.resources | length > 0
+
+    - validation_check:
+        check: "{{ (r_dataconn.resources | length > 0) and ('microshift' in (s3_endpoint | default(''))) }}"
+        pass_msg: "✅ vehicle-models connects to MicroShift MinIO service"
+        error_msg: "❌ vehicle-models endpoint incorrect (expected: microshift MinIO, found: {{ s3_endpoint | default('missing') }})"
+      when: r_dataconn.resources | length > 0
+
+    - name: "⚠️ Manual: Review data connection in UI"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Review data connection
+            - In ai-edge-project, click Connections tab
+            - Click ⋮ on vehicle-models → Edit
+            - Verify connection type: S3 compatible object storage - v1
+            - Verify endpoint points to MicroShift MinIO
+            - Verify bucket: inference
+        warning: true
+
+    - name: "✅ Module 2 validation summary"
       ansible.builtin.debug:
-        msg: "Module 2 validation - to be generated"
+        msg: |
+          Module 2 Validation Complete
+          =============================
+          ✅ RHOAI operator installed and running
+          ✅ DataScienceCluster configured
+          ✅ ai-edge-project namespace exists
+          ✅ Data Science Pipelines configured
+          ✅ vehicle-models data connection exists with correct credentials
+          ⚠️  Manual browser verification required for UI navigation

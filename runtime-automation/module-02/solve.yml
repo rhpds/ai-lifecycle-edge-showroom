@@ -1,9 +1,20 @@
 ---
-# Module 2 - Solve
+# Module 2: Red Hat OpenShift AI configuration - Solve
 - name: Solve Module 2
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Placeholder - to be implemented
+    - name: "Module 2 is review-only - no solve actions required"
       ansible.builtin.debug:
-        msg: "Module 2 solve - to be generated"
+        msg: |
+          Module 2: Red Hat OpenShift AI configuration
+          =============================================
+          This module reviews pre-configured RHOAI resources.
+          All components are deployed during lab provisioning.
+
+          Students will:
+          - Access RHOAI Dashboard (browser)
+          - Review ai-edge-project (browser)
+          - Review vehicle-models data connection (browser)
+
+          No automation solve actions needed.
