@@ -17,7 +17,7 @@ tabs:
 
 antora:
   name: modules
-  dir: /showroom/www
+  dir: www
   modules:
     - name: 03-module-01-transportation-robot
       label: "Module 1: Transportation robot"
