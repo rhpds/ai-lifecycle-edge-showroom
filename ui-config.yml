@@ -19,27 +19,27 @@ antora:
   name: modules
   dir: www
   modules:
-    - name: module-01-transportation-robot
+    - name: 03-module-01-transportation-robot
       label: "Module 1: Transportation robot"
       scripts: [solve, validation]
       solveButton: true
-    - name: module-02-rhoai-configuration
+    - name: 04-module-02-rhoai-configuration
       label: "Module 2: Red Hat OpenShift AI configuration"
       scripts: [solve, validation]
       solveButton: true
-    - name: module-03-model-training
+    - name: 05-module-03-model-training
       label: "Module 3: Model training"
       scripts: [solve, validation]
       solveButton: true
-    - name: module-04-model-serving
+    - name: 06-module-04-model-serving
       label: "Module 4: Model serving"
       scripts: [solve, validation]
       solveButton: true
-    - name: module-05-pipeline-automation
+    - name: 07-module-05-pipeline-automation
       label: "Module 5: Pipeline automation"
       scripts: [solve, validation]
       solveButton: true
-    - name: module-06-test-alerts
+    - name: 08-module-06-test-alerts
       label: "Module 6: Test alerts"
       scripts: [solve, validation]
       solveButton: true
