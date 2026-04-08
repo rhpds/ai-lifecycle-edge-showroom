@@ -3,7 +3,226 @@
 - name: Validate Module 1
   hosts: localhost
   gather_facts: false
+  vars:
+    bastion_user: "{{ lookup('env', 'bastion_ssh_user_name') | default('lab-user', true) }}"
+    bastion_host: "{{ lookup('env', 'bastion_public_hostname') }}"
+    bastion_port: "{{ lookup('env', 'bastion_ssh_port') }}"
+    bastion_password: "{{ lookup('env', 'bastion_ssh_password') }}"
+
   tasks:
-    - name: Placeholder - to be implemented
+    # ========================================
+    # Exercise 1.1: Robot infrastructure setup
+    # ========================================
+    - name: "⚠️ Exercise 1.1: MicroShift verification requires manual SSH access"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: SSH to bastion and verify MicroShift:
+            ssh {{ bastion_user }}@{{ bastion_host }} -p {{ bastion_port }}
+            virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
+            sudo systemctl status microshift
+            oc get pods -A
+        warning: true
+
+    # ========================================
+    # Exercise 1.2: MinIO storage deployment
+    # ========================================
+    - name: "✓ Check GitOps AppProject exists"
+      kubernetes.core.k8s_info:
+        api_version: argoproj.io/v1alpha1
+        kind: AppProject
+        name: default
+        namespace: openshift-gitops
+      register: r_appproject
+      failed_when: false
+
+    - validation_check:
+        check: "{{ r_appproject.resources | length > 0 }}"
+        pass_msg: "✅ AppProject 'default' exists"
+        error_msg: "❌ AppProject 'default' not found in openshift-gitops namespace"
+
+    - name: "✓ Check MinIO Application exists and is Synced"
+      kubernetes.core.k8s_info:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: minio-microshift
+        namespace: openshift-gitops
+      register: r_minio_app
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_minio_app.resources | length > 0) and (r_minio_app.resources[0].status.sync.status | default('') == 'Synced') }}"
+        pass_msg: "✅ MinIO Application is deployed and synced"
+        error_msg: "❌ MinIO Application not synced (status: {{ r_minio_app.resources[0].status.sync.status | default('missing') }})"
+
+    - name: "✓ Check MinIO pods are running"
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: minio
+        label_selectors:
+          - app=minio
+      register: r_minio_pods
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_minio_pods.resources | length > 0) and (r_minio_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0) }}"
+        pass_msg: "✅ MinIO pod is running ({{ r_minio_pods.resources | length }} pod(s) found)"
+        error_msg: "❌ MinIO pods not running (found: {{ r_minio_pods.resources | length }}, running: {{ r_minio_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length }})"
+
+    - name: "⚠️ Manual: Verify MinIO dashboard and bucket contents"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Verify MinIO web console:
+            URL: https://minio-microshift-001.{{ lookup('env', 'openshift_cluster_ingress_domain') }}
+            Credentials: minio / minio123
+            Check: 'inference' bucket contains stress-detection/1/ and time-to-failure/1/ directories
+        warning: true
+
+    # ========================================
+    # Exercise 1.3: Model serving deployment
+    # ========================================
+    - name: "✓ Check model-server Application exists and is Synced"
+      kubernetes.core.k8s_info:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: model-server
+        namespace: openshift-gitops
+      register: r_model_app
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_model_app.resources | length > 0) and (r_model_app.resources[0].status.sync.status | default('') == 'Synced') }}"
+        pass_msg: "✅ Model-server Application is deployed and synced"
+        error_msg: "❌ Model-server Application not synced (status: {{ r_model_app.resources[0].status.sync.status | default('missing') }})"
+
+    - name: "✓ Check inference pods are running"
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: inference
+      register: r_inference_pods
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_inference_pods.resources | length >= 2) and (r_inference_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length >= 2) }}"
+        pass_msg: "✅ Inference pods are running ({{ r_inference_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length }}/{{ r_inference_pods.resources | length }})"
+        error_msg: "❌ Not enough inference pods running (expected: ≥2, running: {{ r_inference_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length }})"
+
+    - name: "✓ Get stress-detection pod IP"
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: inference
+        label_selectors:
+          - app=isvc.stress-detection-predictor
+      register: r_stress_pod
+      failed_when: false
+
+    - name: "✓ Test stress detection inference endpoint"
+      ansible.builtin.uri:
+        url: "http://{{ r_stress_pod.resources[0].status.podIP }}:8888/v2/models/stress-detection/infer"
+        method: POST
+        body_format: json
+        body:
+          inputs:
+            - name: "keras_tensor"
+              shape: [1, 9]
+              datatype: "FP32"
+              data: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+        status_code: 200
+        timeout: 10
+      register: r_stress_test
+      failed_when: false
+      when: r_stress_pod.resources | length > 0
+
+    - validation_check:
+        check: "{{ (r_stress_pod.resources | length > 0) and (r_stress_test.status | default(0) == 200) }}"
+        pass_msg: "✅ Stress detection model responds to inference requests"
+        error_msg: "❌ Stress detection model not responding (status: {{ r_stress_test.status | default('pod not found') }})"
+
+    - name: "✓ Get time-to-failure pod IP"
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: inference
+        label_selectors:
+          - app=isvc.time-to-failure-predictor
+      register: r_ttf_pod
+      failed_when: false
+
+    - name: "✓ Test time-to-failure inference endpoint"
+      ansible.builtin.uri:
+        url: "http://{{ r_ttf_pod.resources[0].status.podIP }}:8888/v2/models/time-to-failure/infer"
+        method: POST
+        body_format: json
+        body:
+          inputs:
+            - name: "keras_tensor"
+              shape: [1, 5]
+              datatype: "FP32"
+              data: [40.0, 48.0, 162.5, -2.0, -18.0]
+        status_code: 200
+        timeout: 10
+      register: r_ttf_test
+      failed_when: false
+      when: r_ttf_pod.resources | length > 0
+
+    - validation_check:
+        check: "{{ (r_ttf_pod.resources | length > 0) and (r_ttf_test.status | default(0) == 200) }}"
+        pass_msg: "✅ Time-to-failure model responds to inference requests"
+        error_msg: "❌ Time-to-failure model not responding (status: {{ r_ttf_test.status | default('pod not found') }})"
+
+    # ========================================
+    # Exercise 1.4: BMS deployment
+    # ========================================
+    - name: "✓ Check battery-simulation Application exists and is Synced"
+      kubernetes.core.k8s_info:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: battery-simulation
+        namespace: openshift-gitops
+      register: r_bms_app
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_bms_app.resources | length > 0) and (r_bms_app.resources[0].status.sync.status | default('') == 'Synced') }}"
+        pass_msg: "✅ Battery-simulation Application is deployed and synced"
+        error_msg: "❌ Battery-simulation Application not synced (status: {{ r_bms_app.resources[0].status.sync.status | default('missing') }})"
+
+    - name: "✓ Check BMS pods are running"
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: battery-demo
+      register: r_bms_pods
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_bms_pods.resources | length >= 5) and (r_bms_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length >= 5) }}"
+        pass_msg: "✅ BMS pods are running ({{ r_bms_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length }}/{{ r_bms_pods.resources | length }})"
+        error_msg: "❌ Not enough BMS pods running (expected: ≥5, running: {{ r_bms_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length }})"
+
+    - name: "⚠️ Manual: Verify BMS dashboard and InfluxDB"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Verify BMS dashboard:
+            URL: https://bms-dashboard-microshift-001.{{ lookup('env', 'openshift_cluster_ingress_domain') }}
+            Check: Telemetry charts show live updates, AI predictions display
+
+          ⚠️ MANUAL STEP: Verify InfluxDB:
+            URL: https://influx-db-microshift-001.{{ lookup('env', 'openshift_cluster_ingress_domain') }}
+            Credentials: admin / password
+            Check: 'bms' bucket contains 'battery_data' measurement
+        warning: true
+
+    - name: "✅ Module 1 validation summary"
       ansible.builtin.debug:
-        msg: "Module 1 validation - to be generated"
+        msg: |
+          Module 1 Validation Complete
+          =============================
+          ✅ GitOps infrastructure deployed
+          ✅ MinIO storage operational
+          ✅ Model serving endpoints responding
+          ✅ Battery monitoring system deployed
+          ⚠️  Manual browser verification required for dashboards
