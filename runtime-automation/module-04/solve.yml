@@ -1,9 +1,17 @@
 ---
-# Module 4 - Solve
+# Module 4: Model serving - Solve
 - name: Solve Module 4
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Placeholder - to be implemented
+    - name: "Module 4 requires manual RHOAI Dashboard interaction"
       ansible.builtin.debug:
-        msg: "Module 4 solve - to be generated"
+        msg: |
+          Module 4: Model serving
+          =======================
+          This module requires manual interaction with RHOAI Dashboard to:
+          - Deploy Stress Detection model server
+          - Deploy Time to Failure model server
+          - Query model endpoints
+
+          Automated solve not applicable for UI-based model deployment.

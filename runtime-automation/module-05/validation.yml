@@ -1,9 +1,40 @@
 ---
-# Module 5 - Validation
+# Module 5: Pipeline automation - Validation
 - name: Validate Module 5
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Placeholder - to be implemented
+    - name: "✓ Check DSPApplication exists"
+      kubernetes.core.k8s_info:
+        api_version: datasciencepipelinesapplications.opendatahub.io/v1alpha1
+        kind: DataSciencePipelinesApplication
+        namespace: ai-edge-project
+      register: r_dsp
+      failed_when: false
+
+    - validation_check:
+        check: "{{ r_dsp.resources | length > 0 }}"
+        pass_msg: "✅ Pipeline server is configured"
+        error_msg: "❌ Pipeline server not configured"
+
+    - name: "⚠️ Manual: Import and execute pipeline"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEPS:
+            1. In RHOAI Dashboard → ai-edge-project → Pipelines
+            2. Click Import pipeline
+            3. Import from: https://github.com/rhpds/ai-lifecycle-edge-automation/raw/main/pipelines/bms-retraining-pipeline.yaml
+            4. Execute pipeline run
+            5. Configure scheduled runs (every 10 minutes)
+            6. Monitor pipeline execution
+        warning: true
+
+    - name: "✅ Module 5 validation summary"
       ansible.builtin.debug:
-        msg: "Module 5 validation - to be generated"
+        msg: |
+          Module 5 Validation Complete
+          =============================
+          ✅ Pipeline infrastructure exists
+          ⚠️  Manual pipeline import/execution required

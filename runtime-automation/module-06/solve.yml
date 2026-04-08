@@ -1,9 +1,18 @@
 ---
-# Module 6 - Solve
+# Module 6: Test alerts - Solve
 - name: Solve Module 6
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Placeholder - to be implemented
+    - name: "Module 6 requires manual BMS dashboard testing"
       ansible.builtin.debug:
-        msg: "Module 6 solve - to be generated"
+        msg: |
+          Module 6: Test alerts
+          ======================
+          This module requires manual interaction with BMS dashboard:
+          - Review BMS dashboard interface
+          - Test stress detection alerts
+          - Test time-to-failure predictions
+          - Monitor real-time inference
+
+          Automated solve not applicable for browser-based dashboard testing.

@@ -1,9 +1,44 @@
 ---
-# Module 6 - Validation
+# Module 6: Test alerts - Validation
 - name: Validate Module 6
   hosts: localhost
   gather_facts: false
+  vars:
+    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
+
   tasks:
-    - name: Placeholder - to be implemented
+    - name: "✓ Check BMS dashboard pod is running"
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: battery-demo
+        label_selectors:
+          - app=bms-dashboard
+      register: r_bms_pod
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_bms_pod.resources | length > 0) and (r_bms_pod.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0) }}"
+        pass_msg: "✅ BMS dashboard pod is running"
+        error_msg: "❌ BMS dashboard not running"
+
+    - name: "⚠️ Manual: Test BMS dashboard and alerts"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEPS:
+            1. Access BMS dashboard: https://bms-dashboard-microshift-001.{{ apps_domain }}
+            2. Review Alerts panel (stress detection + time-to-failure predictions)
+            3. Use Actions panel to trigger manual inference
+            4. Simulate temperature anomalies
+            5. Verify telemetry charts show live updates
+            6. Confirm AI predictions display correctly
+        warning: true
+
+    - name: "✅ Module 6 validation summary"
       ansible.builtin.debug:
-        msg: "Module 6 validation - to be generated"
+        msg: |
+          Module 6 Validation Complete
+          =============================
+          ✅ BMS dashboard infrastructure running
+          ⚠️  Manual browser testing required

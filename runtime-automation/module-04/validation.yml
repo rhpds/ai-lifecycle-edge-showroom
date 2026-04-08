@@ -1,9 +1,54 @@
 ---
-# Module 4 - Validation
+# Module 4: Model serving - Validation
 - name: Validate Module 4
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Placeholder - to be implemented
+    - name: "✓ Check Stress Detection InferenceService exists"
+      kubernetes.core.k8s_info:
+        api_version: serving.kserve.io/v1beta1
+        kind: InferenceService
+        name: stress-detection
+        namespace: ai-edge-project
+      register: r_stress_svc
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_stress_svc.resources | length > 0) and (r_stress_svc.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0) }}"
+        pass_msg: "✅ Stress Detection model server is deployed and ready"
+        error_msg: "❌ Stress Detection model server not ready"
+
+    - name: "✓ Check Time to Failure InferenceService exists"
+      kubernetes.core.k8s_info:
+        api_version: serving.kserve.io/v1beta1
+        kind: InferenceService
+        name: time-to-failure
+        namespace: ai-edge-project
+      register: r_ttf_svc
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_ttf_svc.resources | length > 0) and (r_ttf_svc.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0) }}"
+        pass_msg: "✅ Time to Failure model server is deployed and ready"
+        error_msg: "❌ Time to Failure model server not ready"
+
+    - name: "⚠️ Manual: Deploy model servers and test endpoints"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEPS:
+            1. In RHOAI Dashboard → ai-edge-project → Deployments
+            2. Deploy Stress Detection model (vehicle-models/stress-detection)
+            3. Deploy Time to Failure model (vehicle-models/time-to-failure)
+            4. Wait for both to show Running status
+            5. Query endpoints to test predictions
+        warning: true
+
+    - name: "✅ Module 4 validation summary"
       ansible.builtin.debug:
-        msg: "Module 4 validation - to be generated"
+        msg: |
+          Module 4 Validation Complete
+          =============================
+          ✅ Model serving infrastructure checked
+          ⚠️  Manual RHOAI Dashboard interactions required

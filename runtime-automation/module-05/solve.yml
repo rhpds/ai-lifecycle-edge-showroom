@@ -1,9 +1,17 @@
 ---
-# Module 5 - Solve
+# Module 5: Pipeline automation - Solve
 - name: Solve Module 5
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Placeholder - to be implemented
+    - name: "Module 5 requires manual pipeline interaction"
       ansible.builtin.debug:
-        msg: "Module 5 solve - to be generated"
+        msg: |
+          Module 5: Pipeline automation
+          ==============================
+          This module requires manual interaction with RHOAI Pipelines:
+          - Import retraining pipeline
+          - Execute pipeline manually
+          - Configure scheduled runs (every 10 minutes)
+
+          Automated solve not applicable for UI-based pipeline configuration.
