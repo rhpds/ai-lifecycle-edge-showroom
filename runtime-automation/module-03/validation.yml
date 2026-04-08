@@ -1,9 +1,116 @@
 ---
-# Module 3 - Validation
+# Module 3: Model training - Validation
 - name: Validate Module 3
   hosts: localhost
   gather_facts: false
+  vars:
+    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
+
   tasks:
-    - name: Placeholder - to be implemented
+    # ========================================
+    # Exercise 3.1: Review and access workbench
+    # ========================================
+    - name: "✓ Check model-training Notebook exists"
+      kubernetes.core.k8s_info:
+        api_version: kubeflow.org/v1
+        kind: Notebook
+        name: model-training
+        namespace: ai-edge-project
+      register: r_notebook
+      failed_when: false
+
+    - validation_check:
+        check: "{{ r_notebook.resources | length > 0 }}"
+        pass_msg: "✅ model-training Notebook exists"
+        error_msg: "❌ model-training Notebook not found in ai-edge-project"
+
+    - name: "✓ Check Notebook pod is running"
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: ai-edge-project
+        label_selectors:
+          - notebook-name=model-training
+      register: r_notebook_pod
+      failed_when: false
+
+    - validation_check:
+        check: "{{ (r_notebook_pod.resources | length > 0) and (r_notebook_pod.resources[0].status.phase | default('') == 'Running') }}"
+        pass_msg: "✅ model-training pod is running"
+        error_msg: "❌ model-training pod not running (phase: {{ r_notebook_pod.resources[0].status.phase | default('missing') }})"
+
+    - name: "⚠️ Manual: Access workbench and attach DataConnection"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Configure workbench
+            - In ai-edge-project, go to Workbenches tab
+            - Click ⋮ on model-training → Edit workbench
+            - Attach existing connection: vehicle-models
+            - Click Update workbench
+            - Launch JupyterLab
+        warning: true
+
+    # ========================================
+    # Exercise 3.2: Import training notebooks
+    # ========================================
+    - name: "⚠️ Manual: Clone Git repository in JupyterLab"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Clone repository
+            - In JupyterLab, click Git icon in left sidebar
+            - Click Clone a Repository
+            - Enter URL: https://github.com/rhpds/ai-lifecycle-edge-automation.git
+            - Click Clone
+            - Verify ai-lifecycle-edge-automation folder appears
+        warning: true
+
+    # ========================================
+    # Exercise 3.3: Execute training notebooks
+    # ========================================
+    - name: "⚠️ Manual: Execute training notebooks"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Run training notebooks
+            Navigate to notebooks/training/ and run in order:
+            1. retrieve-influx-data.ipynb
+            2. prepare-data.ipynb
+            3. bms-stress-training.ipynb
+            4. predict-stress.ipynb
+            5. bms-ttf-training.ipynb
+            6. predict-ttf.ipynb
+            7. save-models.ipynb
+
+            Replace InfluxDB URL: https://influx-db-microshift-001.{{ apps_domain }}
+        warning: true
+
+    - name: "⚠️ Manual: Verify models uploaded to MinIO"
+      validation_check:
+        check: false
+        pass_msg: "N/A - Manual verification required"
+        error_msg: |
+          ⚠️ MANUAL STEP: Check MinIO for updated models
+            URL: https://minio-microshift-001.{{ apps_domain }}
+            Credentials: minio / minio123
+            Check inference bucket:
+              - stress-detection/1/model.xml (recent timestamp)
+              - stress-detection/1/model.bin (recent timestamp)
+              - time-to-failure/1/model.xml (recent timestamp)
+              - time-to-failure/1/model.bin (recent timestamp)
+        warning: true
+
+    - name: "✅ Module 3 validation summary"
       ansible.builtin.debug:
-        msg: "Module 3 validation - to be generated"
+        msg: |
+          Module 3 Validation Complete
+          =============================
+          ✅ model-training Notebook infrastructure exists
+          ✅ Notebook pod is running
+          ⚠️  Manual JupyterLab interactions required:
+              - Git clone
+              - Notebook execution
+              - Model upload verification

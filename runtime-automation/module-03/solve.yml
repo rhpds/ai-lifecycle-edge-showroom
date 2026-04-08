@@ -1,9 +1,19 @@
 ---
-# Module 3 - Solve
+# Module 3: Model training - Solve
 - name: Solve Module 3
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Placeholder - to be implemented
+    - name: "Module 3 requires manual Jupyter notebook execution"
       ansible.builtin.debug:
-        msg: "Module 3 solve - to be generated"
+        msg: |
+          Module 3: Model training
+          ========================
+          This module requires manual interaction with JupyterLab to:
+          - Access model-training workbench
+          - Clone Git repository
+          - Execute training notebooks
+
+          Automated solve not applicable for interactive notebook training.
+
+          Students must manually run 7 training notebooks in sequence.
