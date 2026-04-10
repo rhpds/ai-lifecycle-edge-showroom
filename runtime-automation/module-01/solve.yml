@@ -13,6 +13,7 @@
   tasks:
     - name: "Exercise 1.2: Create GitOps AppProject"
       kubernetes.core.k8s:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
         definition:
           apiVersion: argoproj.io/v1alpha1
@@ -32,6 +33,7 @@
 
     - name: "Exercise 1.2: Deploy MinIO using GitOps"
       kubernetes.core.k8s:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
         definition:
           apiVersion: argoproj.io/v1alpha1
@@ -54,6 +56,7 @@
 
     - name: "Exercise 1.2: Wait for MinIO deployment to sync"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: argoproj.io/v1alpha1
         kind: Application
         name: minio-microshift
@@ -68,6 +71,7 @@
 
     - name: "Exercise 1.2: Wait for MinIO pods ready"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: minio
         label_selectors:
@@ -81,6 +85,7 @@
 
     - name: "Exercise 1.3: Deploy model serving using GitOps"
       kubernetes.core.k8s:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
         definition:
           apiVersion: argoproj.io/v1alpha1
@@ -117,6 +122,7 @@
 
     - name: "Exercise 1.3: Wait for inference pods ready"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: inference
       register: r_inference_pods
@@ -128,6 +134,7 @@
 
     - name: "Exercise 1.4: Deploy BMS using GitOps"
       kubernetes.core.k8s:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
         definition:
           apiVersion: argoproj.io/v1alpha1
@@ -182,6 +189,7 @@
 
     - name: "Exercise 1.4: Wait for BMS pods ready"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: battery-demo
       register: r_bms_pods

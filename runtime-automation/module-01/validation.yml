@@ -30,6 +30,7 @@
     # ========================================
     - name: "✓ Check GitOps AppProject exists"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: argoproj.io/v1alpha1
         kind: AppProject
         name: default
@@ -44,6 +45,7 @@
 
     - name: "✓ Check MinIO Application exists and is Synced"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: argoproj.io/v1alpha1
         kind: Application
         name: minio-microshift
@@ -58,6 +60,7 @@
 
     - name: "✓ Check MinIO pods are running"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: minio
         label_selectors:
@@ -86,6 +89,7 @@
     # ========================================
     - name: "✓ Check model-server Application exists and is Synced"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: argoproj.io/v1alpha1
         kind: Application
         name: model-server
@@ -100,6 +104,7 @@
 
     - name: "✓ Check inference pods are running"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: inference
       register: r_inference_pods
@@ -112,6 +117,7 @@
 
     - name: "✓ Get stress-detection pod IP"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: inference
         label_selectors:
@@ -143,6 +149,7 @@
 
     - name: "✓ Get time-to-failure pod IP"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: inference
         label_selectors:
@@ -177,6 +184,7 @@
     # ========================================
     - name: "✓ Check battery-simulation Application exists and is Synced"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: argoproj.io/v1alpha1
         kind: Application
         name: battery-simulation
@@ -191,6 +199,7 @@
 
     - name: "✓ Check BMS pods are running"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: battery-demo
       register: r_bms_pods
