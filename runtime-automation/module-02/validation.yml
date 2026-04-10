@@ -66,7 +66,7 @@
     - name: "✓ Check DSPApplication exists in ai-edge-project"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        api_version: datasciencepipelinesapplications.opendatahub.io/v1alpha1
+        api_version: datasciencepipelinesapplications.opendatahub.io/v1
         kind: DataSciencePipelinesApplication
         namespace: ai-edge-project
       register: r_dsp
