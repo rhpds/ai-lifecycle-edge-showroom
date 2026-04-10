@@ -6,6 +6,7 @@
   tasks:
     - name: "✓ Check Stress Detection InferenceService exists"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: serving.kserve.io/v1beta1
         kind: InferenceService
         name: stress-detection
@@ -20,6 +21,7 @@
 
     - name: "✓ Check Time to Failure InferenceService exists"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: serving.kserve.io/v1beta1
         kind: InferenceService
         name: time-to-failure
@@ -33,17 +35,14 @@
         error_msg: "❌ Time to Failure model server not ready"
 
     - name: "⚠️ Manual: Deploy model servers and test endpoints"
-      validation_check:
-        check: false
-        pass_msg: "N/A - Manual verification required"
-        error_msg: |
+      ansible.builtin.debug:
+        msg: |
           ⚠️ MANUAL STEPS:
             1. In RHOAI Dashboard → ai-edge-project → Deployments
             2. Deploy Stress Detection model (vehicle-models/stress-detection)
             3. Deploy Time to Failure model (vehicle-models/time-to-failure)
             4. Wait for both to show Running status
             5. Query endpoints to test predictions
-        warning: true
 
     - name: "✅ Module 4 validation summary"
       ansible.builtin.debug:
