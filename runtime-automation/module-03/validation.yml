@@ -12,6 +12,7 @@
     # ========================================
     - name: "✓ Check model-training Notebook exists"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: kubeflow.org/v1
         kind: Notebook
         name: model-training
@@ -26,6 +27,7 @@
 
     - name: "✓ Check Notebook pod is running"
       kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
         namespace: ai-edge-project
         label_selectors:
@@ -39,42 +41,34 @@
         error_msg: "❌ model-training pod not running (phase: {{ r_notebook_pod.resources[0].status.phase | default('missing') }})"
 
     - name: "⚠️ Manual: Access workbench and attach DataConnection"
-      validation_check:
-        check: false
-        pass_msg: "N/A - Manual verification required"
-        error_msg: |
+      ansible.builtin.debug:
+        msg: |
           ⚠️ MANUAL STEP: Configure workbench
             - In ai-edge-project, go to Workbenches tab
             - Click ⋮ on model-training → Edit workbench
             - Attach existing connection: vehicle-models
             - Click Update workbench
             - Launch JupyterLab
-        warning: true
 
     # ========================================
     # Exercise 3.2: Import training notebooks
     # ========================================
     - name: "⚠️ Manual: Clone Git repository in JupyterLab"
-      validation_check:
-        check: false
-        pass_msg: "N/A - Manual verification required"
-        error_msg: |
+      ansible.builtin.debug:
+        msg: |
           ⚠️ MANUAL STEP: Clone repository
             - In JupyterLab, click Git icon in left sidebar
             - Click Clone a Repository
             - Enter URL: https://github.com/rhpds/ai-lifecycle-edge-automation.git
             - Click Clone
             - Verify ai-lifecycle-edge-automation folder appears
-        warning: true
 
     # ========================================
     # Exercise 3.3: Execute training notebooks
     # ========================================
     - name: "⚠️ Manual: Execute training notebooks"
-      validation_check:
-        check: false
-        pass_msg: "N/A - Manual verification required"
-        error_msg: |
+      ansible.builtin.debug:
+        msg: |
           ⚠️ MANUAL STEP: Run training notebooks
             Navigate to notebooks/training/ and run in order:
             1. retrieve-influx-data.ipynb
@@ -86,13 +80,10 @@
             7. save-models.ipynb
 
             Replace InfluxDB URL: https://influx-db-microshift-001.{{ apps_domain }}
-        warning: true
 
     - name: "⚠️ Manual: Verify models uploaded to MinIO"
-      validation_check:
-        check: false
-        pass_msg: "N/A - Manual verification required"
-        error_msg: |
+      ansible.builtin.debug:
+        msg: |
           ⚠️ MANUAL STEP: Check MinIO for updated models
             URL: https://minio-microshift-001.{{ apps_domain }}
             Credentials: minio / minio123
@@ -101,7 +92,6 @@
               - stress-detection/1/model.bin (recent timestamp)
               - time-to-failure/1/model.xml (recent timestamp)
               - time-to-failure/1/model.bin (recent timestamp)
-        warning: true
 
     - name: "✅ Module 3 validation summary"
       ansible.builtin.debug:
