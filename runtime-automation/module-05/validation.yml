@@ -6,7 +6,8 @@
   tasks:
     - name: "✓ Check DSPApplication exists"
       kubernetes.core.k8s_info:
-        api_version: datasciencepipelinesapplications.opendatahub.io/v1alpha1
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: datasciencepipelinesapplications.opendatahub.io/v1
         kind: DataSciencePipelinesApplication
         namespace: ai-edge-project
       register: r_dsp
@@ -18,10 +19,8 @@
         error_msg: "❌ Pipeline server not configured"
 
     - name: "⚠️ Manual: Import and execute pipeline"
-      validation_check:
-        check: false
-        pass_msg: "N/A - Manual verification required"
-        error_msg: |
+      ansible.builtin.debug:
+        msg: |
           ⚠️ MANUAL STEPS:
             1. In RHOAI Dashboard → ai-edge-project → Pipelines
             2. Click Import pipeline
@@ -29,7 +28,6 @@
             4. Execute pipeline run
             5. Configure scheduled runs (every 10 minutes)
             6. Monitor pipeline execution
-        warning: true
 
     - name: "✅ Module 5 validation summary"
       ansible.builtin.debug:
