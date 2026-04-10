@@ -29,16 +29,13 @@
         error_msg: "❌ Cannot connect to MicroShift VM"
 
     - name: "⚠️ Exercise 1.1: Manual MicroShift verification"
-      validation_check:
-        check: false
-        pass_msg: "N/A - Manual verification required"
-        error_msg: |
+      ansible.builtin.debug:
+        msg: |
           ⚠️ MANUAL STEP: SSH and verify MicroShift status:
             ssh {{ bastion_user }}@{{ bastion_host }} -p {{ bastion_port }}
             virtctl ssh {{ microshift_vm }} -n {{ microshift_namespace }} --identity-file={{ microshift_ssh_key }}
             sudo systemctl status microshift
             oc get pods -A
-        warning: true
 
     # ========================================
     # Exercise 1.2: MinIO storage deployment
