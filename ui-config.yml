@@ -19,10 +19,12 @@ antora:
   name: modules
   dir: www
   modules:
+    - name: index
+      label: "Workshop Overview"
     - name: 01-overview
-      label: "Overview"
+      label: "Introduction"
     - name: 02-details
-      label: "Details"
+      label: "Technical Details"
     - name: 03-module-01-transportation-robot
       label: "Module 1: Transportation robot"
       scripts: [solve, validation]
@@ -48,4 +50,4 @@ antora:
       scripts: [solve, validation]
       solveButton: true
     - name: 09-conclusion
-      label: "Conclusion"
+      label: "Conclusion and Next Steps"
