@@ -13,26 +13,23 @@
       register: r_dsp
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_dsp.resources | length > 0 }}"
-        pass_msg: "✅ Pipeline server is configured"
-        error_msg: "❌ Pipeline server not configured"
+    # ========================================
+    # Collect all check results
+    # ========================================
+    - name: Collect all validation results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ r_dsp.resources | length > 0 }}"
 
-    - name: "⚠️ Manual: Import and execute pipeline"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEPS:
-            1. In RHOAI Dashboard → ai-edge-project → Pipelines
-            2. Click Import pipeline
-            3. Import from: https://github.com/rhpds/ai-lifecycle-edge-automation/raw/main/pipelines/bms-retraining-pipeline.yaml
-            4. Execute pipeline run
-            5. Configure scheduled runs (every 10 minutes)
-            6. Monitor pipeline execution
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok }}"
+        pass_msg: |
+          ✅ Exercise 5: Pipeline server is configured ({{ r_dsp.resources | length }} DSPApplication(s))
 
-    - name: "✅ Module 5 validation summary"
-      ansible.builtin.debug:
-        msg: |
-          Module 5 Validation Complete
-          =============================
-          ✅ Pipeline infrastructure exists
-          ⚠️  Manual pipeline import/execution required
+          ⚠️ Note: Manual steps required for:
+            - Import pipeline from GitHub (bms-retraining-pipeline.yaml)
+            - Execute pipeline run
+            - Configure scheduled runs (every 10 minutes)
+            - Monitor pipeline execution
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Exercise 5: Pipeline server is configured

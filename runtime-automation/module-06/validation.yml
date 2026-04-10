@@ -21,26 +21,23 @@
       register: r_bms_pod
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_bms_pod.rc == 0 and (r_bms_pod.stdout | int) >= 1 }}"
-        pass_msg: "✅ BMS dashboard pod is running in MicroShift ({{ r_bms_pod.stdout | default('0') }} pods)"
-        error_msg: "❌ BMS dashboard not running in MicroShift"
+    # ========================================
+    # Collect all check results
+    # ========================================
+    - name: Collect all validation results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ r_bms_pod.rc == 0 and (r_bms_pod.stdout | int) >= 1 }}"
 
-    - name: "⚠️ Manual: Test BMS dashboard and alerts"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEPS:
-            1. Access BMS dashboard: https://bms-dashboard-microshift-001.{{ apps_domain }}
-            2. Review Alerts panel (stress detection + time-to-failure predictions)
-            3. Use Actions panel to trigger manual inference
-            4. Simulate temperature anomalies
-            5. Verify telemetry charts show live updates
-            6. Confirm AI predictions display correctly
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok }}"
+        pass_msg: |
+          ✅ Exercise 6: BMS dashboard pod is running in MicroShift ({{ r_bms_pod.stdout | default('0') }} pods)
 
-    - name: "✅ Module 6 validation summary"
-      ansible.builtin.debug:
-        msg: |
-          Module 6 Validation Complete
-          =============================
-          ✅ BMS dashboard infrastructure running in MicroShift
-          ⚠️  Manual browser testing required
+          ⚠️ Note: Manual steps required for:
+            - Access BMS dashboard (https://bms-dashboard-microshift-001.{{ apps_domain }})
+            - Review Alerts panel (stress detection + time-to-failure predictions)
+            - Test manual inference and temperature anomalies
+            - Verify telemetry charts and AI predictions
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Exercise 6: BMS dashboard pod is running in MicroShift (found {{ r_bms_pod.stdout | default('0') }}, need 1+)

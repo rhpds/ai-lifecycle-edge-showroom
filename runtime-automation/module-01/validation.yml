@@ -23,20 +23,6 @@
       register: r_microshift_check
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_microshift_check.rc == 0 and 'microshift' in r_microshift_check.stdout }}"
-        pass_msg: "✅ MicroShift VM is accessible"
-        error_msg: "❌ Cannot connect to MicroShift VM"
-
-    - name: "⚠️ Exercise 1.1: Manual MicroShift verification"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEP: SSH and verify MicroShift status:
-            ssh {{ bastion_user }}@{{ bastion_host }} -p {{ bastion_port }}
-            virtctl ssh {{ microshift_vm }} -n {{ microshift_namespace }} --identity-file={{ microshift_ssh_key }}
-            sudo systemctl status microshift
-            oc get pods -A
-
     # ========================================
     # Exercise 1.2: MinIO storage deployment
     # ========================================
@@ -47,11 +33,6 @@
       register: r_appproject
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_appproject.rc == 0 and 'appproject' in r_appproject.stdout }}"
-        pass_msg: "✅ AppProject 'default' exists in MicroShift"
-        error_msg: "❌ AppProject 'default' not found in openshift-gitops namespace"
-
     - name: "✓ Check MinIO Application in MicroShift"
       ansible.builtin.shell: |
         sshpass -p '{{ bastion_password }}' ssh -o StrictHostKeyChecking=no -p {{ bastion_port }} {{ bastion_user }}@{{ bastion_host }} \
@@ -59,22 +40,12 @@
       register: r_minio_app
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_minio_app.rc == 0 and 'Synced' in r_minio_app.stdout }}"
-        pass_msg: "✅ MinIO Application is Synced in MicroShift"
-        error_msg: "❌ MinIO Application not synced (Status: {{ r_minio_app.stdout }})"
-
     - name: "✓ Check MinIO pods in MicroShift"
       ansible.builtin.shell: |
         sshpass -p '{{ bastion_password }}' ssh -o StrictHostKeyChecking=no -p {{ bastion_port }} {{ bastion_user }}@{{ bastion_host }} \
         "virtctl ssh {{ microshift_vm }} -n {{ microshift_namespace }} --identity-file={{ microshift_ssh_key }} --command='oc get pods -n minio -l app=minio -o jsonpath=\"{.items[*].status.phase}\" 2>/dev/null || echo notfound'"
       register: r_minio_pods
       failed_when: false
-
-    - validation_check:
-        check: "{{ r_minio_pods.rc == 0 and 'Running' in r_minio_pods.stdout }}"
-        pass_msg: "✅ MinIO pod is Running in MicroShift"
-        error_msg: "❌ MinIO pod not ready"
 
     # ========================================
     # Exercise 1.3: Model serving deployment
@@ -86,22 +57,12 @@
       register: r_model_app
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_model_app.rc == 0 and 'Synced' in r_model_app.stdout }}"
-        pass_msg: "✅ Model-server Application is Synced in MicroShift"
-        error_msg: "❌ Model-server Application not synced"
-
     - name: "✓ Check inference pods in MicroShift"
       ansible.builtin.shell: |
         sshpass -p '{{ bastion_password }}' ssh -o StrictHostKeyChecking=no -p {{ bastion_port }} {{ bastion_user }}@{{ bastion_host }} \
         "virtctl ssh {{ microshift_vm }} -n {{ microshift_namespace }} --identity-file={{ microshift_ssh_key }} --command='oc get pods -n inference --no-headers 2>/dev/null | grep Running | wc -l'"
       register: r_inference_pods
       failed_when: false
-
-    - validation_check:
-        check: "{{ r_inference_pods.rc == 0 and (r_inference_pods.stdout | int) >= 2 }}"
-        pass_msg: "✅ Inference pods are Running in MicroShift ({{ r_inference_pods.stdout | default('0') }} pods)"
-        error_msg: "❌ Expected at least 2 inference pods, found {{ r_inference_pods.stdout | default('0') }}"
 
     # ========================================
     # Exercise 1.4: Battery monitoring system
@@ -113,11 +74,6 @@
       register: r_bms_app
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_bms_app.rc == 0 and 'Synced' in r_bms_app.stdout }}"
-        pass_msg: "✅ Battery-simulation Application is Synced in MicroShift"
-        error_msg: "❌ Battery-simulation Application not synced"
-
     - name: "✓ Check BMS pods in MicroShift"
       ansible.builtin.shell: |
         sshpass -p '{{ bastion_password }}' ssh -o StrictHostKeyChecking=no -p {{ bastion_port }} {{ bastion_user }}@{{ bastion_host }} \
@@ -125,18 +81,41 @@
       register: r_bms_pods
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_bms_pods.rc == 0 and (r_bms_pods.stdout | int) >= 5 }}"
-        pass_msg: "✅ BMS pods are Running in MicroShift ({{ r_bms_pods.stdout | default('0') }} pods)"
-        error_msg: "❌ Expected at least 5 BMS pods, found {{ r_bms_pods.stdout | default('0') }}"
+    # ========================================
+    # Collect all check results
+    # ========================================
+    - name: Collect all validation results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ r_microshift_check.rc == 0 and 'microshift' in r_microshift_check.stdout }}"
+        _task2_ok: "{{ r_appproject.rc == 0 and 'appproject' in r_appproject.stdout }}"
+        _task3_ok: "{{ r_minio_app.rc == 0 and 'Synced' in r_minio_app.stdout }}"
+        _task4_ok: "{{ r_minio_pods.rc == 0 and 'Running' in r_minio_pods.stdout }}"
+        _task5_ok: "{{ r_model_app.rc == 0 and 'Synced' in r_model_app.stdout }}"
+        _task6_ok: "{{ r_inference_pods.rc == 0 and (r_inference_pods.stdout | int) >= 2 }}"
+        _task7_ok: "{{ r_bms_app.rc == 0 and 'Synced' in r_bms_app.stdout }}"
+        _task8_ok: "{{ r_bms_pods.rc == 0 and (r_bms_pods.stdout | int) >= 5 }}"
 
-    - name: "✅ Module 1 validation summary"
-      ansible.builtin.debug:
-        msg: |
-          Module 1 Validation Complete
-          =============================
-          ✅ MicroShift VM accessible
-          ✅ GitOps infrastructure deployed
-          ✅ MinIO storage operational
-          ✅ Model serving running
-          ✅ Battery Monitoring System active
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok and _task5_ok and _task6_ok and _task7_ok and _task8_ok }}"
+        pass_msg: |
+          ✅ Exercise 1.1: MicroShift VM is accessible
+          ✅ Exercise 1.2: AppProject 'default' exists in MicroShift
+          ✅ Exercise 1.2: MinIO Application is Synced
+          ✅ Exercise 1.2: MinIO pods are Running
+          ✅ Exercise 1.3: Model-server Application is Synced
+          ✅ Exercise 1.3: Inference pods are Running ({{ r_inference_pods.stdout | default('0') }} pods)
+          ✅ Exercise 1.4: Battery-simulation Application is Synced
+          ✅ Exercise 1.4: BMS pods are Running ({{ r_bms_pods.stdout | default('0') }} pods)
+
+          ⚠️ Note: Exercise 1.1 includes manual verification steps:
+            - SSH to MicroShift VM and check systemctl status microshift
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Exercise 1.1: MicroShift VM is accessible
+          {{ '✅' if _task2_ok else '❌' }} Exercise 1.2: AppProject 'default' exists in MicroShift
+          {{ '✅' if _task3_ok else '❌' }} Exercise 1.2: MinIO Application is Synced (Status: {{ r_minio_app.stdout | default('notfound') }})
+          {{ '✅' if _task4_ok else '❌' }} Exercise 1.2: MinIO pods are Running
+          {{ '✅' if _task5_ok else '❌' }} Exercise 1.3: Model-server Application is Synced
+          {{ '✅' if _task6_ok else '❌' }} Exercise 1.3: Inference pods are Running (found {{ r_inference_pods.stdout | default('0') }}, need 2+)
+          {{ '✅' if _task7_ok else '❌' }} Exercise 1.4: Battery-simulation Application is Synced
+          {{ '✅' if _task8_ok else '❌' }} Exercise 1.4: BMS pods are Running (found {{ r_bms_pods.stdout | default('0') }}, need 5+)

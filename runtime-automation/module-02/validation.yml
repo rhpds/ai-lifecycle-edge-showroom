@@ -20,11 +20,6 @@
       register: r_rhoai_operator
       failed_when: false
 
-    - validation_check:
-        check: "{{ (r_rhoai_operator.resources | length > 0) and (r_rhoai_operator.resources[0].status.readyReplicas | default(0) > 0) }}"
-        pass_msg: "✅ RHOAI operator is installed and running"
-        error_msg: "❌ RHOAI operator not found or not ready"
-
     - name: "✓ Check DataScienceCluster exists"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
@@ -32,19 +27,6 @@
         kind: DataScienceCluster
       register: r_dsc
       failed_when: false
-
-    - validation_check:
-        check: "{{ r_dsc.resources | length > 0 }}"
-        pass_msg: "✅ DataScienceCluster is configured"
-        error_msg: "❌ DataScienceCluster not found"
-
-    - name: "⚠️ Manual: Access RHOAI Dashboard"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEP: Access RHOAI Dashboard
-            URL: https://data-science-gateway.{{ apps_domain }}
-            Credentials: Use OpenShift login
-            Verify: Dashboard loads, shows ai-edge-project
 
     # ========================================
     # Exercise 2.2: Review data science project
@@ -58,11 +40,6 @@
       register: r_project_ns
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_project_ns.resources | length > 0 }}"
-        pass_msg: "✅ ai-edge-project namespace exists"
-        error_msg: "❌ ai-edge-project namespace not found"
-
     - name: "✓ Check DSPApplication exists in ai-edge-project"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
@@ -71,18 +48,6 @@
         namespace: ai-edge-project
       register: r_dsp
       failed_when: false
-
-    - validation_check:
-        check: "{{ r_dsp.resources | length > 0 }}"
-        pass_msg: "✅ Data Science Pipelines configured in ai-edge-project ({{ r_dsp.resources | length }} pipeline(s))"
-        error_msg: "❌ Data Science Pipelines not configured in ai-edge-project"
-
-    - name: "⚠️ Manual: Review project dashboard tabs"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEP: Navigate RHOAI Dashboard
-            - Click Projects → ai-edge-project
-            - Verify tabs exist: Overview, Workbenches, Pipelines, Deployments, Connections, Permissions
 
     # ========================================
     # Exercise 2.3: Review data connection
@@ -97,11 +62,6 @@
       register: r_dataconn
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_dataconn.resources | length > 0 }}"
-        pass_msg: "✅ vehicle-models data connection Secret exists"
-        error_msg: "❌ vehicle-models Secret not found in ai-edge-project"
-
     - name: "✓ Validate S3 credentials in vehicle-models Secret"
       ansible.builtin.set_fact:
         s3_endpoint: "{{ r_dataconn.resources[0].data.AWS_S3_ENDPOINT | b64decode }}"
@@ -110,36 +70,40 @@
       when: r_dataconn.resources | length > 0
       failed_when: false
 
-    - validation_check:
-        check: "{{ (r_dataconn.resources | length > 0) and (s3_bucket | default('') == 'inference') }}"
-        pass_msg: "✅ vehicle-models points to 'inference' bucket (endpoint: {{ s3_endpoint | default('unknown') }})"
-        error_msg: "❌ vehicle-models bucket mismatch (expected: inference, found: {{ s3_bucket | default('missing') }})"
-      when: r_dataconn.resources | length > 0
+    # ========================================
+    # Collect all check results
+    # ========================================
+    - name: Collect all validation results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ (r_rhoai_operator.resources | length > 0) and (r_rhoai_operator.resources[0].status.readyReplicas | default(0) > 0) }}"
+        _task2_ok: "{{ r_dsc.resources | length > 0 }}"
+        _task3_ok: "{{ r_project_ns.resources | length > 0 }}"
+        _task4_ok: "{{ r_dsp.resources | length > 0 }}"
+        _task5_ok: "{{ r_dataconn.resources | length > 0 }}"
+        _task6_ok: "{{ (r_dataconn.resources | length > 0) and (s3_bucket | default('') == 'inference') }}"
+        _task7_ok: "{{ (r_dataconn.resources | length > 0) and ('microshift' in (s3_endpoint | default(''))) }}"
 
-    - validation_check:
-        check: "{{ (r_dataconn.resources | length > 0) and ('microshift' in (s3_endpoint | default(''))) }}"
-        pass_msg: "✅ vehicle-models connects to MicroShift MinIO service"
-        error_msg: "❌ vehicle-models endpoint incorrect (expected: microshift MinIO, found: {{ s3_endpoint | default('missing') }})"
-      when: r_dataconn.resources | length > 0
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok and _task5_ok and _task6_ok and _task7_ok }}"
+        pass_msg: |
+          ✅ Exercise 2.1: RHOAI operator is installed and running
+          ✅ Exercise 2.1: DataScienceCluster is configured
+          ✅ Exercise 2.2: ai-edge-project namespace exists
+          ✅ Exercise 2.2: Data Science Pipelines configured ({{ r_dsp.resources | length }} pipeline(s))
+          ✅ Exercise 2.3: vehicle-models data connection Secret exists
+          ✅ Exercise 2.3: vehicle-models points to 'inference' bucket
+          ✅ Exercise 2.3: vehicle-models connects to MicroShift MinIO ({{ s3_endpoint | default('unknown') }})
 
-    - name: "⚠️ Manual: Review data connection in UI"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEP: Review data connection
-            - In ai-edge-project, click Connections tab
-            - Click ⋮ on vehicle-models → Edit
-            - Verify connection type: S3 compatible object storage - v1
-            - Verify endpoint points to MicroShift MinIO
-            - Verify bucket: inference
-
-    - name: "✅ Module 2 validation summary"
-      ansible.builtin.debug:
-        msg: |
-          Module 2 Validation Complete
-          =============================
-          ✅ RHOAI operator installed and running
-          ✅ DataScienceCluster configured
-          ✅ ai-edge-project namespace exists
-          ✅ Data Science Pipelines configured
-          ✅ vehicle-models data connection exists with correct credentials
-          ⚠️  Manual browser verification required for UI navigation
+          ⚠️ Note: Manual verification required for:
+            - RHOAI Dashboard access (https://data-science-gateway.{{ apps_domain }})
+            - Project dashboard navigation
+            - Data connection UI review
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Exercise 2.1: RHOAI operator is installed and running
+          {{ '✅' if _task2_ok else '❌' }} Exercise 2.1: DataScienceCluster is configured
+          {{ '✅' if _task3_ok else '❌' }} Exercise 2.2: ai-edge-project namespace exists
+          {{ '✅' if _task4_ok else '❌' }} Exercise 2.2: Data Science Pipelines configured
+          {{ '✅' if _task5_ok else '❌' }} Exercise 2.3: vehicle-models Secret exists
+          {{ '✅' if _task6_ok else '❌' }} Exercise 2.3: vehicle-models bucket correct (expected: inference, found: {{ s3_bucket | default('missing') }})
+          {{ '✅' if _task7_ok else '❌' }} Exercise 2.3: vehicle-models endpoint correct (expected: microshift, found: {{ s3_endpoint | default('missing') }})

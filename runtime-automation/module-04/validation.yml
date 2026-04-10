@@ -14,11 +14,6 @@
       register: r_stress_svc
       failed_when: false
 
-    - validation_check:
-        check: "{{ (r_stress_svc.resources | length > 0) and (r_stress_svc.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0) }}"
-        pass_msg: "✅ Stress Detection model server is deployed and ready"
-        error_msg: "❌ Stress Detection model server not ready"
-
     - name: "✓ Check Time to Failure InferenceService exists"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
@@ -29,25 +24,24 @@
       register: r_ttf_svc
       failed_when: false
 
-    - validation_check:
-        check: "{{ (r_ttf_svc.resources | length > 0) and (r_ttf_svc.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0) }}"
-        pass_msg: "✅ Time to Failure model server is deployed and ready"
-        error_msg: "❌ Time to Failure model server not ready"
+    # ========================================
+    # Collect all check results
+    # ========================================
+    - name: Collect all validation results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ (r_stress_svc.resources | length > 0) and (r_stress_svc.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0) }}"
+        _task2_ok: "{{ (r_ttf_svc.resources | length > 0) and (r_ttf_svc.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0) }}"
 
-    - name: "⚠️ Manual: Deploy model servers and test endpoints"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEPS:
-            1. In RHOAI Dashboard → ai-edge-project → Deployments
-            2. Deploy Stress Detection model (vehicle-models/stress-detection)
-            3. Deploy Time to Failure model (vehicle-models/time-to-failure)
-            4. Wait for both to show Running status
-            5. Query endpoints to test predictions
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok and _task2_ok }}"
+        pass_msg: |
+          ✅ Exercise 4: Stress Detection model server is deployed and ready
+          ✅ Exercise 4: Time to Failure model server is deployed and ready
 
-    - name: "✅ Module 4 validation summary"
-      ansible.builtin.debug:
-        msg: |
-          Module 4 Validation Complete
-          =============================
-          ✅ Model serving infrastructure checked
-          ⚠️  Manual RHOAI Dashboard interactions required
+          ⚠️ Note: Manual steps required for:
+            - Deploy model servers via RHOAI Dashboard
+            - Test model endpoints with prediction queries
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Exercise 4: Stress Detection model server is ready
+          {{ '✅' if _task2_ok else '❌' }} Exercise 4: Time to Failure model server is ready

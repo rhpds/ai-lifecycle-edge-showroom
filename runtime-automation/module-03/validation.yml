@@ -20,11 +20,6 @@
       register: r_notebook
       failed_when: false
 
-    - validation_check:
-        check: "{{ r_notebook.resources | length > 0 }}"
-        pass_msg: "✅ model-training Notebook exists"
-        error_msg: "❌ model-training Notebook not found in ai-edge-project"
-
     - name: "✓ Check Notebook pod is running"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
@@ -35,72 +30,26 @@
       register: r_notebook_pod
       failed_when: false
 
-    - validation_check:
-        check: "{{ (r_notebook_pod.resources | length > 0) and (r_notebook_pod.resources[0].status.phase | default('') == 'Running') }}"
-        pass_msg: "✅ model-training pod is running"
-        error_msg: "❌ model-training pod not running (phase: {{ r_notebook_pod.resources[0].status.phase | default('missing') }})"
-
-    - name: "⚠️ Manual: Access workbench and attach DataConnection"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEP: Configure workbench
-            - In ai-edge-project, go to Workbenches tab
-            - Click ⋮ on model-training → Edit workbench
-            - Attach existing connection: vehicle-models
-            - Click Update workbench
-            - Launch JupyterLab
-
     # ========================================
-    # Exercise 3.2: Import training notebooks
+    # Collect all check results
     # ========================================
-    - name: "⚠️ Manual: Clone Git repository in JupyterLab"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEP: Clone repository
-            - In JupyterLab, click Git icon in left sidebar
-            - Click Clone a Repository
-            - Enter URL: https://github.com/rhpds/ai-lifecycle-edge-automation.git
-            - Click Clone
-            - Verify ai-lifecycle-edge-automation folder appears
+    - name: Collect all validation results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ r_notebook.resources | length > 0 }}"
+        _task2_ok: "{{ (r_notebook_pod.resources | length > 0) and (r_notebook_pod.resources[0].status.phase | default('') == 'Running') }}"
 
-    # ========================================
-    # Exercise 3.3: Execute training notebooks
-    # ========================================
-    - name: "⚠️ Manual: Execute training notebooks"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEP: Run training notebooks
-            Navigate to notebooks/training/ and run in order:
-            1. retrieve-influx-data.ipynb
-            2. prepare-data.ipynb
-            3. bms-stress-training.ipynb
-            4. predict-stress.ipynb
-            5. bms-ttf-training.ipynb
-            6. predict-ttf.ipynb
-            7. save-models.ipynb
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok and _task2_ok }}"
+        pass_msg: |
+          ✅ Exercise 3.1: model-training Notebook exists
+          ✅ Exercise 3.1: model-training pod is running
 
-            Replace InfluxDB URL: https://influx-db-microshift-001.{{ apps_domain }}
-
-    - name: "⚠️ Manual: Verify models uploaded to MinIO"
-      ansible.builtin.debug:
-        msg: |
-          ⚠️ MANUAL STEP: Check MinIO for updated models
-            URL: https://minio-microshift-001.{{ apps_domain }}
-            Credentials: minio / minio123
-            Check inference bucket:
-              - stress-detection/1/model.xml (recent timestamp)
-              - stress-detection/1/model.bin (recent timestamp)
-              - time-to-failure/1/model.xml (recent timestamp)
-              - time-to-failure/1/model.bin (recent timestamp)
-
-    - name: "✅ Module 3 validation summary"
-      ansible.builtin.debug:
-        msg: |
-          Module 3 Validation Complete
-          =============================
-          ✅ model-training Notebook infrastructure exists
-          ✅ Notebook pod is running
-          ⚠️  Manual JupyterLab interactions required:
-              - Git clone
-              - Notebook execution
-              - Model upload verification
+          ⚠️ Note: Manual steps required for:
+            - Exercise 3.1: Attach vehicle-models connection and launch JupyterLab
+            - Exercise 3.2: Clone Git repository (https://github.com/rhpds/ai-lifecycle-edge-automation.git)
+            - Exercise 3.3: Execute training notebooks (retrieve-influx-data.ipynb → save-models.ipynb)
+            - Exercise 3.3: Verify models in MinIO (https://minio-microshift-001.{{ apps_domain }})
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Exercise 3.1: model-training Notebook exists
+          {{ '✅' if _task2_ok else '❌' }} Exercise 3.1: model-training pod is running (phase: {{ r_notebook_pod.resources[0].status.phase | default('missing') if r_notebook_pod.resources | length > 0 else 'pod not found' }})
