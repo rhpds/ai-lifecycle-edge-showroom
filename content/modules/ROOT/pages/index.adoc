@@ -51,51 +51,51 @@ Before starting this workshop, you should have:
 
 This workshop consists of 6 hands-on modules:
 
-**xref:01-overview.adoc[Introduction]** - Business scenario and solution architecture
+**xref:01-overview.adoc[Introduction: Battery Health Monitoring for Transportation Robots]** - Business scenario and solution architecture
 
-**xref:02-details.adoc[Technical Details]** - Environment specs and lab access
+**xref:02-details.adoc[Technical Details: Architecture and Components Overview]** - Environment specs and lab access
 
-**xref:03-module-01-transportation-robot.adoc[Module 1: Transportation Robot]**
+**xref:03-module-01-transportation-robot.adoc[Module 1: Setting Up the Transportation Robot on MicroShift]**
 
-* Robot infrastructure setup
-* MinIO storage deployment
-* Model serving deployment
-* Battery monitoring system deployment
+* Connect and check the robot edge infrastructure
+* Deploy MinIO object storage on MicroShift
+* Deploy model serving runtime on the edge
+* Deploy the battery monitoring system dashboard
 
-**xref:04-module-02-rhoai-configuration.adoc[Module 2: Red Hat OpenShift AI configuration]**
+**xref:04-module-02-rhoai-configuration.adoc[Module 2: Configuring Red Hat OpenShift AI on Single Node OpenShift]**
 
-* Review Red Hat OpenShift AI installation
-* Review data science project
-* Review data connection to robot storage
+* Access the OpenShift AI dashboard
+* Review the data science project configuration
+* Review the MinIO data connection settings
 
-**xref:05-module-03-model-training.adoc[Module 3: Model training]**
+**xref:05-module-03-model-training.adoc[Module 3: Training ML Models in OpenShift AI Workbench]**
 
-* Review training workbench
-* Import training notebooks
-* Train battery health models
+* Access and review the Jupyter workbench environment
+* Import training notebooks from Git repository
+* Execute model training for stress and time-to-failure prediction
 
-**xref:06-module-04-model-serving.adoc[Module 4: Model serving]**
+**xref:06-module-04-model-serving.adoc[Module 4: Testing Trained Models with OpenShift AI Model Serving]**
 
-* Deploy stress detection model server
-* Deploy time-to-failure model server
-* Query inference endpoints
+* Create inference server for stress detection model
+* Create inference server for time-to-failure model
+* Test model endpoints with sample battery data
 
-**xref:07-module-05-pipeline-automation.adoc[Module 5: Pipeline automation]**
+**xref:07-module-05-pipeline-automation.adoc[Module 5: Automating ML Workflows with Data Science Pipelines]**
 
-* Review pipeline server
-* Execute automated retraining pipeline
-* Schedule continuous automation
+* Review the pipeline server configuration in OpenShift AI
+* Run the automated training and deployment pipeline
+* Configure scheduled pipeline runs for continuous training
 
-**xref:08-module-06-test-alerts.adoc[Module 6: Test alerts]**
+**xref:08-module-06-test-alerts.adoc[Module 6: Testing Battery Health Alerts on the Edge Device]**
 
-* Review BMS dashboard
-* Test battery health alerts
+* Understand the battery monitoring system dashboard
+* Test and verify alerting system
 
 **xref:09-conclusion.adoc[Conclusion and next steps]** - Summary and next steps
 
 == Estimated time
 
-**Total duration**: Approximately 1 hour
+**Total duration**: Approximately 1:30 hour
 
 == Let's get started!
 
