@@ -93,7 +93,7 @@ image::05-module-03_git-import.png[JupyterLab Git clone option,link=self,window=
 
 . Enter the repository URL:
 +
-[source,text,options="wrap",role="execute",subs="attributes+"]
+[source,text,options="wrap",subs="attributes+"]
 ----
 https://github.com/rhpds/ai-lifecycle-edge-automation.git
 ----
