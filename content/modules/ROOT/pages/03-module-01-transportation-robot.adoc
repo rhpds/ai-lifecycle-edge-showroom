@@ -263,7 +263,7 @@ The inference server loads AI models from MinIO and exposes REST API endpoints f
 
 In the terminal, type the following to deploy the inference server GitOps application:
 
-[source,yaml, options="wrap",role="execute",subs="attributes+"]
+[source,bash, options="wrap",role="execute",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -352,7 +352,7 @@ The Battery Monitoring System (BMS) brings together all robot components to prov
 
 In the terminal, type the following to deploy the complete Battery Monitoring System application:
 
-[source,yaml, options="wrap",role="execute",subs="attributes+"]
+[source,bash, options="wrap",role="execute",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -414,9 +414,9 @@ NOTE: Press `Ctrl+C` to exit when all pods show `Running` status.
 
 Open the Battery Monitoring System dashboard:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[subs="attributes,macros"]
 ----
-https://bms-dashboard-microshift-001.{ai_edge_apps_domain}
+link:https://bms-dashboard-microshift-001.{ai_edge_apps_domain}[https://bms-dashboard-microshift-001.{ai_edge_apps_domain}^]
 ----
 
 The dashboard will display real-time battery telemetry data, AI predictions for stress detection and time-to-failure, and provide alerting capabilities for battery health monitoring.
@@ -431,9 +431,9 @@ Access the InfluxDB dashboard to see historical sensor data:
 
 . Open the InfluxDB dashboard and login with credentials:
 +
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[subs="attributes,macros"]
 ----
-https://influx-db-microshift-001.{ai_edge_apps_domain}
+link:https://influx-db-microshift-001.{ai_edge_apps_domain}[https://influx-db-microshift-001.{ai_edge_apps_domain}^]
 ----
 +
 [cols="1,2"]
