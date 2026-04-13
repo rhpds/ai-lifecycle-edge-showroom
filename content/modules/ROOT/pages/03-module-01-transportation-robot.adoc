@@ -222,11 +222,7 @@ NOTE: Press `Ctrl+C` to exit when pods show `Running` and `Completed` status.
 Once deployed, access the MinIO web console:
 
 . Open the MinIO dashboard and login with credential:
-+
-[source,bash,options="wrap",role="execute",subs="attributes+"]
-----
-https://minio-microshift-001.{ai_edge_apps_domain}
-----
++                                                                                                                                                                             link:https://minio-microshift-001.{ai_edge_apps_domain}[https://minio-microshift-001.{ai_edge_apps_domain}^]    
 +
 [cols="1,2"]
 |===
