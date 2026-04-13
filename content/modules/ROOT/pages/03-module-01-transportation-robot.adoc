@@ -223,7 +223,10 @@ Once deployed, access the MinIO web console:
 
 . Open the MinIO dashboard and login with credential:
 +
-link:https://minio-microshift-001.{ai_edge_apps_domain}[https://minio-microshift-001.{ai_edge_apps_domain}^]                                                                                                                                                        
+[subs="attributes,macros"]
+----
+link:https://minio-microshift-001.{ai_edge_apps_domain}[https://minio-microshift-001.{ai_edge_apps_domain}^]
+----
 +
 [cols="1,2"]
 |===
