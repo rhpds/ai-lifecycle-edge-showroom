@@ -1,4 +1,4 @@
-= Module 2: Red Hat OpenShift AI configuration
+= Module 2: Configuring Red Hat OpenShift AI on Single Node OpenShift
 
 include::vars.adoc[]
 
@@ -79,8 +79,6 @@ Review the project dashboard tabs:
 These tabs organize all resources for the battery monitoring AI solution.
 
 === Verify
-
-Confirm the project is properly configured:
 
 ✓ `ai-edge-project` appears in Data Science Projects list
 

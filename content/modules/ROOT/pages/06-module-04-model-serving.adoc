@@ -1,4 +1,4 @@
-= Module 4: Model serving
+= Module 4: Testing Trained Models with OpenShift AI Model Serving
 
 include::vars.adoc[]
 

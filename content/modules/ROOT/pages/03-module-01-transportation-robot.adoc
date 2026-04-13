@@ -1,8 +1,8 @@
-= Module 1: Transportation robot
+= Module 1: Setting Up the Transportation Robot on MicroShift
 
 include::vars.adoc[]
 
-This module explores the complete infrastructure running on Red Bot Logistics' autonomous transportation robots. Each robot runs **Red Hat Device Edge (MicroShift)**, a lightweight Kubernetes platform optimized for resource-constrained environments.
+This module explores the complete infrastructure running on RedBot Logistics' autonomous transportation robots. Each robot runs **Red Hat Device Edge (MicroShift)**, a lightweight Kubernetes platform optimized for resource-constrained environments.
 
 == Learning objectives
 
@@ -489,7 +489,7 @@ You have successfully deployed the complete transportation robot infrastructure 
 
 **What You've Learned:**
 
-* How to access edge infrastructure via bastion host
+* How to access edge infrastructure via the bastion host
 * GitOps-based deployment for edge automation
 * S3 object storage for AI model distribution
 * KServe model serving architecture on edge devices

@@ -21,7 +21,7 @@ Batteries are the heart of these machines. An unexpected battery failure can lea
 [#the-solution]
 == Our AI-powered solution
 
-As systems engineers for **Red Bot Logistics**, we've developed an end-to-end AI solution that covers 2 scenarios:
+As systems engineers for **RedBot Logistics**, we've developed an end-to-end AI solution that covers 2 scenarios:
 
 === Battery monitoring system
 
@@ -34,13 +34,13 @@ Each factory robot runs an application that monitors battery health during opera
 
 To support this containerized solution on each robot, we use **Red Hat Device Edge (MicroShift)**, a lightweight Kubernetes platform optimized for resource-constrained environments with model serving and GitOps capabilities.
 
-=== Automated model re-training at the edge
+=== Automated model retraining at the edge
 
 AI models must stay accurate as battery behavior evolves over time. However, robots generate massive amounts of telemetry data, making it impractical to continuously upload all data over the factory network. Our solution uses **Red Hat OpenShift AI** for the entire AI/ML lifecycle:
 
 * Collects new data every 10 minutes from the robot
 * Trains 2 AI models using the new data
-* Serve both models to test performance
+* Serves both models to test performance
 * Runs a fully automated pipeline: data collection → model training → validation → deployment
 * Automatically deploys improved models back to robots if they outperform existing ones
 

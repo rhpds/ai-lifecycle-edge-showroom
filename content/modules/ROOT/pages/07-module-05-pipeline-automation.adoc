@@ -1,4 +1,4 @@
-= Module 5: Pipeline automation
+= Module 5: Automating ML Workflows with Data Science Pipelines
 
 include::vars.adoc[]
 

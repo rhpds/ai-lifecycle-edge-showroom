@@ -1,4 +1,4 @@
-= Module 3: Model training
+= Module 3: Training ML Models in OpenShift AI Workbench
 
 include::vars.adoc[]
 
@@ -71,8 +71,6 @@ image::05-module-03_jupyterlab.png[JupyterLab dashboard,link=self,window=blank,w
 
 === Verify
 
-Confirm the workbench is accessible and operational:
-
 ✓ `model-training` workbench exists in Workbenches tab
 
 ✓ DataConnection has been attached to the workbench
@@ -106,8 +104,6 @@ image::05-module-03_imported-folder.png[The ai-lifecycle-edge-automation folder 
 
 === Verify
 
-Confirm the repository was cloned successfully:
-
 ✓ Clone operation completes without errors
 
 ✓ `ai-lifecycle-edge-automation` folder appears in file browser
@@ -123,13 +119,13 @@ Run the training notebooks to train both battery health prediction models. The n
 . Navigate to `notebooks/training/`
 . Verify you see the training notebooks:
 +
-.. **retrieve-influx-data.ipynb** - Retrieve battery telemetry from InfluxDB on robots
-.. **prepare-data.ipynb** - Clean, normalize, and prepare training datasets
-.. **bms-stress-training.ipynb** - Trains the Stress Detection model and saves it locally
-.. **predict-stress.ipynb** - Validates the Stress Detection model performance with new data
-.. **bms-ttf-training.ipynb** - Trains the Time to Failure model and saves it locally
-.. **predict-ttf.ipynb** - Validates the Time to Failure model performance with new data
-.. **save-models.ipynb** - Store in MinIO instance in MicroShift for distribution to robots
+** **01_retrieve-influx-data.ipynb** - Retrieve battery telemetry from InfluxDB on robots
+** **02_prepare-data.ipynb** - Clean, normalize, and prepare training datasets
+** **03_bms-stress-training.ipynb** - Trains the Stress Detection model and saves it locally
+** **04_predict-stress.ipynb** - Validates the Stress Detection model performance with new data
+** **05_bms-ttf-training.ipynb** - Trains the Time to Failure model and saves it locally
+** **06_predict-ttf.ipynb** - Validates the Time to Failure model performance with new data
+** **07_save-models.ipynb** - Store in MinIO instance in MicroShift for distribution to robots
 
 . Open in order each file and press the **Play** button at the top to manually run each cell or the **Double Play** icon to run the entire file
 
@@ -142,11 +138,11 @@ At this point, you can follow the instructions contained in each Notebook. Those
 https://influx-db-microshift-001.{ai_edge_apps_domain}
 ----
 
-Once you have run all of them, the new AI models should have been uploaded to the vehicle’s MinIO storage and are now being used by the Battery Monitoring System for real-time stress detection and time-to-failure predictions.
+Once you have run all of them, the new AI models should have been uploaded to the vehicle’s MinIO storage and will now be used by the Battery Monitoring System for real-time stress detection and time-to-failure predictions.
 
 === Verify model export
 
-After all notebooks complete, check that models were exported to OpenVINO format and MinIO contains updated models:
+After all notebooks have been executed, check that models were exported to OpenVINO format and MinIO contains the updated models:
 
 . Open MinIO dashboard:
 +

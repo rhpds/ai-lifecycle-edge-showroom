@@ -7,7 +7,7 @@ This section provides the technical specifications, architecture, and access inf
 [#edge-computing-essentials]
 == Edge computing essentials
 
-Our solution is designed to run at the edge, directly on the transportation robots operating within the plant during real operational conditions. This means it operates far from centralized data centers. Therefore, the corresponding infrastructure must be as lightweight as possible due to space limitations. For this reason, compact architectures such as Single Node OpenShift (SNO) and Red Hat Device Edge have been used.
+Our solution is designed to run at the edge, directly on the transportation robots operating within the plant under real operational conditions. This means it operates far from centralized data centers. Therefore, the corresponding infrastructure must be as lightweight as possible due to space limitations. For this reason, compact architectures such as Single Node OpenShift (SNO) and Red Hat Device Edge have been used.
 
 When moving the entire AI/ML lifecycle to the edge, models are trained, deployed, and managed closer to where the data is generated, which introduces several distinct advantages:
 
@@ -25,7 +25,7 @@ However, the edge environment presents challenges as well:
 [#architecture]
 == Solution architecture
 
-Now that we understand the goal of the lab, the solution we want to implement, and the existing limitations, let's focus on the infrastructure we'll be working with. This infrastructure consists of 2 key components: the transportation robot and the re-training machine.
+Now that we understand the goal of the lab, the solution we want to implement, and the existing limitations, let's focus on the infrastructure we'll be working with. This infrastructure consists of 2 key components: the transportation robot and the retraining machine.
 
 === Transportation robot (Red Hat Device Edge)
 
@@ -41,9 +41,9 @@ Components that will be manually deployed on each robot:
 ** InfluxDB to store the collected data
 ** Inference Services to interact with 2 AI models
 
-=== Re-training node (Single Node OpenShift)
+=== Retraining node (Single Node OpenShift)
 
-This is a single-node deployment of OpenShift that will serve as the primary platform for re-training and validating our AI models in an automated manner thanks to Red Hat OpenShift AI (RHOAI). This single node is located in the plant. The sensor data will be collected from the robots and used to re-train the models.
+This is a single-node deployment of OpenShift that will serve as the primary platform for retraining and validating our AI models in an automated manner thanks to Red Hat OpenShift AI (RHOAI). This single node is located in the plant. The sensor data will be collected from the robots and used to retrain the models.
 
 Components on the SNO server:
 
@@ -131,7 +131,7 @@ Password: `minio123`
 Password: `password`
 |===
 
-=== Re-training server dashboards
+=== Retraining server dashboards
 
 Available Dashboards:
 

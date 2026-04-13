@@ -1,4 +1,4 @@
-= Module 6: Test alerts
+= Module 6: Testing Battery Health Alerts on the Edge Device
 
 include::vars.adoc[]
 
