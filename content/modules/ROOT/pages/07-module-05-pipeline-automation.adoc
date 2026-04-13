@@ -190,7 +190,7 @@ Execute the pipeline manually to test the automation workflow.
 | Authentication token for InfluxDB
 
 | `influxdb_url`
-| https://influx-db-microshift-001.{ai_edge_apps_domain}
+| `\https://influx-db-microshift-001.{ai_edge_apps_domain}`
 | Robot's InfluxDB endpoint URL
 |===
 +
