@@ -62,6 +62,8 @@ Expected output should show `active (running)`:
      Active: active (running) since ...
 ----
 
+NOTE: Press `Ctrl+C` to exit the log view.
+
 Additionally you can check if all the MicroShift pods are Running:
 
 [source,bash,options="wrap",role="execute",subs="attributes+"]
@@ -150,7 +152,7 @@ Both models are stored in OpenVINO IR format (`.xml` and `.bin` files) in versio
 
 In the terminal, type the following to create the default project for GitOps applications:
 
-[source,yaml, options="wrap",role="execute",subs="attributes+"]
+[source,bash, options="wrap",role="execute",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 kind: AppProject
@@ -174,7 +176,7 @@ EOF
 
 In the terminal, type the following to deploy MinIO by creating a GitOps Application:
 
-[source,yaml, options="wrap",role="execute",subs="attributes+"]
+[source,bash, options="wrap",role="execute",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
