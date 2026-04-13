@@ -17,14 +17,14 @@ The lab covers GitOps deployment, AI inference, model serving and automated mode
 
 NOTE: Part of the infrastructure is pre-configured. You'll review configurations and execute hands-on tasks to understand the complete AI/ML lifecycle.
 
-== Who this is for
+== Who is this for
 
 This workshop is designed for **platform engineers, ML engineers, DevOps teams, and data scientists** who want to:
 
 * Deploy AI/ML workloads on edge platforms with limited resources
 * Implement automated MLOps workflows for continuous model improvement
 * Work with Kubernetes-based edge infrastructure (MicroShift, Single Node OpenShift)
-* Use Red Hat OpenShift AI for the complete ML lifecycle
+* Use Red Hat OpenShift AI to manage the complete ML lifecycle
 * Build solutions for IoT, industrial automation, or edge AI use cases
 
 == What you'll learn
@@ -40,20 +40,20 @@ By the end of this workshop, you will understand how to:
 
 == Prerequisites
 
-Before starting this workshop, you should have:
+Before starting this workshop, you should:
 
-* Basic Kubernetes/OpenShift concepts (pods, deployments, services)
-* Basic Python and Jupyter notebooks knowledge
-* Basic machine learning concepts (training, inference, model validation)
-* Experience with command-line tools (ssh, oc)
+* Understand basic Kubernetes/OpenShift concepts (pods, deployments, services)
+* Have basic Python and Jupyter notebooks knowledge
+* Understand basic machine learning concepts (training, inference, model validation)
+* Have experience with command-line tools (ssh, oc)
 
-== Lab modules
+== Lab structure
 
-This workshop consists of 6 hands-on modules:
+This workshop is divided into 9 different sections:
 
-**xref:01-overview.adoc[Introduction: Battery Health Monitoring for Transportation Robots]** - Business scenario and solution architecture
+**xref:01-overview.adoc[Introduction: Battery Health Monitoring for Transportation Robots]** - Business scenario and challenges
 
-**xref:02-details.adoc[Technical Details: Architecture and Components Overview]** - Environment specs and lab access
+**xref:02-details.adoc[Technical Details: Architecture and Components Overview]** - Solution architecture and lab access
 
 **xref:03-module-01-transportation-robot.adoc[Module 1: Setting Up the Transportation Robot on MicroShift]**
 
@@ -95,7 +95,7 @@ This workshop consists of 6 hands-on modules:
 
 == Estimated time
 
-**Total duration**: Approximately 1:30 hour
+**Total duration**: Approximately 1:30 hours
 
 == Let's get started!
 
