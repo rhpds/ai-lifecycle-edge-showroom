@@ -1,41 +1,43 @@
 = Conclusion and Next Steps
 
+Review your achievements in deploying AI/ML automation at the edge and explore next steps for continuing your edge AI journey.
+
 == What You've Accomplished
 
-Congratulations! You've completed the AI Lifecycle at the Edge workshop. You've explored a complete solution spanning edge devices and cloud-like infrastructure:
+Congratulations! You've completed the AI Lifecycle at the Edge workshop. You've explored a complete solution spanning edge infrastructure and AI workloads:
 
-**Module 1 - Transportation robot:**
+**Module 1 - Setting Up the Transportation Robot on MicroShift:**
 
 * Connected to robot infrastructure via MicroShift
 * Deployed MinIO object storage for AI models
 * Configured model serving with KServe/OpenVINO
 * Deployed Battery Monitoring System with real-time predictions
 
-**Module 2 - Red Hat OpenShift AI Configuration:**
+**Module 2 - Configuring Red Hat OpenShift AI on Single Node OpenShift:**
 
 * Reviewed Red Hat OpenShift AI installation optimized for edge
 * Explored data science project organization
 * Examined data connections linking SNO to robot storage
 
-**Module 3 - Model training:**
+**Module 3 - Training ML Models in OpenShift AI Workbench:**
 
 * Reviewed JupyterLab workbench configuration
 * Imported training notebooks from GitHub
 * Trained Stress Detection and Time-to-Failure models
 
-**Module 4 - Model serving:**
+**Module 4 - Testing Trained Models with OpenShift AI Model Serving:**
 
 * Reviewed OpenVINO model servers on SNO
 * Understood KServe v2 inference API protocol
 * Queried endpoints to validate predictions
 
-**Module 5 - Pipeline automation:**
+**Module 5 - Automating ML Workflows with Data Science Pipelines:**
 
 * Reviewed pipeline server architecture
 * Executed automated retraining pipeline
 * Scheduled pipelines for continuous model improvement
 
-**Module 6 - Test alerts:**
+**Module 6 - Testing Battery Health Alerts on the Edge Device:**
 
 * Tested battery health alerts dashboard
 * Verified auto-inference and AI predictions
