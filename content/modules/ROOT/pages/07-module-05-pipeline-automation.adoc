@@ -270,7 +270,7 @@ image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for
 | Identifier for this schedule
 
 | Trigger type
-| Select **Periodic**
+| `Periodic`
 | Runs at regular intervals
 
 | Run every
@@ -302,7 +302,7 @@ image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for
 | Bucket where trained models are deployed
 
 | `aws_s3_endpoint`
-| `http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
+| `\http://minio-microshift-vm.microshift-001.svc.cluster.local:30000`
 | Robot's MinIO service URL
 
 | `aws_secret_access_key`
@@ -322,7 +322,7 @@ image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for
 | Authentication token for InfluxDB
 
 | `influxdb_url`
-| https://influx-db-microshift-001.{ai_edge_apps_domain}`\
+| `\https://influx-db-microshift-001.{ai_edge_apps_domain}`
 | Robot's InfluxDB endpoint URL
 |===
 +
