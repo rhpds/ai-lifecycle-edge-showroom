@@ -20,33 +20,33 @@ antora:
   dir: www
   modules:
     - name: index
-      label: "Workshop Overview"
+      label: "Workshop Overview: AI Lifecycle for Edge Computing"
     - name: 01-overview
-      label: "Introduction"
+      label: "Introduction: Battery Health Monitoring for Transportation Robots"
     - name: 02-details
-      label: "Technical Details"
+      label: "Technical Details: Architecture and Components Overview"
     - name: 03-module-01-transportation-robot
-      label: "Module 1: Transportation robot"
+      label: "Module 1: Setting Up the Transportation Robot on MicroShift"
       scripts: [solve, validation]
       solveButton: true
     - name: 04-module-02-rhoai-configuration
-      label: "Module 2: Red Hat OpenShift AI configuration"
+      label: "Module 2: Configuring Red Hat OpenShift AI on Single Node OpenShift"
       scripts: [solve, validation]
       solveButton: true
     - name: 05-module-03-model-training
-      label: "Module 3: Model training"
+      label: "Module 3: Training ML Models in OpenShift AI Workbench"
       scripts: [solve, validation]
       solveButton: true
     - name: 06-module-04-model-serving
-      label: "Module 4: Model serving"
+      label: "Module 4: Testing Trained Models with OpenShift AI Model Serving"
       scripts: [solve, validation]
       solveButton: true
     - name: 07-module-05-pipeline-automation
-      label: "Module 5: Pipeline automation"
+      label: "Module 5: Automating ML Workflows with Data Science Pipelines"
       scripts: [solve, validation]
       solveButton: true
     - name: 08-module-06-test-alerts
-      label: "Module 6: Test alerts"
+      label: "Module 6: Testing Battery Health Alerts on the Edge Device"
       scripts: [solve, validation]
       solveButton: true
     - name: 09-conclusion
