@@ -18,7 +18,7 @@ By the end of this module, you will be able to:
 [#review-pipeline-server]
 == Exercise 5.1: Review pipeline infrastructure
 
-Kubeflow Pipelines provides workflow automation for machine learning. The pipeline server orchestrates the complete model lifecycle from data collection through deployment, ensuring Consistency, Auditability, Scalability and Reliability.
+Kubeflow Pipelines provides workflow automation for machine learning. The pipeline server orchestrates the complete model lifecycle from data collection through deployment, ensuring consistency, suditability, scalability and reliability.
 
 Machine learning workflows involve multiple steps that must execute in sequence:
 
@@ -66,7 +66,7 @@ image::07-module-05_pipeline-server-config.png[Review pipeline server configurat
 | SNO MinIO service endpoint
 
 | Bucket
-| `pipeline`
+| `pipelines`
 | Stores pipeline artifacts and execution metadata
 |===
 
@@ -127,6 +127,8 @@ Execute the pipeline manually to test the automation workflow.
 . Select **Create run** from dropdown
 
 . Configure the pipeline run:
++
+NOTE: You will only need to update the `influxdb_url` value.
 +
 .Pipeline run configuration
 [cols="1,2,2",options="header"]
@@ -193,9 +195,7 @@ Execute the pipeline manually to test the automation workflow.
 | `\https://influx-db-microshift-001.{ai_edge_apps_domain}`
 | Robot's InfluxDB endpoint URL
 |===
-+
-NOTE: You will only need to update the `influxdb_url` value.
-+
+
 . Click **Create run**
 
 Watch the pipeline execute in real-time and wait for all nodes to complete.
@@ -204,7 +204,7 @@ image::07-module-05_pipeline-complete.png[Completed pipeline run with all nodes 
 
 === Check new models
 
-If new models outperformed existing ones, verify they were uploaded to MinIO:
+If the new models outperformed existing ones, verify they were uploaded to MinIO:
 
 . Open the MinIO dashboard and login with credential:
 +

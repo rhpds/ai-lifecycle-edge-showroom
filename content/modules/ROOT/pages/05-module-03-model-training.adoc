@@ -52,7 +52,7 @@ image::05-module-03_workbench.png[Workbenches tab showing model-training workben
 | 2 CPUs and 4 GiB of memory
 |===
 
-. Connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot.
+. Connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot
 
 .. Select **Attach existing connections**
 .. Verify that the `vehicle-models` connection is selected

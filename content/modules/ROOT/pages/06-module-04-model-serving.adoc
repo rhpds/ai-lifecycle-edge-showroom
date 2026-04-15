@@ -188,11 +188,11 @@ BASE_URL = "http://stress-detection-predictor.ai-edge-project.svc.cluster.local:
 ----
 +
 . Execute the cells to:
-
-.. Define the inference endpoint
-.. Prepare test input data (9 normalized feature values)
-.. Send POST request with test data
-.. Receive and display prediction
++
+* Define the inference endpoint
+* Prepare test input data (9 normalized feature values)
+* Send POST request with test data
+* Receive and display prediction
 
 +
 . The model returns a stress score between 0 and 1. The notebook interprets:
