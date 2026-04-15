@@ -25,29 +25,29 @@ antora:
       label: "Introduction: Battery Health Monitoring for Transportation Robots"
     - name: 02-details
       label: "Technical Details: Architecture and Components Overview"
-    - name: 03-module-01-transportation-robot
+    - name: module-01
       label: "Module 1: Setting Up the Transportation Robot on MicroShift"
       scripts: [solve, validation]
-      solveButton: true
-    - name: 04-module-02-rhoai-configuration
+      solveButton: false
+    - name: module-02
       label: "Module 2: Configuring Red Hat OpenShift AI on Single Node OpenShift"
       scripts: [solve, validation]
-      solveButton: true
-    - name: 05-module-03-model-training
+      solveButton: false
+    - name: module-03
       label: "Module 3: Training ML Models in OpenShift AI Workbench"
       scripts: [solve, validation]
-      solveButton: true
-    - name: 06-module-04-model-serving
+      solveButton: false
+    - name: module-04
       label: "Module 4: Testing Trained Models with OpenShift AI Model Serving"
       scripts: [solve, validation]
-      solveButton: true
-    - name: 07-module-05-pipeline-automation
+      solveButton: false
+    - name: module-05
       label: "Module 5: Automating ML Workflows with Data Science Pipelines"
       scripts: [solve, validation]
-      solveButton: true
-    - name: 08-module-06-test-alerts
+      solveButton: false
+    - name: module-06
       label: "Module 6: Testing Battery Health Alerts on the Edge Device"
       scripts: [solve, validation]
-      solveButton: true
+      solveButton: false
     - name: 09-conclusion
       label: "Conclusion and Next Steps"
