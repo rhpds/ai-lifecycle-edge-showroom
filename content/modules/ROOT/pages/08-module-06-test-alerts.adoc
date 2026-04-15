@@ -10,7 +10,7 @@ By the end of this module, you will be able to:
 
 * Understand the Battery Monitoring System (BMS) dashboard architecture
 * Test stress detection alerts with simulated battery conditions
-* Verify time-to-failure predictions trigger maintenance notifications
+* Verify that time-to-failure predictions trigger maintenance notifications
 * Monitor real-time inference execution on the robot edge devices
 * Understand the complete data flow from sensors through AI to alerting
 
@@ -112,7 +112,7 @@ The Actions panel complements the automatic inference system by providing immedi
 
 === Battery Telemetry panel
 
-The Battery Telemetry panel displays real-time graphs of critical battery metrics collected from the robot sensors. These visualizations provide operators with immediate insight into battery performance and operating conditions. The telemetry data shown in these graphs is also sent to the AI models for inference.
+The Battery Telemetry panel displays real-time graphs of critical battery metrics collected from the robot's sensors. These visualizations provide operators with immediate insight into battery performance and operating conditions. The telemetry data shown in these graphs is also sent to the AI models for inference.
 
 image::08-module-06_battery-telemetry.png[Battery Telemetry panel showing real-time graphs of battery metrics,link=self,window=blank,width=700]
 
@@ -240,31 +240,3 @@ You have successfully tested the complete AI-powered battery monitoring and aler
 * Integration of AI inference into operational dashboards
 * Alert configuration at the edge
 * End-to-end testing with battery simulation
-
-**The Complete AI Lifecycle at the Edge:**
-
-Throughout this workshop, you've explored:
-
-**Module 1: Transportation robot** - Deployed MicroShift, MinIO, model serving, and BMS on edge devices
-
-**Module 2: Red Hat OpenShift AI configuration** - Configured Red Hat OpenShift AI for ML workloads
-
-**Module 3: Model training** - Trained battery health prediction models in Jupyter notebooks
-
-**Module 4: Model serving** - Deployed and tested inference endpoints for real-time predictions
-
-**Module 5: Pipeline automation** - Configured automated retraining every 10 minutes
-
-**Module 6: Test alerts** - Verified end-to-end monitoring and alerting system
-
-**You now understand how to build, deploy, and maintain self-improving AI systems at the edge.**
-
-This architecture enables:
-
-* **Autonomous Operations** - Robots operate with minimal human oversight
-* **Predictive Maintenance** - Prevent failures before they occur
-* **Continuous Improvement** - Models get better over time with fresh data
-* **Edge Efficiency** - Low latency inference where decisions are made
-* **Operational Resilience** - Automated recovery from failures
-
-Thank you for completing the AI Lifecycle at the Edge workshop!
