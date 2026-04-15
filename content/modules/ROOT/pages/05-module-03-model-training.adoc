@@ -51,17 +51,15 @@ image::05-module-03_workbench.png[Workbenches tab showing model-training workben
 | `default-profile`
 | 2 CPUs and 4 GiB of memory
 |===
-+
-.Connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot.
+
+. Connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot.
 
 .. Select **Attach existing connections**
 .. Verify that the `vehicle-models` connection is selected
 .. Click **Attach**
 .. To apply the configuration, click **Update workbench**
 
-=== Access the model training workbench
-
-. Click **model-training** to launch JupyterLab
+. Click **model-training** to access the model training workbench
 
 image::05-module-03_jupyterlab.png[JupyterLab dashboard,link=self,window=blank,width=700]
 
@@ -123,16 +121,16 @@ Run the training notebooks to train both battery health prediction models. The n
 ** **06_predict-ttf.ipynb** - Validates the Time to Failure model performance with new data
 ** **07_save-models.ipynb** - Store in MinIO instance in MicroShift for distribution to robots
 
-. Open in order each file and press the **Play** button at the top to manually run each cell or the **Double Play** icon to run the entire file
-
-image::05-module-03_run-notebooks.png[Play and Double Play buttons to run the Notebook,link=self,window=blank,width=700]
-
-At this point, you can follow the instructions contained in each Notebook. Those will explain each step in detail. Pay attention to some of the variables used during the execution. You will need to replace some of them based on your environment. For example, in the first notebook you will need to replace the InfluxDB URL with yours:
-
+. At this point, you can open each Notebook in order and follow the instructions contained. Pay attention to some of the variables used during the execution. You will need to replace in the first notebook the InfluxDB URL with yours:
++
 [source,yaml,options="wrap",role="execute",subs="attributes+"]
 ----
 https://influx-db-microshift-001.{ai_edge_apps_domain}
-----
+---- 
++
+. Execute each Notebook. You can do it by pressing the **Play** button at the top to manually run each cell or the **Double Play** icon to run the entire file
++
+image::05-module-03_run-notebooks.png[Play and Double Play buttons to run the Notebook,link=self,window=blank,width=700]
 
 Once you have run all of them, the new AI models should have been uploaded to the vehicle’s MinIO storage and will now be used by the Battery Monitoring System for real-time stress detection and time-to-failure predictions.
 
