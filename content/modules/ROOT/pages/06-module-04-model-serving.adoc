@@ -212,11 +212,11 @@ BASE_URL = "http://time-to-failure-predictor.ai-edge-project.svc.cluster.local:8
 ----
 +
 . Execute the cells to:
-
-.. Define the TTF inference endpoint
-.. Prepare test input data (5 feature values)
-.. Send POST request
-.. Receive and display time-to-failure prediction
++
+* Define the TTF inference endpoint
+* Prepare test input data (5 feature values)
+* Send POST request
+* Receive and display time-to-failure prediction
 
 +
 . The model returns the **predicted number of hours** until battery failure.

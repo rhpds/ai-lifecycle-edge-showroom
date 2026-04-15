@@ -128,8 +128,6 @@ Execute the pipeline manually to test the automation workflow.
 
 . Configure the pipeline run:
 +
-NOTE: You will only need to update the `influxdb_url` value.
-+
 .Pipeline run configuration
 [cols="1,2,2",options="header"]
 |===
@@ -157,6 +155,8 @@ NOTE: You will only need to update the `influxdb_url` value.
 |===
 
 . Review pipeline parameters (scroll down):
++
+NOTE: You will only need to update the `influxdb_url` value.
 +
 .Pipeline execution parameters
 [cols="1,2,2",options="header"]
