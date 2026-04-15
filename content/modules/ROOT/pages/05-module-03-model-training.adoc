@@ -25,13 +25,11 @@ Red Hat OpenShift AI provides Jupyter workbench environments for data scientists
 . Navigate to the **Workbenches** tab
 . Locate the `model-training` workbench
 . Click on the **three vertical dots** (⋮) on the right and click **Edit workbench**
-
++
 image::05-module-03_workbench.png[Workbenches tab showing model-training workbench,link=self,window=blank,width=700]
-
-=== Understand Workbench configuration
-
-The Workbench is configured with:
-
++
+. The Workbench is configured with:
++
 .Workbench configuration
 [cols="1,2,2"]
 |===
@@ -53,15 +51,13 @@ The Workbench is configured with:
 | `default-profile`
 | 2 CPUs and 4 GiB of memory
 |===
++
+.Connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot.
 
-=== Attach DataConnection
-
-Connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot.
-
-. Select **Attach existing connections**
-. Verify that the `vehicle-models` connection is selected
-. Click **Attach**
-. To apply the configuration, click **Update workbench**
+.. Select **Attach existing connections**
+.. Verify that the `vehicle-models` connection is selected
+.. Click **Attach**
+.. To apply the configuration, click **Update workbench**
 
 === Access the model training workbench
 
