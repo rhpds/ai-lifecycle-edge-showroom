@@ -288,6 +288,8 @@ image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for
 
 . Scroll down to verify the pipeline parameters (same as manual run):
 +
+NOTE: Again, you will only need to update the `influxdb_url` value.
++
 .Scheduled pipeline parameters
 [cols="1,2,2",options="header"]
 |===
@@ -325,8 +327,6 @@ image::07-module-05_pipeline-scheduled.png[Pipeline list with three-dot menu for
 | `\https://influx-db-microshift-001.{ai_edge_apps_domain}`
 | Robot's InfluxDB endpoint URL
 |===
-+
-NOTE: Again, you will only need to update the `influxdb_url` value.
 +
 . Click **Create schedule**
 
