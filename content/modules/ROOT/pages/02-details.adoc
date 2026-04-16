@@ -1,4 +1,4 @@
-= Technical details
+= Technical details: Architecture and Components Overview
 
 include::vars.adoc[]
 
@@ -25,7 +25,7 @@ However, the edge environment presents challenges as well:
 [#architecture]
 == Solution architecture
 
-Now that we understand the goal of the lab, the solution we want to implement, and the existing limitations, let's focus on the infrastructure we'll be working with. This infrastructure consists of 2 key components: the transportation robot and the retraining machine.
+Now that we understand the goal of the lab, the solution we want to implement, and the existing limitations, let's focus on the infrastructure we'll be working with. This infrastructure consists of two key components: the transportation robot and the retraining machine.
 
 === Transportation robot (Red Hat Device Edge)
 
@@ -33,13 +33,13 @@ Our transportation robot runs on a Red Hat Enterprise Linux (RHEL) operating sys
 
 Components that will be manually deployed on each robot:
 
-* **MinIO Storage** - Stores 2 AI models in the `inference` bucket used for battery stress and fault detection. By default, 2 baseline models are preloaded at startup. These will later be replaced by the retrained models coming from our Single Node OpenShift instance
-* **Model Serving** - KServe/ModelMesh for loading and serving models via API
+* **MinIO Storage** - Stores two AI models in the `inference` bucket used for battery stress and fault detection. By default, 2 baseline models are preloaded at startup. These will later be replaced by the retrained models coming from our Single Node OpenShift instance
+* **Model Serving** - KServe Single-Model Serving (Serverless) for loading and exposing models through standard inference APIs
 * **Battery Monitoring System (BMS) app** - Dashboard showing real-time telemetry and AI predictions, making use of:
 
 ** Simulated data coming from sensors
 ** InfluxDB to store the collected data
-** Inference Services to interact with 2 AI models
+** Inference Services to interact with two AI models
 
 === Retraining node (Single Node OpenShift)
 
@@ -61,15 +61,15 @@ Sometimes, a picture is worth a thousand words. Below, you will find a diagram i
 
 image::02-details_diagram.png[AI lifecycle edge architecture diagram showing MicroShift robots with MinIO and model serving connecting to SNO training server with RHOAI pipelines and automated model retraining workflow,link=self,window=blank,width=700]
 
-1. Our environment comes with 2 base AI models stored in the _inference_ MinIO bucket. The first one called **Stress Detection** will be able to identify early signs of battery stress - conditions that may lead to degradation or failure. The second one - **Time to Failure** - uses sensor data to provide an estimate of the remaining time until a potential battery failure.
+1. Our environment comes with two base AI models stored in the _inference_ MinIO bucket. The first one called **Stress Detection** will be able to identify early signs of battery stress - conditions that may lead to degradation or failure. The second one - **Time to Failure** - uses sensor data to provide an estimate of the remaining time until a potential battery failure.
 
 2. Both models are loaded into the InferenceServer instance to make them available for inference via API endpoints.
 
 3. The Battery simulator item is a Quarkus component that simulates the battery consumption of an operating transportation robot and sends telemetry data to the Mosquitto MQTT broker that acts as the central messaging hub, receiving the data coming from the emulated sensors.
 
-4. 2 different Camel Quarkus components are in charge of reading the data from Mosquitto and sending it to the Battery Monitoring System (BMS) app. The **mqtt2ws** exposes the data as WebSocket for the BMS Dashboard and the **data ingester** stores it in InfluxDB.
+4. Two different Camel Quarkus components are in charge of reading the data from Mosquitto and sending it to the Battery Monitoring System (BMS) app. The mqtt2ws exposes the data as WebSocket for the BMS Dashboard and the data ingester stores it in InfluxDB.
 
-5. The Battery Monitoring System application includes a component that retrieves real-time data from InfluxDB and sends it as queries to the 2 inference endpoints and receives the predictions from the AI models currently being served.
+5. The Battery Monitoring System application includes a component that retrieves real-time data from InfluxDB, sends it as queries to the two inference endpoints and receives the predictions from the AI models currently being served.
 
 6. The response returned by the models is analyzed, and forwarded to an alerting system that triggers notifications in case of detected battery stress conditions or signs of an imminent failure.
 
@@ -78,7 +78,7 @@ image::02-details_diagram.png[AI lifecycle edge architecture diagram showing Mic
 8. If the comparison results show that the new models perform better, they are sent back to the _inference_ MinIO bucket in the transportation robot, so the cycle can start again with the updated models.
 
 [#dashboards]
-== Dashboard control center
+== Dashboard access control center
 
 Below are the dashboards and consoles you'll use during this lab. Some will become available as you progress through the modules.
 
@@ -112,6 +112,7 @@ virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/la
 
 Available Dashboards:
 
+.Transportation robot dashboards
 [cols="2,3,2",options="header",subs="attributes+"]
 |===
 | Dashboard | URL | Credentials
@@ -135,6 +136,7 @@ Password: `password`
 
 Available Dashboards:
 
+.Retraining node dashboards
 [cols="2,3,2",options="header"]
 |===
 | Dashboard | URL | Credentials
@@ -158,6 +160,6 @@ Password: `minio123`
 [#next-steps]
 == Next steps
 
-Now that you understand the technical architecture and have access to all dashboards, you're ready to begin the hands-on modules.
+Now that you understand the technical architecture and know how to access all dashboards, you're ready to begin the hands-on modules.
 
 **Begin the hands-on exercises:** xref:03-module-01-transportation-robot.adoc[Module 1: Transportation robot]

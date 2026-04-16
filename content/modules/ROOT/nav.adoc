@@ -1,6 +1,8 @@
 * xref:index.adoc[Workshop Overview: AI Lifecycle for Edge Computing]
 * xref:01-overview.adoc[Introduction: Battery Health Monitoring for Transportation Robots]
+
 * xref:02-details.adoc[Technical Details: Architecture and Components Overview]
+* xref:03-details.adoc#dashboards[Dashboard access control center]
 
 * xref:03-module-01-transportation-robot.adoc[Module 1: Setting Up the Transportation Robot on MicroShift]
 ** xref:03-module-01-transportation-robot.adoc#connect-robot[1.1 Connect and Check the Robot Edge Infrastructure]

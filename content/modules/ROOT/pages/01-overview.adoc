@@ -1,4 +1,4 @@
-= Introduction
+= Introduction: Battery Health Monitoring for Transportation Robots
 
 This hands-on workshop showcases how the integration of AI and edge computing can effectively address specific customer use cases and fit seamlessly into various real-world scenarios. The demo will highlight the practical application of AI in resource-constrained environments, making it essential to use lightweight topologies and platforms such as Single Node OpenShift (SNO) and Red Hat Device Edge.
 
@@ -21,13 +21,13 @@ Batteries are the heart of these machines. An unexpected battery failure can lea
 [#the-solution]
 == Our AI-powered solution
 
-As systems engineers for **RedBot Logistics**, we've developed an end-to-end AI solution that covers 2 scenarios:
+As systems engineers for **RedBot Logistics**, we've developed an end-to-end AI solution that involves two architectures:
 
 === Battery monitoring system
 
 Each factory robot runs an application that monitors battery health during operational routes throughout the facility. This application:
 
-* Displays real-time telemetry data (voltage, temperature, charge cycles, operational distance) via a dashboard accessible from the plant control center
+* Displays real-time telemetry data (voltage, temperature, operational distance, etc) via a dashboard accessible from the plant control center
 * Uses AI models to detect early signs of battery stress
 * Predicts potential battery failure before it happens
 * Triggers alerts to maintenance teams
