@@ -30,7 +30,7 @@ Machine learning workflows involve multiple steps that must execute in sequence:
 
 === Review pipeline server deployment
 
-. In the **Red Hat OpenShift AI (RHOAI) Dashboard**, navigate to the `ai-edge-project` project
+. In the **Red Hat OpenShift AI Dashboard**, navigate to the `ai-edge-project` project
 . Click the **Pipelines** tab
 . Verify the pipeline server is pre-configured and shows _Import pipeline_
 
@@ -75,8 +75,6 @@ image::07-module-05_pipeline-server-config.png[Review pipeline server configurat
 === Verify
 
 ✓ **Pipelines** tab is accessible in `ai-edge-project`
-
-✓ Pipeline server shows as configured
 
 ✓ Pipeline server allows to import pipelines
 
@@ -226,7 +224,7 @@ link:https://minio-microshift-001.{ai_edge_apps_domain}[https://minio-microshift
 +
 . Navigate to the `inference` bucket
 . Check model files in `stress-detection/1/` and `time-to-failure/1/`
-. File timestamps show recent updates (within last few minutes)
+. File timestamps show recent updates
 
 === Verify
 
@@ -234,7 +232,7 @@ link:https://minio-microshift-001.{ai_edge_apps_domain}[https://minio-microshift
 
 ✓ Pipeline run shows "Succeeded" status in the Runs tab
 
-✓ Run duration is reasonable (typically ~3-5 minutes)
+✓ File timestamps show recent updates (in case the new models outperform the existing ones)
 
 [#schedule-automation]
 == Exercise 5.3: Schedule pipeline automation
@@ -245,7 +243,7 @@ Scheduled pipelines enable fully automated model retraining. Configure the pipel
 
 Configure the pipeline to execute automatically every 10 minutes.
 
-. In the **Red Hat OpenShift AI (RHOAI) Dashboard**, navigate to the **Pipeline definitions** tab
+. In the **Red Hat OpenShift AI Dashboard**, navigate to the **Pipeline definitions** tab
 . Locate the `Model Retraining` pipeline
 . Click the **three dots** (⋮) at the far right of the pipeline row
 +

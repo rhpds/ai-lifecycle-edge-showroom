@@ -180,7 +180,7 @@ image::06-module-04_query-models.png[JupyterLab showing query_models.ipynb noteb
 
 The notebook contains code to test the Stress Detection endpoint.
 
-. Verify the endpoint URL in the first cell**
+. Verify the endpoint URL in the first cell
 +
 [source,python,options="wrap",role="execute",subs="attributes+"]
 ----
