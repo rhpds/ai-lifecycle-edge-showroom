@@ -105,7 +105,7 @@ ssh {ai_edge_bastion_username}@{ai_edge_bastion_hostname} -p {ai_edge_bastion_po
 
 Then connect to robot VM:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-wetty",subs="attributes+"]
 ----
 virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
