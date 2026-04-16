@@ -88,7 +88,7 @@ NOTE: This section is provided for your convenience, allowing quick access to an
 
 Access the robot infrastructure via bastion host:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 ssh {ai_edge_bastion_username}@{ai_edge_bastion_hostname} -p {ai_edge_bastion_port}
 ----
@@ -105,7 +105,7 @@ ssh {ai_edge_bastion_username}@{ai_edge_bastion_hostname} -p {ai_edge_bastion_po
 
 Then connect to robot VM:
 
-[source,sh,role="send-to-wetty",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
