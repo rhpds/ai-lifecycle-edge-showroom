@@ -141,7 +141,7 @@ Beyond the core MicroShift functionality, we can see that additional services ar
 [#deploy-minio]
 == Exercise 1.2: MinIO storage deployment
 
-MinIO provides S3-compatible object storage for AI models on the robot. The `inference` bucket stores 2 AI models:
+MinIO provides S3-compatible object storage for AI models on the robot. The `inference` bucket stores two AI models:
 
 * **Stress Detection** - identifies battery stress conditions
 * **Time to Failure** - predicts remaining battery life
@@ -221,7 +221,7 @@ NOTE: Press `Ctrl+C` to exit when pods show `Running` and `Completed` status.
 
 Once deployed, access the MinIO web console:
 
-. Open the MinIO dashboard and login with credential:
+. Open the MinIO dashboard and login with the provided credentials:
 +
 [subs="attributes,macros"]
 ----
@@ -239,7 +239,7 @@ link:https://minio-microshift-001.{ai_edge_apps_domain}[https://minio-microshift
 | `minio123`
 |===
 
-. Verify the `inference` bucket contains 2 directories:
+. Verify the `inference` bucket contains two directories:
 +
 * `stress-detection/1/` - Baseline Stress Detection model files (`.xml`, `.bin`)
 * `time-to-failure/1/` - Baseline Time to Failure model files (`.xml`, `.bin`)
@@ -263,7 +263,7 @@ The inference server loads AI models from MinIO and exposes REST API endpoints f
 
 In the terminal, type the following to deploy the inference server GitOps application:
 
-[source,bash, options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -298,7 +298,7 @@ This deploys:
 
 Watch the deployment:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 watch oc get pods -n inference
 ----
@@ -311,7 +311,7 @@ Verify that models are loaded and responding to inference requests.
 
 **Test stress detection model:**
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 curl -s -X POST http://$(oc get pod -n inference -l app=isvc.stress-detection-predictor -o jsonpath='{.items[0].status.podIP}'):8888/v2/models/stress-detection/infer \
      -H "Content-Type: application/json" \
@@ -323,7 +323,7 @@ Expected output: `STRESSED` or `NORMAL`
 
 **Test time to failure model:**
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 curl -s -X POST http://$(oc get pod -n inference -l app=isvc.time-to-failure-predictor -o jsonpath='{.items[0].status.podIP}'):8888/v2/models/time-to-failure/infer \
      -H "Content-Type: application/json" \
@@ -352,7 +352,7 @@ The Battery Monitoring System (BMS) brings together all robot components to prov
 
 In the terminal, type the following to deploy the complete Battery Monitoring System application:
 
-[source,bash, options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -403,7 +403,7 @@ This deploys:
 
 Monitor the deployment:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 watch oc get pods -n battery-demo
 ----
