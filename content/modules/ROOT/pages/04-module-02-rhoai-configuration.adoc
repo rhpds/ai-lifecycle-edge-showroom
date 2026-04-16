@@ -21,7 +21,7 @@ The Red Hat OpenShift AI operator is installed and pre-configured in the Single 
 
 Access the Red Hat OpenShift AI dashboard:
 
-. Open the RHOAI dashboard and login with credentials:
+. Navigate to the OpenShift AI tab or open the dashboard URL provided below and login with the OpenShift credentials:
 +
 [subs="attributes,macros"]
 ----
@@ -59,7 +59,7 @@ Data Science Projects in Red Hat OpenShift AI organize users and AI/ML resources
 
 . Ensure you're in the **Red Hat OpenShift AI Dashboard**
 . Click **Projects** in the left navigation
-. Locate and click on `ai-edge-project` that has been pre-created
+. Locate and click on the `ai-edge-project` that has been pre-created
 
 image::04-module-02_project.png[AI & Edge Data Science Project,link=self,window=blank,width=700]
 
@@ -88,7 +88,7 @@ These tabs organize all resources for the battery monitoring AI solution.
 [#review-dataconnection]
 == Exercise 2.3: Review data connection
 
-Data connections link Red Hat OpenShift AI to external object storage. The `vehicle-models` connection provides access to the robot's MinIO storage where AI models are stored. The connection bridges the SNO training environment and robot's edge storage.
+Data connections link Red Hat OpenShift AI to external object storage. The `vehicle-models` connection provides access to the robot's MinIO instance where the AI models are stored. This connection bridges the SNO training environment and robot's edge storage.
 
 === Review the vehicle-models data connection
 
@@ -110,7 +110,7 @@ The `vehicle-models` connection is configured with:
 
 | Connection type
 | S3 compatible object storage - v1
-| Standard S3 protocol compatible with MinIO
+| `Standard S3 protocol compatible with MinIO`
 
 | Connection name
 | `vehicle-models`
@@ -139,7 +139,7 @@ The `vehicle-models` connection is configured with:
 
 **Close** (x) the configuration view
 
-Data connections are stored as Kubernetes Secrets. The secret contains base64-encoded S3 credentials:
+Data connections are stored as Kubernetes Secrets containing:
 
 * `AWS_ACCESS_KEY_ID` - MinIO username
 * `AWS_SECRET_ACCESS_KEY` - MinIO password
