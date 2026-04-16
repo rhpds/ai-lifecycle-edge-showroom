@@ -290,9 +290,9 @@ This deploys:
 
 * **Namespace** - `inference` namespace for model serving
 * **ServingRuntime** - Defines the model server container (OpenVINO Model Server)
-* **Service Account:** Provides S3 credentials to access MinIO storage
+* **Service Account** - Provides S3 credentials to access MinIO storage
 * **Service & Routes** - External access to inference endpoints
-* **InferenceServices** (2): Connects models from MinIO to the ServingRuntime
+* **InferenceServices** (2) - Connects models from MinIO to the ServingRuntime
 ** `stress-detection` - Loads stress detection model from MinIO
 ** `time-to-failure` - Loads time-to-failure model from MinIO
 
@@ -429,7 +429,7 @@ Also you can access the InfluxDB dashboard where the sensor data is collected an
 
 Access the InfluxDB dashboard to see historical sensor data:
 
-. Open the InfluxDB dashboard and login with credentials:
+. Open the InfluxDB dashboard and login using the credentials provided:
 +
 [subs="attributes,macros"]
 ----
