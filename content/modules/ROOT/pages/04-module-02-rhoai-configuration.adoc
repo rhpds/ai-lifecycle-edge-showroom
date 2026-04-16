@@ -109,8 +109,8 @@ The `vehicle-models` connection is configured with:
 | Parameter | Value | Purpose
 
 | Connection type
-| S3 compatible object storage - v1
-| `Standard S3 protocol compatible with MinIO`
+| `S3 compatible object storage - v1`
+| Standard S3 protocol compatible with MinIO
 
 | Connection name
 | `vehicle-models`
