@@ -52,14 +52,14 @@ image::05-module-03_workbench.png[Workbenches tab showing model-training workben
 | 2 CPUs and 4 GiB of memory
 |===
 
-. Connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot
+. Keep scrolling until you reach the *Connections* section. Here we will connect the Workbench to the existing DataConnection that contains the credentials to access the MinIO instance in the transportation robot
 
 .. Select **Attach existing connections**
 .. Verify that the `vehicle-models` connection is selected
 .. Click **Attach**
 .. To apply the configuration, click **Update workbench**
 
-. Click **model-training** to access the model training workbench
+. Click **model-training** to access the model training JupyterLab environment
 
 image::05-module-03_jupyterlab.png[JupyterLab dashboard,link=self,window=blank,width=700]
 
@@ -119,7 +119,7 @@ Run the training notebooks to train both battery health prediction models. The n
 ** **04_predict-stress.ipynb** - Validates the Stress Detection model performance with new data
 ** **05_bms-ttf-training.ipynb** - Trains the Time to Failure model and saves it locally
 ** **06_predict-ttf.ipynb** - Validates the Time to Failure model performance with new data
-** **07_save-models.ipynb** - Store in MinIO instance in MicroShift for distribution to robots
+** **07_save-models.ipynb** - Store the new models in the MicroShift's MinIO instance
 
 . At this point, you can open each Notebook in order and follow the instructions contained. Pay attention to some of the variables used during the execution. You will need to replace in the first notebook the InfluxDB URL with yours:
 +
