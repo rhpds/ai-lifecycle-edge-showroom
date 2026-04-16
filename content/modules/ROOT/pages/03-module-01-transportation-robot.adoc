@@ -22,7 +22,7 @@ Access the robot infrastructure and verify MicroShift is running.
 
 Establish an SSH connection to the bastion host:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 ssh {ai_edge_bastion_username}@{ai_edge_bastion_hostname} -p {ai_edge_bastion_port}
 ----
@@ -40,7 +40,7 @@ NOTE: If a message regarding the authenticity of the host is displayed, type `ye
 
 Once connected to the bastion, access the transportation robot's MicroShift VM:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/lab-user/.ssh/microshift-001
 ----
@@ -49,7 +49,7 @@ virtctl ssh cloud-user@vmi/microshift -n microshift-001 --identity-file=/home/la
 
 Check that MicroShift is running:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 sudo systemctl status microshift
 ----
@@ -66,7 +66,7 @@ NOTE: Press `Ctrl+C` to exit the log view.
 
 Additionally you can check if all the MicroShift pods are Running:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 oc get pods -A
 ----
@@ -152,7 +152,7 @@ Both models are stored in OpenVINO IR format (`.xml` and `.bin` files) in versio
 
 In the terminal, type the following to create the default project for GitOps applications:
 
-[source,bash, options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 kind: AppProject
@@ -176,7 +176,7 @@ EOF
 
 In the terminal, type the following to deploy MinIO by creating a GitOps Application:
 
-[source,bash, options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 oc apply -f - <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -210,7 +210,7 @@ This deploys:
 
 Watch the deployment:
 
-[source,bash,options="wrap",role="execute",subs="attributes+"]
+[source,sh,role="send-to-terminal",subs="attributes+"]
 ----
 watch oc get pods -n minio
 ----
