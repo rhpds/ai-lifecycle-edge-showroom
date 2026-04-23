@@ -7,7 +7,7 @@
     # ========================================
     # Exercise 5.1: Review pipeline infrastructure
     # ========================================
-    - name: "✓ Check DSPApplication exists"
+    - name: "Check DSPApplication exists"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: datasciencepipelinesapplications.opendatahub.io/v1
@@ -16,7 +16,7 @@
       register: r_dsp
       failed_when: false
 
-    - name: "✓ Check pipeline server pods are running"
+    - name: "Check pipeline server pods are running"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
@@ -27,52 +27,90 @@
       failed_when: false
 
     # ========================================
-    # Exercise 5.2: Check WorkflowTemplate and first run
+    # Exercise 5.2: Check pipeline uploaded and first run created
     # ========================================
-    - name: "✓ Check WorkflowTemplate exists"
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        api_version: argoproj.io/v1alpha1
-        kind: WorkflowTemplate
-        name: model-retraining
-        namespace: ai-edge-project
-      register: r_workflow_template
+    - name: "Get cluster domain for KFP API URL"
+      ansible.builtin.shell: |
+        echo "${DOMAIN}"
+      register: r_domain
+      changed_when: false
       failed_when: false
 
-    - name: "✓ Check first Workflow run exists"
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        api_version: argoproj.io/v1alpha1
-        kind: Workflow
-        namespace: ai-edge-project
-        label_selectors:
-          - pipelines.kubeflow.org/kfp_sdk_version
-      register: r_first_run_workflows
+    - name: "Set KFP API URL"
+      ansible.builtin.set_fact:
+        kfp_api_url: "https://ds-pipeline-dspa-ai-edge-project.{{ r_domain.stdout }}"
+      when: r_domain.stdout | length > 0
+
+    - name: "Get OAuth token for KFP API"
+      ansible.builtin.command: oc whoami -t
+      register: r_oauth_token
+      changed_when: false
       failed_when: false
 
-    # ========================================
-    # Exercise 5.3: Check scheduled runs
-    # ========================================
-    - name: "✓ Check CronWorkflow for scheduled-run exists"
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        api_version: argoproj.io/v1alpha1
-        kind: CronWorkflow
-        name: scheduled-run
-        namespace: ai-edge-project
-      register: r_cronworkflow
+    - name: "Check pipeline uploaded to KFP API"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/pipelines?filter=%7B%22predicates%22%3A%5B%7B%22key%22%3A%22display_name%22%2C%22operation%22%3A%22EQUALS%22%2C%22string_value%22%3A%22Model%20retraining%22%7D%5D%7D"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+        validate_certs: false
+        return_content: true
+      register: r_kfp_pipelines
       failed_when: false
+      when:
+        - kfp_api_url is defined
+        - r_oauth_token.stdout | length > 0
+
+    - name: "Check first pipeline run exists and succeeded in KFP"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/runs?filter=%7B%22predicates%22%3A%5B%7B%22key%22%3A%22display_name%22%2C%22operation%22%3A%22EQUALS%22%2C%22string_value%22%3A%22First%20run%22%7D%5D%7D"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+        validate_certs: false
+        return_content: true
+      register: r_kfp_runs
+      failed_when: false
+      when:
+        - kfp_api_url is defined
+        - r_oauth_token.stdout | length > 0
+
+    # ========================================
+    # Exercise 5.3: Check scheduled recurring run
+    # ========================================
+    - name: "Check scheduled recurring run exists in KFP"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/recurringruns?filter=%7B%22predicates%22%3A%5B%7B%22key%22%3A%22display_name%22%2C%22operation%22%3A%22EQUALS%22%2C%22string_value%22%3A%22Scheduled%20run%22%7D%5D%7D"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+        validate_certs: false
+        return_content: true
+      register: r_kfp_recurring
+      failed_when: false
+      when:
+        - kfp_api_url is defined
+        - r_oauth_token.stdout | length > 0
 
     # ========================================
     # Collect all check results
     # ========================================
+    - name: Extract first run state
+      ansible.builtin.set_fact:
+        first_run_state: "{{ r_kfp_runs.json.runs[0].state | default('NOT_FOUND') }}"
+      when:
+        - r_kfp_runs is defined
+        - r_kfp_runs.json is defined
+        - r_kfp_runs.json.runs is defined
+        - r_kfp_runs.json.runs | length > 0
+
     - name: Collect all validation results
       ansible.builtin.set_fact:
         _task1_ok: "{{ r_dsp.resources | length > 0 }}"
         _task2_ok: "{{ (r_pipeline_pods.resources | length > 0) and (r_pipeline_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0) }}"
-        _task3_ok: "{{ r_workflow_template.resources | length > 0 }}"
-        _task4_ok: "{{ r_first_run_workflows.resources | length > 0 }}"
-        _task5_ok: "{{ r_cronworkflow.resources | length > 0 }}"
+        _task3_ok: "{{ r_kfp_pipelines is defined and r_kfp_pipelines.json is defined and r_kfp_pipelines.json.pipelines is defined and r_kfp_pipelines.json.pipelines | length > 0 }}"
+        _task4_ok: "{{ r_kfp_runs is defined and r_kfp_runs.json is defined and r_kfp_runs.json.runs is defined and r_kfp_runs.json.runs | length > 0 and first_run_state is defined and first_run_state == 'SUCCEEDED' }}"
+        _task5_ok: "{{ r_kfp_recurring is defined and r_kfp_recurring.json is defined and r_kfp_recurring.json.recurringRuns is defined and r_kfp_recurring.json.recurringRuns | length > 0 }}"
 
     - name: Validate all tasks
       validation_check:
@@ -80,16 +118,17 @@
         pass_msg: |
           ✅ Exercise 5.1: Pipeline server is configured (DSPApplication exists)
           ✅ Exercise 5.1: Pipeline server pods are running ({{ r_pipeline_pods.resources | length }} pod(s))
-          ✅ Exercise 5.2: WorkflowTemplate created (model-retraining)
-          ✅ Exercise 5.2: First Workflow run created ({{ r_first_run_workflows.resources | length }} workflow(s))
-          ✅ Exercise 5.3: scheduled-run CronWorkflow configured (every 10 minutes)
+          ✅ Exercise 5.2: Pipeline "Model retraining" uploaded to KFP API
+          ✅ Exercise 5.2: First run completed successfully (state: {{ first_run_state | default('UNKNOWN') }})
+          ✅ Exercise 5.3: Scheduled recurring run configured (every 10 minutes)
 
           ⚠️ Note: Manual verification recommended for:
-            - Monitor workflow execution in Argo Workflows UI or RHOAI Dashboard
-            - Verify models uploaded to MinIO after successful workflow runs
+            - Monitor workflow execution in RHOAI Dashboard > Pipelines > Runs
+            - Verify models uploaded to MinIO after successful runs
+            - Check scheduled run executions in RHOAI Dashboard > Pipelines > Schedules
         error_msg: |
           {{ '✅' if _task1_ok else '❌' }} Exercise 5.1: Pipeline server is configured
           {{ '✅' if _task2_ok else '❌' }} Exercise 5.1: Pipeline server pods are running
-          {{ '✅' if _task3_ok else '❌' }} Exercise 5.2: WorkflowTemplate created ({{ r_workflow_template.resources | length }})
-          {{ '✅' if _task4_ok else '❌' }} Exercise 5.2: First Workflow run created ({{ r_first_run_workflows.resources | length }})
-          {{ '✅' if _task5_ok else '❌' }} Exercise 5.3: CronWorkflow scheduled
+          {{ '✅' if _task3_ok else '❌' }} Exercise 5.2: Pipeline "Model retraining" uploaded (found: {{ r_kfp_pipelines.json.pipelines | length if (r_kfp_pipelines is defined and r_kfp_pipelines.json is defined and r_kfp_pipelines.json.pipelines is defined) else 0 }})
+          {{ '✅' if _task4_ok else '❌' }} Exercise 5.2: First run completed successfully (state: {{ first_run_state | default('NOT_FOUND') }}, expected: SUCCEEDED)
+          {{ '✅' if _task5_ok else '❌' }} Exercise 5.3: Scheduled recurring run configured (found: {{ r_kfp_recurring.json.recurringRuns | length if (r_kfp_recurring is defined and r_kfp_recurring.json is defined and r_kfp_recurring.json.recurringRuns is defined) else 0 }})

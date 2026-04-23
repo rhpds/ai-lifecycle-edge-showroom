@@ -4,200 +4,208 @@
   hosts: localhost
   gather_facts: false
   vars:
-    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
     pipeline_url: "https://raw.githubusercontent.com/rhpds/ai-lifecycle-edge-automation/refs/heads/main/notebooks/pipelines/model-retraining.yaml"
-    influxdb_url: "https://influx-db-microshift-001.{{ apps_domain }}"
 
   tasks:
-    # ========================================
-    # Exercise 5.2: Import pipeline as Argo Workflow
+    - name: "Get cluster domain"
+      ansible.builtin.shell: |
+        echo "${DOMAIN}"
+      register: r_domain
+      changed_when: false
+      failed_when: r_domain.stdout | length == 0
+
+    - name: "Set URLs from cluster domain"
+      ansible.builtin.set_fact:
+        kfp_api_url: "https://ds-pipeline-dspa-ai-edge-project.{{ r_domain.stdout }}"
+        influxdb_url: "https://influx-db-microshift-001.{{ r_domain.stdout }}"
 
     # ========================================
+    # Exercise 5.2: Import pipeline via KFP API
+    # ========================================
+    - name: "Exercise 5.2: Get OAuth token for KFP API"
+      ansible.builtin.command: oc whoami -t
+      register: r_oauth_token
+      changed_when: false
+
+    - name: "Exercise 5.2: Check if pipeline already exists"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/pipelines?filter=%7B%22predicates%22%3A%5B%7B%22key%22%3A%22display_name%22%2C%22operation%22%3A%22EQUALS%22%2C%22string_value%22%3A%22Model%20retraining%22%7D%5D%7D"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+        validate_certs: false
+        return_content: true
+      register: r_existing_pipelines
+      failed_when: false
+
+    - name: "Exercise 5.2: Extract existing pipeline ID if present"
+      ansible.builtin.set_fact:
+        pipeline_id: "{{ r_existing_pipelines.json.pipelines[0].pipeline_id }}"
+      when:
+        - r_existing_pipelines.json is defined
+        - r_existing_pipelines.json.pipelines is defined
+        - r_existing_pipelines.json.pipelines | length > 0
+
     - name: "Exercise 5.2: Download pipeline YAML"
       ansible.builtin.uri:
         url: "{{ pipeline_url }}"
         return_content: true
       register: r_pipeline_yaml
+      when: pipeline_id is not defined
 
-    - name: "Exercise 5.2: Import pipeline as Argo WorkflowTemplate"
-      kubernetes.core.k8s:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        state: present
-        definition:
-          apiVersion: argoproj.io/v1alpha1
-          kind: WorkflowTemplate
-          metadata:
-            name: model-retraining
-            namespace: ai-edge-project
-            labels:
-              pipelines.kubeflow.org/kfp_sdk_version: 1.8.22
-          spec:
-            serviceAccountName: pipeline-runner-dspa
-            entrypoint: model-retraining
-            arguments:
-              parameters:
-                - name: aws_access_key_id
-                  value: "minio"
-                - name: aws_s3_bucket
-                  value: "inference"
-                - name: aws_s3_endpoint
-                  value: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
-                - name: aws_secret_access_key
-                  value: "minio123"
-                - name: influxdb_bucket
-                  value: "bms"
-                - name: influxdb_org
-                  value: "redhat"
-                - name: influxdb_token
-                  value: "admin_token"
-                - name: influxdb_url
-                  value: "{{ influxdb_url }}"
-            templates:
-              - name: model-retraining
-                dag:
-                  tasks:
-                    - name: run-pipeline
-                      template: kfp-launcher
-                      arguments:
-                        parameters:
-                          - name: pipeline
-                            value: "{{ r_pipeline_yaml.content | b64encode }}"
-                          - name: aws_access_key_id
-                            value: "{{ '{{' }}workflow.parameters.aws_access_key_id{{ '}}' }}"
-                          - name: aws_s3_bucket
-                            value: "{{ '{{' }}workflow.parameters.aws_s3_bucket{{ '}}' }}"
-                          - name: aws_s3_endpoint
-                            value: "{{ '{{' }}workflow.parameters.aws_s3_endpoint{{ '}}' }}"
-                          - name: aws_secret_access_key
-                            value: "{{ '{{' }}workflow.parameters.aws_secret_access_key{{ '}}' }}"
-                          - name: influxdb_bucket
-                            value: "{{ '{{' }}workflow.parameters.influxdb_bucket{{ '}}' }}"
-                          - name: influxdb_org
-                            value: "{{ '{{' }}workflow.parameters.influxdb_org{{ '}}' }}"
-                          - name: influxdb_token
-                            value: "{{ '{{' }}workflow.parameters.influxdb_token{{ '}}' }}"
-                          - name: influxdb_url
-                            value: "{{ '{{' }}workflow.parameters.influxdb_url{{ '}}' }}"
-              - name: kfp-launcher
-                inputs:
-                  parameters:
-                    - name: pipeline
-                    - name: aws_access_key_id
-                    - name: aws_s3_bucket
-                    - name: aws_s3_endpoint
-                    - name: aws_secret_access_key
-                    - name: influxdb_bucket
-                    - name: influxdb_org
-                    - name: influxdb_token
-                    - name: influxdb_url
-                container:
-                  image: registry.redhat.io/rhoai/odh-ml-pipelines-api-server-rhel8:v2.9
-                  command:
-                    - sh
-                    - -c
-                  args:
-                    - echo "{{ '{{' }}inputs.parameters.pipeline{{ '}}' }}" | base64 -d | python3 -
-                  env:
-                    - name: AWS_ACCESS_KEY_ID
-                      value: "{{ '{{' }}inputs.parameters.aws_access_key_id{{ '}}' }}"
-                    - name: AWS_S3_BUCKET
-                      value: "{{ '{{' }}inputs.parameters.aws_s3_bucket{{ '}}' }}"
-                    - name: AWS_S3_ENDPOINT
-                      value: "{{ '{{' }}inputs.parameters.aws_s3_endpoint{{ '}}' }}"
-                    - name: AWS_SECRET_ACCESS_KEY
-                      value: "{{ '{{' }}inputs.parameters.aws_secret_access_key{{ '}}' }}"
-                    - name: INFLUXDB_BUCKET
-                      value: "{{ '{{' }}inputs.parameters.influxdb_bucket{{ '}}' }}"
-                    - name: INFLUXDB_ORG
-                      value: "{{ '{{' }}inputs.parameters.influxdb_org{{ '}}' }}"
-                    - name: INFLUXDB_TOKEN
-                      value: "{{ '{{' }}inputs.parameters.influxdb_token{{ '}}' }}"
-                    - name: INFLUXDB_URL
-                      value: "{{ '{{' }}inputs.parameters.influxdb_url{{ '}}' }}"
-      register: r_workflow_template
+    - name: "Exercise 5.2: Upload pipeline to KFP API"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/pipelines/upload?name=Model%20retraining"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+        body_format: form-multipart
+        body:
+          uploadfile:
+            content: "{{ r_pipeline_yaml.content }}"
+            filename: "model-retraining.yaml"
+        validate_certs: false
+        status_code: [200, 201]
+        return_content: true
+      register: r_pipeline_upload
+      when: pipeline_id is not defined
+      failed_when: false
 
-    - name: "Exercise 5.2: Create first pipeline run as Argo Workflow"
-      kubernetes.core.k8s:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        state: present
-        definition:
-          apiVersion: argoproj.io/v1alpha1
-          kind: Workflow
-          metadata:
-            generateName: first-run-
-            namespace: ai-edge-project
-            labels:
-              pipelines.kubeflow.org/kfp_sdk_version: 1.8.22
-          spec:
-            workflowTemplateRef:
-              name: model-retraining
-            arguments:
-              parameters:
-                - name: aws_access_key_id
-                  value: "minio"
-                - name: aws_s3_bucket
-                  value: "inference"
-                - name: aws_s3_endpoint
-                  value: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
-                - name: aws_secret_access_key
-                  value: "minio123"
-                - name: influxdb_bucket
-                  value: "bms"
-                - name: influxdb_org
-                  value: "redhat"
-                - name: influxdb_token
-                  value: "admin_token"
-                - name: influxdb_url
-                  value: "{{ influxdb_url }}"
-      register: r_workflow_run
+    - name: "Exercise 5.2: Extract pipeline ID from upload response"
+      ansible.builtin.set_fact:
+        pipeline_id: "{{ r_pipeline_upload.json.pipeline_id }}"
+      when:
+        - r_pipeline_upload is defined
+        - r_pipeline_upload.json is defined
+        - r_pipeline_upload.json.pipeline_id is defined
+
+    - name: "Exercise 5.2: Fail if pipeline_id is still not defined"
+      ansible.builtin.fail:
+        msg: "Pipeline upload failed or pipeline_id not returned. Upload response: {{ r_pipeline_upload | default('skipped') }}"
+      when: pipeline_id is not defined
+
+    - name: "Exercise 5.2: Get pipeline version ID"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/pipelines/{{ pipeline_id }}/versions"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+        validate_certs: false
+        return_content: true
+      register: r_pipeline_versions
+      failed_when: false
+
+    - name: "Exercise 5.2: Extract pipeline version ID"
+      ansible.builtin.set_fact:
+        pipeline_version_id: "{{ r_pipeline_versions.json.pipeline_versions[0].pipeline_version_id }}"
+      when:
+        - r_pipeline_versions.json is defined
+        - r_pipeline_versions.json.pipeline_versions is defined
+        - r_pipeline_versions.json.pipeline_versions | length > 0
+
+    - name: "Exercise 5.2: Create first pipeline run"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/runs"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          display_name: "First run"
+          pipeline_version_reference:
+            pipeline_id: "{{ pipeline_id }}"
+          runtime_config:
+            parameters:
+              aws_access_key_id: "minio"
+              aws_s3_bucket: "inference"
+              aws_s3_endpoint: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
+              aws_secret_access_key: "minio123"
+              influxdb_bucket: "bms"
+              influxdb_org: "redhat"
+              influxdb_token: "admin_token"
+              influxdb_url: "{{ influxdb_url }}"
+        validate_certs: false
+        status_code: [200, 201]
+      register: r_pipeline_run
+      failed_when: false
 
     # ========================================
-    # Exercise 5.3: Schedule pipeline automation
+    # Exercise 5.3: Schedule pipeline automation via KFP recurring run
     # ========================================
-    - name: "Exercise 5.3: Create scheduled pipeline run as Argo CronWorkflow"
-      kubernetes.core.k8s:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        state: present
-        definition:
-          apiVersion: argoproj.io/v1alpha1
-          kind: CronWorkflow
-          metadata:
-            name: scheduled-run
-            namespace: ai-edge-project
-            labels:
-              pipelines.kubeflow.org/kfp_sdk_version: 1.8.22
-          spec:
-            schedule: "*/10 * * * *"
-            concurrencyPolicy: "Allow"
-            startingDeadlineSeconds: 0
-            successfulJobsHistoryLimit: 3
-            failedJobsHistoryLimit: 3
-            workflowSpec:
-              serviceAccountName: pipeline-runner-dspa
-              workflowTemplateRef:
-                name: model-retraining
-              arguments:
-                parameters:
-                  - name: aws_access_key_id
-                    value: "minio"
-                  - name: aws_s3_bucket
-                    value: "inference"
-                  - name: aws_s3_endpoint
-                    value: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
-                  - name: aws_secret_access_key
-                    value: "minio123"
-                  - name: influxdb_bucket
-                    value: "bms"
-                  - name: influxdb_org
-                    value: "redhat"
-                  - name: influxdb_token
-                    value: "admin_token"
-                  - name: influxdb_url
-                    value: "{{ influxdb_url }}"
-      register: r_cronworkflow
+    - name: "Exercise 5.3: Check if recurring run already exists"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/recurringruns?filter=%7B%22predicates%22%3A%5B%7B%22key%22%3A%22display_name%22%2C%22operation%22%3A%22EQUALS%22%2C%22string_value%22%3A%22Scheduled%20run%22%7D%5D%7D"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+        validate_certs: false
+        return_content: true
+      register: r_existing_recurring
+      failed_when: false
 
-    - name: "✅ Module 5 solve completed"
+    - name: "Exercise 5.3: Extract existing recurring run ID if present"
+      ansible.builtin.set_fact:
+        recurring_run_id: "{{ r_existing_recurring.json.recurringRuns[0].recurring_run_id }}"
+      when:
+        - r_existing_recurring.json is defined
+        - r_existing_recurring.json.recurringRuns is defined
+        - r_existing_recurring.json.recurringRuns | length > 0
+
+    - name: "Exercise 5.3: Create scheduled pipeline recurring run"
+      ansible.builtin.uri:
+        url: "{{ kfp_api_url }}/apis/v2beta1/recurringruns"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ r_oauth_token.stdout }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          display_name: "Scheduled run"
+          pipeline_version_reference:
+            pipeline_id: "{{ pipeline_id }}"
+            pipeline_version_id: "{{ pipeline_version_id | default(omit) }}"
+          runtime_config:
+            parameters:
+              aws_access_key_id: "minio"
+              aws_s3_bucket: "inference"
+              aws_s3_endpoint: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
+              aws_secret_access_key: "minio123"
+              influxdb_bucket: "bms"
+              influxdb_org: "redhat"
+              influxdb_token: "admin_token"
+              influxdb_url: "{{ influxdb_url }}"
+          trigger:
+            periodic_schedule:
+              interval_second: "600"
+          max_concurrency: "10"
+          mode: "ENABLE"
+        validate_certs: false
+        status_code: [200, 201]
+        return_content: true
+      register: r_recurring_run
+      when: recurring_run_id is not defined
+      failed_when: false
+
+    - name: "Exercise 5.3: Extract recurring run ID from creation response"
+      ansible.builtin.set_fact:
+        recurring_run_id: "{{ r_recurring_run.json.recurring_run_id }}"
+      when:
+        - r_recurring_run is defined
+        - r_recurring_run.json is defined
+        - r_recurring_run.json.recurring_run_id is defined
+
+    - name: "Exercise 5.3: Fail if recurring_run_id is still not defined"
+      ansible.builtin.fail:
+        msg: "Recurring run creation failed. Response: {{ r_recurring_run | default('skipped') }}"
+      when: recurring_run_id is not defined
+
+    - name: "Module 5 solve completed"
       ansible.builtin.debug:
         msg: |
-          ✅ Module 5: Pipeline automation configured
-          WorkflowTemplate created, first Workflow run submitted, and CronWorkflow scheduled for every 10 minutes.
+          Module 5: Pipeline automation configured
+          Pipeline ID: {{ pipeline_id | default('N/A') }}
+          Pipeline version ID: {{ pipeline_version_id | default('N/A') }}
+          First run created: {{ r_pipeline_run.json.run_id | default('N/A') if (r_pipeline_run is defined and r_pipeline_run.json is defined) else 'N/A' }}
+          Scheduled recurring run ID: {{ recurring_run_id | default('N/A') }}
+          Recurring run interval: weekly (604800 seconds)
