@@ -119,6 +119,7 @@
         namespace: ai-edge-project
       register: r_job_status
       until:
+        - r_job_status.resources is defined
         - r_job_status.resources | length > 0
         - r_job_status.resources[0].status.succeeded is defined
         - r_job_status.resources[0].status.succeeded > 0
