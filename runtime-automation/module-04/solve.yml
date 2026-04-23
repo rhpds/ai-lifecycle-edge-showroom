@@ -28,7 +28,6 @@
                 modelFormat:
                   name: openvino_ir
                   version: opset13
-                runtime: ovms-runtime
                 storage:
                   key: vehicle-models
                   path: stress-detection
@@ -44,6 +43,8 @@
       register: r_stress_check
       until:
         - r_stress_check.resources | length > 0
+        - r_stress_check.resources[0].status is defined
+        - r_stress_check.resources[0].status.conditions is defined
         - r_stress_check.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
       retries: 60
       delay: 10
@@ -73,7 +74,6 @@
                 modelFormat:
                   name: openvino_ir
                   version: opset13
-                runtime: ovms-runtime
                 storage:
                   key: vehicle-models
                   path: time-to-failure
@@ -89,6 +89,8 @@
       register: r_ttf_check
       until:
         - r_ttf_check.resources | length > 0
+        - r_ttf_check.resources[0].status is defined
+        - r_ttf_check.resources[0].status.conditions is defined
         - r_ttf_check.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
       retries: 60
       delay: 10
