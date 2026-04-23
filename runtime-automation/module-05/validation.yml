@@ -22,6 +22,7 @@
     - name: "✓ Check pipeline API route exists"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: route.openshift.io/v1
         kind: Route
         namespace: ai-edge-project
         label_selectors:

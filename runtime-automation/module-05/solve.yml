@@ -8,6 +8,7 @@
     pipeline_url: "https://raw.githubusercontent.com/rhpds/ai-lifecycle-edge-automation/refs/heads/main/notebooks/pipelines/model-retraining.yaml"
     pipeline_name: "Model retraining"
     influxdb_url: "https://influx-db-microshift-001.{{ apps_domain }}"
+    pipeline_id: ""
 
   tasks:
     # ========================================
@@ -16,16 +17,18 @@
     - name: "Get Data Science Pipelines API route"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: route.openshift.io/v1
         kind: Route
         namespace: ai-edge-project
         label_selectors:
           - app=ds-pipeline-dspa
       register: r_pipeline_route
-      failed_when: r_pipeline_route.resources | length == 0
+      failed_when: false
 
     - name: "Set pipeline API URL"
       ansible.builtin.set_fact:
         pipeline_api_url: "https://{{ r_pipeline_route.resources[0].spec.host }}"
+      when: r_pipeline_route.resources | length > 0
 
     # ========================================
     # Exercise 5.2: Import and execute pipeline
@@ -35,6 +38,7 @@
         url: "{{ pipeline_url }}"
         return_content: true
       register: r_pipeline_yaml
+      when: r_pipeline_route.resources | length > 0
 
     - name: "Exercise 5.2: Upload pipeline to RHOAI"
       ansible.builtin.uri:
@@ -50,11 +54,16 @@
         validate_certs: false
         status_code: [200, 201]
       register: r_pipeline_upload
+      when: r_pipeline_route.resources | length > 0
       failed_when: false
 
     - name: "Exercise 5.2: Get pipeline ID"
       ansible.builtin.set_fact:
-        pipeline_id: "{{ r_pipeline_upload.json.pipeline_id if r_pipeline_upload.json is defined else '' }}"
+        pipeline_id: "{{ r_pipeline_upload.json.pipeline_id | default('') }}"
+      when:
+        - r_pipeline_route.resources | length > 0
+        - r_pipeline_upload is defined
+        - r_pipeline_upload.json is defined
 
     - name: "Exercise 5.2: Create pipeline run"
       ansible.builtin.uri:
@@ -87,7 +96,10 @@
         validate_certs: false
         status_code: [200, 201]
       register: r_pipeline_run
-      when: pipeline_id != ''
+      when:
+        - r_pipeline_route.resources | length > 0
+        - pipeline_id is defined
+        - pipeline_id != ''
       failed_when: false
 
     # ========================================
@@ -129,7 +141,10 @@
         validate_certs: false
         status_code: [200, 201]
       register: r_scheduled_run
-      when: pipeline_id != ''
+      when:
+        - r_pipeline_route.resources | length > 0
+        - pipeline_id is defined
+        - pipeline_id != ''
       failed_when: false
 
     - name: "✅ Module 5 solve completed"
