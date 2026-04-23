@@ -24,6 +24,68 @@
     # ========================================
     # Exercise 4.1: Deploy Stress Detection model server
     # ========================================
+    - name: "Exercise 4.1: Create OpenVINO ServingRuntime for Stress Detection"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        state: present
+        definition:
+          apiVersion: serving.kserve.io/v1alpha1
+          kind: ServingRuntime
+          metadata:
+            name: stress-detection
+            namespace: ai-edge-project
+            labels:
+              opendatahub.io/dashboard: "true"
+            annotations:
+              openshift.io/display-name: "OpenVINO Model Server"
+              opendatahub.io/apiProtocol: REST
+              opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+              opendatahub.io/runtime-version: v2025.4
+              opendatahub.io/serving-runtime-scope: global
+              opendatahub.io/template-display-name: OpenVINO Model Server
+              opendatahub.io/template-name: kserve-ovms
+          spec:
+            multiModel: false
+            protocolVersions:
+              - v2
+              - grpc-v2
+            supportedModelFormats:
+              - autoSelect: true
+                name: openvino_ir
+                version: opset13
+              - name: onnx
+                version: "1"
+              - autoSelect: true
+                name: tensorflow
+                version: "1"
+              - autoSelect: true
+                name: tensorflow
+                version: "2"
+              - autoSelect: true
+                name: paddle
+                version: "2"
+              - autoSelect: true
+                name: pytorch
+                version: "2"
+            annotations:
+              opendatahub.io/kserve-runtime: ovms
+              prometheus.io/path: /metrics
+              prometheus.io/port: "8888"
+            containers:
+              - name: kserve-container
+                image: registry.redhat.io/rhoai/odh-openvino-model-server-rhel9@sha256:defd01ac5a37a6138de73a8f1b10c676a2efa617238049378f8bc63fb0eb00c6
+                args:
+                  - --model_name={{.Name}}
+                  - --port=8001
+                  - --rest_port=8888
+                  - --model_path=/mnt/models
+                  - --file_system_poll_wait_seconds=0
+                  - --metrics_enable
+                ports:
+                  - containerPort: 8888
+                    protocol: TCP
+      register: r_stress_runtime
+
     - name: "Exercise 4.1: Deploy Stress Detection InferenceService"
       kubernetes.core.k8s:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
@@ -57,6 +119,7 @@
                 modelFormat:
                   name: openvino_ir
                   version: opset13
+                runtime: stress-detection
                 resources:
                   requests:
                     cpu: "2"
@@ -90,6 +153,68 @@
     # ========================================
     # Exercise 4.2: Deploy Time to Failure model server
     # ========================================
+    - name: "Exercise 4.2: Create OpenVINO ServingRuntime for Time to Failure"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        state: present
+        definition:
+          apiVersion: serving.kserve.io/v1alpha1
+          kind: ServingRuntime
+          metadata:
+            name: time-to-failure
+            namespace: ai-edge-project
+            labels:
+              opendatahub.io/dashboard: "true"
+            annotations:
+              openshift.io/display-name: "OpenVINO Model Server"
+              opendatahub.io/apiProtocol: REST
+              opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+              opendatahub.io/runtime-version: v2025.4
+              opendatahub.io/serving-runtime-scope: global
+              opendatahub.io/template-display-name: OpenVINO Model Server
+              opendatahub.io/template-name: kserve-ovms
+          spec:
+            multiModel: false
+            protocolVersions:
+              - v2
+              - grpc-v2
+            supportedModelFormats:
+              - autoSelect: true
+                name: openvino_ir
+                version: opset13
+              - name: onnx
+                version: "1"
+              - autoSelect: true
+                name: tensorflow
+                version: "1"
+              - autoSelect: true
+                name: tensorflow
+                version: "2"
+              - autoSelect: true
+                name: paddle
+                version: "2"
+              - autoSelect: true
+                name: pytorch
+                version: "2"
+            annotations:
+              opendatahub.io/kserve-runtime: ovms
+              prometheus.io/path: /metrics
+              prometheus.io/port: "8888"
+            containers:
+              - name: kserve-container
+                image: registry.redhat.io/rhoai/odh-openvino-model-server-rhel9@sha256:defd01ac5a37a6138de73a8f1b10c676a2efa617238049378f8bc63fb0eb00c6
+                args:
+                  - --model_name={{.Name}}
+                  - --port=8001
+                  - --rest_port=8888
+                  - --model_path=/mnt/models
+                  - --file_system_poll_wait_seconds=0
+                  - --metrics_enable
+                ports:
+                  - containerPort: 8888
+                    protocol: TCP
+      register: r_ttf_runtime
+
     - name: "Exercise 4.2: Deploy Time to Failure InferenceService"
       kubernetes.core.k8s:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
@@ -123,6 +248,7 @@
                 modelFormat:
                   name: openvino_ir
                   version: opset13
+                runtime: time-to-failure
                 resources:
                   requests:
                     cpu: "2"
