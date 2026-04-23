@@ -22,7 +22,7 @@
       failed_when: false
 
     # ========================================
-    # Exercise 5.2: Import and run pipeline
+    # Exercise 5.2: Import pipeline
     # ========================================
     - name: "Exercise 5.2: Download KFP pipeline YAML"
       ansible.builtin.uri:
@@ -30,13 +30,7 @@
         return_content: true
       register: r_pipeline_content
 
-    - name: "Exercise 5.2: Save pipeline YAML to temp file"
-      ansible.builtin.copy:
-        content: "{{ r_pipeline_content.content }}"
-        dest: "/tmp/model-retraining-pipeline.yaml"
-      delegate_to: localhost
-
-    - name: "Exercise 5.2: Submit pipeline via KFP SDK in container"
+    - name: "Exercise 5.2: Import pipeline to KFP server (store in DB)"
       kubernetes.core.k8s:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
@@ -52,7 +46,7 @@
               spec:
                 serviceAccountName: default-editor
                 containers:
-                  - name: kfp-submit
+                  - name: kfp-import
                     image: registry.access.redhat.com/ubi9/python-311:latest
                     command:
                       - /bin/bash
@@ -64,35 +58,85 @@
                         PIPELINE_EOF
                         python3 <<'PYTHON_EOF'
                         import kfp
-                        from kfp import compiler
-                        import yaml
-                        import os
-
-                        # Load pipeline YAML
-                        with open('/tmp/pipeline.yaml', 'r') as f:
-                            pipeline_spec = yaml.safe_load(f)
 
                         # Connect to KFP API
                         client = kfp.Client(host='http://ds-pipeline-dspa.ai-edge-project.svc.cluster.local:8888')
 
-                        # Create or get pipeline
+                        # Import pipeline (stores in DB, no K8s resources created)
                         pipeline_name = 'battery-ml-pipeline'
                         try:
-                            pipeline = client.get_pipeline_id(name=pipeline_name)
-                            print(f"Pipeline {pipeline_name} already exists with ID: {pipeline}")
+                            pipeline_id = client.get_pipeline_id(name=pipeline_name)
+                            print(f"Pipeline '{pipeline_name}' already exists with ID: {pipeline_id}")
                         except:
-                            # Upload pipeline
-                            pipeline_file = '/tmp/pipeline.yaml'
+                            # Upload pipeline to KFP server database
                             pipeline = client.upload_pipeline(
-                                pipeline_package_path=pipeline_file,
-                                pipeline_name=pipeline_name
+                                pipeline_package_path='/tmp/pipeline.yaml',
+                                pipeline_name=pipeline_name,
+                                description='Battery ML training pipeline for stress detection and time-to-failure prediction'
                             )
-                            print(f"Pipeline uploaded: {pipeline}")
+                            print(f"Pipeline '{pipeline_name}' imported successfully with ID: {pipeline.id}")
+                        PYTHON_EOF
+                restartPolicy: Never
+            backoffLimit: 3
+      register: r_import_job
 
-                        # Create a run
-                        run = client.create_run_from_pipeline_package(
-                            pipeline_file='/tmp/pipeline.yaml',
-                            arguments={
+    - name: "Exercise 5.2: Wait for pipeline import to complete"
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        kind: Job
+        name: import-pipeline-job
+        namespace: ai-edge-project
+      register: r_import_status
+      until:
+        - r_import_status.resources is defined
+        - r_import_status.resources | length > 0
+        - r_import_status.resources[0].status.succeeded is defined
+        - r_import_status.resources[0].status.succeeded > 0
+      retries: 30
+      delay: 10
+      failed_when: false
+
+    # ========================================
+    # Exercise 5.2: Create first pipeline run
+    # ========================================
+    - name: "Exercise 5.2: Create first pipeline run (creates Workflow resource)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        state: present
+        definition:
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: first-pipeline-run-job
+            namespace: ai-edge-project
+          spec:
+            ttlSecondsAfterFinished: 300
+            template:
+              spec:
+                serviceAccountName: default-editor
+                containers:
+                  - name: kfp-run
+                    image: registry.access.redhat.com/ubi9/python-311:latest
+                    command:
+                      - /bin/bash
+                      - -c
+                      - |
+                        pip install -q kfp==2.14.4
+                        python3 <<'PYTHON_EOF'
+                        import kfp
+
+                        # Connect to KFP API
+                        client = kfp.Client(host='http://ds-pipeline-dspa.ai-edge-project.svc.cluster.local:8888')
+
+                        # Get pipeline ID
+                        pipeline_id = client.get_pipeline_id(name='battery-ml-pipeline')
+
+                        # Create a run (this creates the Workflow K8s resource)
+                        run = client.run_pipeline(
+                            experiment_id=None,
+                            job_name='first-run',
+                            pipeline_id=pipeline_id,
+                            params={
                                 'aws_access_key_id': 'minio',
                                 'aws_s3_bucket': 'inference',
                                 'aws_s3_endpoint': 'http://minio-microshift-vm.microshift-001.svc.cluster.local:30000',
@@ -102,32 +146,32 @@
                                 'influxdb_token': 'admin_token',
                                 'influxdb_url': '{{ influxdb_url }}'
                             },
-                            run_name='first-run',
                             enable_caching=True
                         )
                         print(f"Pipeline run created: {run.run_id}")
+                        print(f"This created an Argo Workflow resource in Kubernetes")
                         PYTHON_EOF
                 restartPolicy: Never
             backoffLimit: 3
-      register: r_import_job
+      register: r_run_job
 
-    - name: "Exercise 5.2: Wait for pipeline import job to complete"
+    - name: "Exercise 5.2: Wait for first run job to complete"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Job
-        name: import-pipeline-job
+        name: first-pipeline-run-job
         namespace: ai-edge-project
-      register: r_job_status
+      register: r_run_status
       until:
-        - r_job_status.resources is defined
-        - r_job_status.resources | length > 0
-        - r_job_status.resources[0].status.succeeded is defined
-        - r_job_status.resources[0].status.succeeded > 0
+        - r_run_status.resources is defined
+        - r_run_status.resources | length > 0
+        - r_run_status.resources[0].status.succeeded is defined
+        - r_run_status.resources[0].status.succeeded > 0
       retries: 30
       delay: 10
       failed_when: false
 
-    - name: "Exercise 5.2: Get created Workflow from first run"
+    - name: "Exercise 5.2: Verify Workflow was created"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: argoproj.io/v1alpha1
@@ -138,16 +182,10 @@
       register: r_workflows
       failed_when: false
 
-    - name: "Exercise 5.2: Extract WorkflowTemplate name from Workflow"
-      ansible.builtin.set_fact:
-        workflow_template_name: "{{ r_workflows.resources[0].metadata.labels['workflows.argoproj.io/workflow-template'] | default('') }}"
-      when: r_workflows.resources | length > 0
-      failed_when: false
-
     # ========================================
     # Exercise 5.3: Schedule pipeline automation
     # ========================================
-    - name: "Exercise 5.3: Create scheduled pipeline run as CronWorkflow"
+    - name: "Exercise 5.3: Create CronWorkflow for scheduled pipeline runs"
       kubernetes.core.k8s:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
@@ -167,9 +205,9 @@
             failedJobsHistoryLimit: 3
             workflowSpec:
               serviceAccountName: default-editor
-              entrypoint: submit-pipeline
+              entrypoint: create-pipeline-run
               templates:
-                - name: submit-pipeline
+                - name: create-pipeline-run
                   container:
                     image: registry.access.redhat.com/ubi9/python-311:latest
                     command:
@@ -177,20 +215,23 @@
                       - -c
                       - |
                         pip install -q kfp==2.14.4
-                        cat <<'PIPELINE_EOF' > /tmp/pipeline.yaml
-                        {{ r_pipeline_content.content }}
-                        PIPELINE_EOF
                         python3 <<'PYTHON_EOF'
                         import kfp
-                        import yaml
+                        from datetime import datetime
 
                         # Connect to KFP API
                         client = kfp.Client(host='http://ds-pipeline-dspa.ai-edge-project.svc.cluster.local:8888')
 
-                        # Create a run from the pipeline file
-                        run = client.create_run_from_pipeline_package(
-                            pipeline_file='/tmp/pipeline.yaml',
-                            arguments={
+                        # Get pipeline ID by name
+                        pipeline_id = client.get_pipeline_id(name='battery-ml-pipeline')
+
+                        # Create a scheduled run (creates a new Workflow each time)
+                        timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
+                        run = client.run_pipeline(
+                            experiment_id=None,
+                            job_name=f'scheduled-run-{timestamp}',
+                            pipeline_id=pipeline_id,
+                            params={
                                 'aws_access_key_id': 'minio',
                                 'aws_s3_bucket': 'inference',
                                 'aws_s3_endpoint': 'http://minio-microshift-vm.microshift-001.svc.cluster.local:30000',
@@ -202,7 +243,8 @@
                             },
                             enable_caching=True
                         )
-                        print(f"Scheduled run created: {run.run_id}")
+                        print(f"Scheduled pipeline run created: {run.run_id}")
+                        print(f"This created a new Argo Workflow resource")
                         PYTHON_EOF
       register: r_cronworkflow
 
@@ -210,4 +252,7 @@
       ansible.builtin.debug:
         msg: |
           ✅ Module 5: Pipeline automation configured
-          Pipeline imported via KFP SDK, first run submitted, and CronWorkflow scheduled for every 10 minutes.
+
+          Step 1 - Pipeline imported to KFP server (stored in database)
+          Step 2 - First pipeline run created (Workflow resource: {{ r_workflows.resources | length }} workflow(s))
+          Step 3 - CronWorkflow scheduled for automated runs every 10 minutes
