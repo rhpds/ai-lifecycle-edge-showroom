@@ -75,7 +75,7 @@
               - name: kserve-container
                 image: registry.redhat.io/rhoai/odh-openvino-model-server-rhel9@sha256:defd01ac5a37a6138de73a8f1b10c676a2efa617238049378f8bc63fb0eb00c6
                 args:
-                  - --model_name={{.Name}}
+                  - "--model_name={{ '{{' }}.Name{{ '}}' }}"
                   - --port=8001
                   - --rest_port=8888
                   - --model_path=/mnt/models
@@ -204,7 +204,7 @@
               - name: kserve-container
                 image: registry.redhat.io/rhoai/odh-openvino-model-server-rhel9@sha256:defd01ac5a37a6138de73a8f1b10c676a2efa617238049378f8bc63fb0eb00c6
                 args:
-                  - --model_name={{.Name}}
+                  - "--model_name={{ '{{' }}.Name{{ '}}' }}"
                   - --port=8001
                   - --rest_port=8888
                   - --model_path=/mnt/models
