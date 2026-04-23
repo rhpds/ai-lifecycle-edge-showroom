@@ -5,6 +5,23 @@
   gather_facts: false
   tasks:
     # ========================================
+    # Get hardware profile resourceVersion
+    # ========================================
+    - name: "Get default hardware profile resourceVersion"
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: dashboard.opendatahub.io/v1
+        kind: AcceleratorProfile
+        name: default-profile
+        namespace: redhat-ods-applications
+      register: r_hw_profile
+      failed_when: false
+
+    - name: "Set hardware profile resourceVersion"
+      ansible.builtin.set_fact:
+        hw_profile_resource_version: "{{ r_hw_profile.resources[0].metadata.resourceVersion if r_hw_profile.resources | length > 0 else '' }}"
+
+    # ========================================
     # Exercise 4.1: Deploy Stress Detection model server
     # ========================================
     - name: "Exercise 4.1: Deploy Stress Detection InferenceService"
@@ -21,16 +38,37 @@
               opendatahub.io/dashboard: "true"
             annotations:
               openshift.io/display-name: "Stress Detection"
+              openshift.io/description: ""
               serving.kserve.io/deploymentMode: RawDeployment
+              security.opendatahub.io/enable-auth: "false"
+              opendatahub.io/model-type: predictive
+              opendatahub.io/hardware-profile-name: default-profile
+              opendatahub.io/hardware-profile-namespace: redhat-ods-applications
+              opendatahub.io/hardware-profile-resource-version: "{{ hw_profile_resource_version }}"
+              opendatahub.io/connection-path: stress-detection
+              opendatahub.io/connections: vehicle-models
           spec:
             predictor:
+              minReplicas: 1
+              maxReplicas: 1
+              deploymentStrategy:
+                type: RollingUpdate
               model:
                 modelFormat:
                   name: openvino_ir
                   version: opset13
+                runtime: stress-detection
+                resources:
+                  requests:
+                    cpu: "2"
+                    memory: 4Gi
+                  limits:
+                    cpu: "2"
+                    memory: 4Gi
                 storage:
                   key: vehicle-models
                   path: stress-detection
+              serviceAccountName: vehicle-models-sa
       register: r_stress_deploy
 
     - name: "Exercise 4.1: Wait for Stress Detection model to be ready"
@@ -67,16 +105,37 @@
               opendatahub.io/dashboard: "true"
             annotations:
               openshift.io/display-name: "Time to Failure"
+              openshift.io/description: ""
               serving.kserve.io/deploymentMode: RawDeployment
+              security.opendatahub.io/enable-auth: "false"
+              opendatahub.io/model-type: predictive
+              opendatahub.io/hardware-profile-name: default-profile
+              opendatahub.io/hardware-profile-namespace: redhat-ods-applications
+              opendatahub.io/hardware-profile-resource-version: "{{ hw_profile_resource_version }}"
+              opendatahub.io/connection-path: time-to-failure
+              opendatahub.io/connections: vehicle-models
           spec:
             predictor:
+              minReplicas: 1
+              maxReplicas: 1
+              deploymentStrategy:
+                type: RollingUpdate
               model:
                 modelFormat:
                   name: openvino_ir
                   version: opset13
+                runtime: time-to-failure
+                resources:
+                  requests:
+                    cpu: "2"
+                    memory: 4Gi
+                  limits:
+                    cpu: "2"
+                    memory: 4Gi
                 storage:
                   key: vehicle-models
                   path: time-to-failure
+              serviceAccountName: vehicle-models-sa
       register: r_ttf_deploy
 
     - name: "Exercise 4.2: Wait for Time to Failure model to be ready"
