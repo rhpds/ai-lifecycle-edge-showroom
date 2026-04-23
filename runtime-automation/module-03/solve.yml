@@ -4,16 +4,89 @@
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: "Module 3 requires manual Jupyter notebook execution"
+    # ========================================
+    # Exercise 3.1: Review and access workbench
+    # ========================================
+    - name: "Exercise 3.1: Get current model-training Notebook"
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: kubeflow.org/v1
+        kind: Notebook
+        name: model-training
+        namespace: ai-edge-project
+      register: r_notebook
+      failed_when: r_notebook.resources | length == 0
+
+    - name: "Exercise 3.1: Check if DataConnection is already attached"
+      ansible.builtin.set_fact:
+        _current_envFrom: "{{ r_notebook.resources[0].spec.template.spec.containers[0].envFrom | default([]) }}"
+        _has_vehicle_models: "{{ r_notebook.resources[0].spec.template.spec.containers[0].envFrom | default([]) | selectattr('secretRef', 'defined') | selectattr('secretRef.name', 'equalto', 'vehicle-models') | list | length > 0 }}"
+
+    - name: "Exercise 3.1: Attach vehicle-models DataConnection to workbench"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: kubeflow.org/v1
+        kind: Notebook
+        name: model-training
+        namespace: ai-edge-project
+        definition:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "{{ r_notebook.resources[0].spec.template.spec.containers[0].name }}"
+                    envFrom: "{{ _current_envFrom + [{'secretRef': {'name': 'vehicle-models'}}] }}"
+        state: patched
+      when: not _has_vehicle_models
+      register: r_notebook_patch
+
+    - name: "Exercise 3.1: Wait for workbench pod to restart"
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        kind: Pod
+        namespace: ai-edge-project
+        label_selectors:
+          - notebook-name=model-training
+      register: r_notebook_pod
+      until:
+        - r_notebook_pod.resources | length > 0
+        - r_notebook_pod.resources[0].status.phase == 'Running'
+        - r_notebook_pod.resources[0].status.containerStatuses | selectattr('name', 'equalto', 'model-training') | map(attribute='ready') | first
+      retries: 30
+      delay: 10
+      when: not _has_vehicle_models
+
+    # ========================================
+    # Exercise 3.2: Import training notebooks
+    # ========================================
+    - name: "Exercise 3.2: ⚠️ Manual step - Clone Git repository"
       ansible.builtin.debug:
         msg: |
-          Module 3: Model training
-          ========================
-          This module requires manual interaction with JupyterLab to:
-          - Access model-training workbench
-          - Clone Git repository
-          - Execute training notebooks
+          ⚠️ Exercise 3.2 requires manual interaction with JupyterLab:
+          - Access JupyterLab from RHOAI Dashboard
+          - Click Git icon in left sidebar
+          - Clone: https://github.com/rhpds/ai-lifecycle-edge-automation.git
+          This step cannot be automated.
 
-          Automated solve not applicable for interactive notebook training.
+    # ========================================
+    # Exercise 3.3: Execute training notebooks
+    # ========================================
+    - name: "Exercise 3.3: ⚠️ Manual step - Execute training notebooks"
+      ansible.builtin.debug:
+        msg: |
+          ⚠️ Exercise 3.3 requires manual notebook execution:
+          Navigate to notebooks/training/ and run in sequence:
+          1. 01_retrieve-influx-data.ipynb
+          2. 02_prepare-data.ipynb
+          3. 03_bms-stress-training.ipynb
+          4. 04_predict-stress.ipynb
+          5. 05_bms-ttf-training.ipynb
+          6. 06_predict-ttf.ipynb
+          7. 07_save-models.ipynb
+          This step cannot be automated.
 
-          Students must manually run 7 training notebooks in sequence.
+    - name: "✅ Module 3 solve completed"
+      ansible.builtin.debug:
+        msg: |
+          ✅ Module 3: Model training workbench configured
+          DataConnection attached successfully. Manual notebook execution required.

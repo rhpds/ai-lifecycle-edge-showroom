@@ -30,6 +30,12 @@
       register: r_notebook_pod
       failed_when: false
 
+    - name: "✓ Check vehicle-models DataConnection attached to workbench"
+      ansible.builtin.set_fact:
+        _has_vehicle_models: "{{ r_notebook.resources[0].spec.template.spec.containers[0].envFrom | default([]) | selectattr('secretRef', 'defined') | selectattr('secretRef.name', 'equalto', 'vehicle-models') | list | length > 0 }}"
+      when: r_notebook.resources | length > 0
+      failed_when: false
+
     # ========================================
     # Collect all check results
     # ========================================
@@ -37,19 +43,22 @@
       ansible.builtin.set_fact:
         _task1_ok: "{{ r_notebook.resources | length > 0 }}"
         _task2_ok: "{{ (r_notebook_pod.resources | length > 0) and (r_notebook_pod.resources[0].status.phase | default('') == 'Running') }}"
+        _task3_ok: "{{ _has_vehicle_models | default(false) }}"
 
     - name: Validate all tasks
       validation_check:
-        check: "{{ _task1_ok and _task2_ok }}"
+        check: "{{ _task1_ok and _task2_ok and _task3_ok }}"
         pass_msg: |
           ✅ Exercise 3.1: model-training Notebook exists
           ✅ Exercise 3.1: model-training pod is running
+          ✅ Exercise 3.1: vehicle-models DataConnection is attached
 
-          ⚠️ Note: Manual steps required for:
-            - Exercise 3.1: Attach vehicle-models connection and launch JupyterLab
+          ⚠️ Note: Manual verification required for:
+            - Exercise 3.1: Launch JupyterLab and verify access
             - Exercise 3.2: Clone Git repository (https://github.com/rhpds/ai-lifecycle-edge-automation.git)
-            - Exercise 3.3: Execute training notebooks (retrieve-influx-data.ipynb → save-models.ipynb)
-            - Exercise 3.3: Verify models in MinIO (https://minio-microshift-001.{{ apps_domain }})
+            - Exercise 3.3: Execute training notebooks (01_retrieve-influx-data.ipynb → 07_save-models.ipynb)
+            - Exercise 3.3: Verify models uploaded to MinIO (https://minio-microshift-001.{{ apps_domain }})
         error_msg: |
           {{ '✅' if _task1_ok else '❌' }} Exercise 3.1: model-training Notebook exists
           {{ '✅' if _task2_ok else '❌' }} Exercise 3.1: model-training pod is running (phase: {{ r_notebook_pod.resources[0].status.phase | default('missing') if r_notebook_pod.resources | length > 0 else 'pod not found' }})
+          {{ '✅' if _task3_ok else '❌' }} Exercise 3.1: vehicle-models DataConnection is attached
