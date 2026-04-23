@@ -5,189 +5,156 @@
   gather_facts: false
   vars:
     apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
-    pipeline_yaml_url: "https://raw.githubusercontent.com/rhpds/ai-lifecycle-edge-automation/refs/heads/main/notebooks/pipelines/model-retraining.yaml"
+    pipeline_url: "https://raw.githubusercontent.com/rhpds/ai-lifecycle-edge-automation/refs/heads/main/notebooks/pipelines/model-retraining.yaml"
     influxdb_url: "https://influx-db-microshift-001.{{ apps_domain }}"
 
   tasks:
     # ========================================
-    # Exercise 5.1: Verify pipeline infrastructure
-    # ========================================
-    - name: "Exercise 5.1: Get ds-pipeline API server service"
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        kind: Service
-        name: ds-pipeline-dspa
-        namespace: ai-edge-project
-      register: r_pipeline_svc
-      failed_when: false
+    # Exercise 5.2: Import pipeline as Argo Workflow
 
     # ========================================
-    # Exercise 5.2: Import pipeline
-    # ========================================
-    - name: "Exercise 5.2: Download KFP pipeline YAML"
+    - name: "Exercise 5.2: Download pipeline YAML"
       ansible.builtin.uri:
-        url: "{{ pipeline_yaml_url }}"
+        url: "{{ pipeline_url }}"
         return_content: true
-      register: r_pipeline_content
+      register: r_pipeline_yaml
 
-    - name: "Exercise 5.2: Import pipeline to KFP server (store in DB)"
+    - name: "Exercise 5.2: Import pipeline as Argo WorkflowTemplate"
       kubernetes.core.k8s:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
         definition:
-          apiVersion: batch/v1
-          kind: Job
+          apiVersion: argoproj.io/v1alpha1
+          kind: WorkflowTemplate
           metadata:
-            generateName: import-pipeline-job-
+            name: model-retraining
             namespace: ai-edge-project
+            labels:
+              pipelines.kubeflow.org/kfp_sdk_version: 1.8.22
           spec:
-            ttlSecondsAfterFinished: 300
-            template:
-              spec:
-                serviceAccountName: default-editor
-                containers:
-                  - name: kfp-import
-                    image: registry.access.redhat.com/ubi9/python-311:latest
-                    command:
-                      - /bin/bash
-                      - -c
-                      - |
-                        pip install -q kfp==2.14.4
-                        cat <<'PIPELINE_EOF' > /tmp/pipeline.yaml
-                        {{ r_pipeline_content.content }}
-                        PIPELINE_EOF
-                        python3 <<'PYTHON_EOF'
-                        import kfp
+            serviceAccountName: pipeline-runner-dspa
+            entrypoint: model-retraining
+            arguments:
+              parameters:
+                - name: aws_access_key_id
+                  value: "minio"
+                - name: aws_s3_bucket
+                  value: "inference"
+                - name: aws_s3_endpoint
+                  value: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
+                - name: aws_secret_access_key
+                  value: "minio123"
+                - name: influxdb_bucket
+                  value: "bms"
+                - name: influxdb_org
+                  value: "redhat"
+                - name: influxdb_token
+                  value: "admin_token"
+                - name: influxdb_url
+                  value: "{{ influxdb_url }}"
+            templates:
+              - name: model-retraining
+                dag:
+                  tasks:
+                    - name: run-pipeline
+                      template: kfp-launcher
+                      arguments:
+                        parameters:
+                          - name: pipeline
+                            value: "{{ r_pipeline_yaml.content | b64encode }}"
+                          - name: aws_access_key_id
+                            value: "{{ '{{' }}workflow.parameters.aws_access_key_id{{ '}}' }}"
+                          - name: aws_s3_bucket
+                            value: "{{ '{{' }}workflow.parameters.aws_s3_bucket{{ '}}' }}"
+                          - name: aws_s3_endpoint
+                            value: "{{ '{{' }}workflow.parameters.aws_s3_endpoint{{ '}}' }}"
+                          - name: aws_secret_access_key
+                            value: "{{ '{{' }}workflow.parameters.aws_secret_access_key{{ '}}' }}"
+                          - name: influxdb_bucket
+                            value: "{{ '{{' }}workflow.parameters.influxdb_bucket{{ '}}' }}"
+                          - name: influxdb_org
+                            value: "{{ '{{' }}workflow.parameters.influxdb_org{{ '}}' }}"
+                          - name: influxdb_token
+                            value: "{{ '{{' }}workflow.parameters.influxdb_token{{ '}}' }}"
+                          - name: influxdb_url
+                            value: "{{ '{{' }}workflow.parameters.influxdb_url{{ '}}' }}"
+              - name: kfp-launcher
+                inputs:
+                  parameters:
+                    - name: pipeline
+                    - name: aws_access_key_id
+                    - name: aws_s3_bucket
+                    - name: aws_s3_endpoint
+                    - name: aws_secret_access_key
+                    - name: influxdb_bucket
+                    - name: influxdb_org
+                    - name: influxdb_token
+                    - name: influxdb_url
+                container:
+                  image: registry.redhat.io/rhoai/odh-ml-pipelines-api-server-rhel8:v2.9
+                  command:
+                    - sh
+                    - -c
+                  args:
+                    - echo "{{ '{{' }}inputs.parameters.pipeline{{ '}}' }}" | base64 -d | python3 -
+                  env:
+                    - name: AWS_ACCESS_KEY_ID
+                      value: "{{ '{{' }}inputs.parameters.aws_access_key_id{{ '}}' }}"
+                    - name: AWS_S3_BUCKET
+                      value: "{{ '{{' }}inputs.parameters.aws_s3_bucket{{ '}}' }}"
+                    - name: AWS_S3_ENDPOINT
+                      value: "{{ '{{' }}inputs.parameters.aws_s3_endpoint{{ '}}' }}"
+                    - name: AWS_SECRET_ACCESS_KEY
+                      value: "{{ '{{' }}inputs.parameters.aws_secret_access_key{{ '}}' }}"
+                    - name: INFLUXDB_BUCKET
+                      value: "{{ '{{' }}inputs.parameters.influxdb_bucket{{ '}}' }}"
+                    - name: INFLUXDB_ORG
+                      value: "{{ '{{' }}inputs.parameters.influxdb_org{{ '}}' }}"
+                    - name: INFLUXDB_TOKEN
+                      value: "{{ '{{' }}inputs.parameters.influxdb_token{{ '}}' }}"
+                    - name: INFLUXDB_URL
+                      value: "{{ '{{' }}inputs.parameters.influxdb_url{{ '}}' }}"
+      register: r_workflow_template
 
-                        # Connect to KFP API
-                        client = kfp.Client(host='http://ds-pipeline-dspa.ai-edge-project.svc.cluster.local:8888')
-
-                        # Import pipeline (stores in DB, no K8s resources created)
-                        pipeline_name = 'battery-ml-pipeline'
-                        try:
-                            pipeline_id = client.get_pipeline_id(name=pipeline_name)
-                            print(f"Pipeline '{pipeline_name}' already exists with ID: {pipeline_id}")
-                        except:
-                            # Upload pipeline to KFP server database
-                            pipeline = client.upload_pipeline(
-                                pipeline_package_path='/tmp/pipeline.yaml',
-                                pipeline_name=pipeline_name,
-                                description='Battery ML training pipeline for stress detection and time-to-failure prediction'
-                            )
-                            print(f"Pipeline '{pipeline_name}' imported successfully with ID: {pipeline.id}")
-                        PYTHON_EOF
-                restartPolicy: Never
-            backoffLimit: 3
-      register: r_import_job
-
-    - name: "Exercise 5.2: Wait for pipeline import to complete"
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        kind: Job
-        namespace: ai-edge-project
-        label_selectors:
-          - job-name={{ r_import_job.result.metadata.name }}
-      register: r_import_status
-      until:
-        - r_import_status.resources is defined
-        - r_import_status.resources | length > 0
-        - r_import_status.resources[0].status.succeeded is defined
-        - r_import_status.resources[0].status.succeeded > 0
-      retries: 30
-      delay: 10
-      failed_when: false
-
-    # ========================================
-    # Exercise 5.2: Create first pipeline run
-    # ========================================
-    - name: "Exercise 5.2: Create first pipeline run (creates Workflow resource)"
+    - name: "Exercise 5.2: Create first pipeline run as Argo Workflow"
       kubernetes.core.k8s:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
         definition:
-          apiVersion: batch/v1
-          kind: Job
+          apiVersion: argoproj.io/v1alpha1
+          kind: Workflow
           metadata:
-            generateName: first-pipeline-run-job-
+            generateName: first-run-
             namespace: ai-edge-project
+            labels:
+              pipelines.kubeflow.org/kfp_sdk_version: 1.8.22
           spec:
-            ttlSecondsAfterFinished: 300
-            template:
-              spec:
-                serviceAccountName: default-editor
-                containers:
-                  - name: kfp-run
-                    image: registry.access.redhat.com/ubi9/python-311:latest
-                    command:
-                      - /bin/bash
-                      - -c
-                      - |
-                        pip install -q kfp==2.14.4
-                        python3 <<'PYTHON_EOF'
-                        import kfp
-
-                        # Connect to KFP API
-                        client = kfp.Client(host='http://ds-pipeline-dspa.ai-edge-project.svc.cluster.local:8888')
-
-                        # Get pipeline ID
-                        pipeline_id = client.get_pipeline_id(name='battery-ml-pipeline')
-
-                        # Create a run (this creates the Workflow K8s resource)
-                        run = client.run_pipeline(
-                            experiment_id=None,
-                            job_name='first-run',
-                            pipeline_id=pipeline_id,
-                            params={
-                                'aws_access_key_id': 'minio',
-                                'aws_s3_bucket': 'inference',
-                                'aws_s3_endpoint': 'http://minio-microshift-vm.microshift-001.svc.cluster.local:30000',
-                                'aws_secret_access_key': 'minio123',
-                                'influxdb_bucket': 'bms',
-                                'influxdb_org': 'redhat',
-                                'influxdb_token': 'admin_token',
-                                'influxdb_url': '{{ influxdb_url }}'
-                            },
-                            enable_caching=True
-                        )
-                        print(f"Pipeline run created: {run.run_id}")
-                        print(f"This created an Argo Workflow resource in Kubernetes")
-                        PYTHON_EOF
-                restartPolicy: Never
-            backoffLimit: 3
-      register: r_run_job
-
-    - name: "Exercise 5.2: Wait for first run job to complete"
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        kind: Job
-        namespace: ai-edge-project
-        label_selectors:
-          - job-name={{ r_run_job.result.metadata.name }}
-      register: r_run_status
-      until:
-        - r_run_status.resources is defined
-        - r_run_status.resources | length > 0
-        - r_run_status.resources[0].status.succeeded is defined
-        - r_run_status.resources[0].status.succeeded > 0
-      retries: 30
-      delay: 10
-      failed_when: false
-
-    - name: "Exercise 5.2: Verify Workflow was created"
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        api_version: argoproj.io/v1alpha1
-        kind: Workflow
-        namespace: ai-edge-project
-        label_selectors:
-          - pipelines.kubeflow.org/kfp_sdk_version
-      register: r_workflows
-      failed_when: false
+            workflowTemplateRef:
+              name: model-retraining
+            arguments:
+              parameters:
+                - name: aws_access_key_id
+                  value: "minio"
+                - name: aws_s3_bucket
+                  value: "inference"
+                - name: aws_s3_endpoint
+                  value: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
+                - name: aws_secret_access_key
+                  value: "minio123"
+                - name: influxdb_bucket
+                  value: "bms"
+                - name: influxdb_org
+                  value: "redhat"
+                - name: influxdb_token
+                  value: "admin_token"
+                - name: influxdb_url
+                  value: "{{ influxdb_url }}"
+      register: r_workflow_run
 
     # ========================================
     # Exercise 5.3: Schedule pipeline automation
     # ========================================
-    - name: "Exercise 5.3: Create CronWorkflow for scheduled pipeline runs"
+    - name: "Exercise 5.3: Create scheduled pipeline run as Argo CronWorkflow"
       kubernetes.core.k8s:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         state: present
@@ -198,7 +165,7 @@
             name: scheduled-run
             namespace: ai-edge-project
             labels:
-              pipelines.kubeflow.org/kfp_sdk_version: "2.14.4"
+              pipelines.kubeflow.org/kfp_sdk_version: 1.8.22
           spec:
             schedule: "*/10 * * * *"
             concurrencyPolicy: "Allow"
@@ -206,55 +173,31 @@
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
             workflowSpec:
-              serviceAccountName: default-editor
-              entrypoint: create-pipeline-run
-              templates:
-                - name: create-pipeline-run
-                  container:
-                    image: registry.access.redhat.com/ubi9/python-311:latest
-                    command:
-                      - /bin/bash
-                      - -c
-                      - |
-                        pip install -q kfp==2.14.4
-                        python3 <<'PYTHON_EOF'
-                        import kfp
-                        from datetime import datetime
-
-                        # Connect to KFP API
-                        client = kfp.Client(host='http://ds-pipeline-dspa.ai-edge-project.svc.cluster.local:8888')
-
-                        # Get pipeline ID by name
-                        pipeline_id = client.get_pipeline_id(name='battery-ml-pipeline')
-
-                        # Create a scheduled run (creates a new Workflow each time)
-                        timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-                        run = client.run_pipeline(
-                            experiment_id=None,
-                            job_name=f'scheduled-run-{timestamp}',
-                            pipeline_id=pipeline_id,
-                            params={
-                                'aws_access_key_id': 'minio',
-                                'aws_s3_bucket': 'inference',
-                                'aws_s3_endpoint': 'http://minio-microshift-vm.microshift-001.svc.cluster.local:30000',
-                                'aws_secret_access_key': 'minio123',
-                                'influxdb_bucket': 'bms',
-                                'influxdb_org': 'redhat',
-                                'influxdb_token': 'admin_token',
-                                'influxdb_url': '{{ influxdb_url }}'
-                            },
-                            enable_caching=True
-                        )
-                        print(f"Scheduled pipeline run created: {run.run_id}")
-                        print(f"This created a new Argo Workflow resource")
-                        PYTHON_EOF
+              serviceAccountName: pipeline-runner-dspa
+              workflowTemplateRef:
+                name: model-retraining
+              arguments:
+                parameters:
+                  - name: aws_access_key_id
+                    value: "minio"
+                  - name: aws_s3_bucket
+                    value: "inference"
+                  - name: aws_s3_endpoint
+                    value: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
+                  - name: aws_secret_access_key
+                    value: "minio123"
+                  - name: influxdb_bucket
+                    value: "bms"
+                  - name: influxdb_org
+                    value: "redhat"
+                  - name: influxdb_token
+                    value: "admin_token"
+                  - name: influxdb_url
+                    value: "{{ influxdb_url }}"
       register: r_cronworkflow
 
     - name: "✅ Module 5 solve completed"
       ansible.builtin.debug:
         msg: |
           ✅ Module 5: Pipeline automation configured
-
-          Step 1 - Pipeline imported to KFP server (stored in database)
-          Step 2 - First pipeline run created (Workflow resource: {{ r_workflows.resources | length }} workflow(s))
-          Step 3 - CronWorkflow scheduled for automated runs every 10 minutes
+          WorkflowTemplate created, first Workflow run submitted, and CronWorkflow scheduled for every 10 minutes.
