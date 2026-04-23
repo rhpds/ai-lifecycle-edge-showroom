@@ -3,7 +3,13 @@
 - name: Validate Module 5
   hosts: localhost
   gather_facts: false
+  vars:
+    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
+
   tasks:
+    # ========================================
+    # Exercise 5.1: Review pipeline infrastructure
+    # ========================================
     - name: "✓ Check DSPApplication exists"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
@@ -13,23 +19,81 @@
       register: r_dsp
       failed_when: false
 
+    - name: "✓ Check pipeline API route exists"
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        kind: Route
+        namespace: ai-edge-project
+        label_selectors:
+          - app=ds-pipeline-dspa
+      register: r_pipeline_route
+      failed_when: false
+
+    # ========================================
+    # Exercise 5.2 & 5.3: Check pipelines via API
+    # ========================================
+    - name: "Set pipeline API URL"
+      ansible.builtin.set_fact:
+        pipeline_api_url: "https://{{ r_pipeline_route.resources[0].spec.host }}"
+      when: r_pipeline_route.resources | length > 0
+
+    - name: "✓ Check if Model retraining pipeline exists"
+      ansible.builtin.uri:
+        url: "{{ pipeline_api_url }}/apis/v2beta1/pipelines"
+        method: GET
+        validate_certs: false
+        status_code: [200]
+      register: r_pipelines_list
+      when: r_pipeline_route.resources | length > 0
+      failed_when: false
+
+    - name: "✓ Check if pipeline runs exist"
+      ansible.builtin.uri:
+        url: "{{ pipeline_api_url }}/apis/v2beta1/runs"
+        method: GET
+        validate_certs: false
+        status_code: [200]
+      register: r_runs_list
+      when: r_pipeline_route.resources | length > 0
+      failed_when: false
+
+    - name: "✓ Check if recurring runs exist"
+      ansible.builtin.uri:
+        url: "{{ pipeline_api_url }}/apis/v2beta1/recurringruns"
+        method: GET
+        validate_certs: false
+        status_code: [200]
+      register: r_recurring_list
+      when: r_pipeline_route.resources | length > 0
+      failed_when: false
+
     # ========================================
     # Collect all check results
     # ========================================
     - name: Collect all validation results
       ansible.builtin.set_fact:
         _task1_ok: "{{ r_dsp.resources | length > 0 }}"
+        _task2_ok: "{{ r_pipeline_route.resources | length > 0 }}"
+        _task3_ok: "{{ (r_pipelines_list.json is defined) and (r_pipelines_list.json.pipelines is defined) and (r_pipelines_list.json.pipelines | selectattr('display_name', 'equalto', 'Model retraining') | list | length > 0) }}"
+        _task4_ok: "{{ (r_runs_list.json is defined) and (r_runs_list.json.runs is defined) and (r_runs_list.json.runs | length > 0) }}"
+        _task5_ok: "{{ (r_recurring_list.json is defined) and (r_recurring_list.json.recurring_runs is defined) and (r_recurring_list.json.recurring_runs | length > 0) }}"
 
     - name: Validate all tasks
       validation_check:
-        check: "{{ _task1_ok }}"
+        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok and _task5_ok }}"
         pass_msg: |
-          ✅ Exercise 5: Pipeline server is configured ({{ r_dsp.resources | length }} DSPApplication(s))
+          ✅ Exercise 5.1: Pipeline server is configured (DSPApplication exists)
+          ✅ Exercise 5.1: Pipeline API route is accessible
+          ✅ Exercise 5.2: Model retraining pipeline imported
+          ✅ Exercise 5.2: Pipeline run created ({{ r_runs_list.json.total_size | default(0) }} run(s))
+          ✅ Exercise 5.3: Scheduled run configured ({{ r_recurring_list.json.total_size | default(0) }} schedule(s))
 
-          ⚠️ Note: Manual steps required for:
-            - Import pipeline from GitHub (bms-retraining-pipeline.yaml)
-            - Execute pipeline run
-            - Configure scheduled runs (every 10 minutes)
-            - Monitor pipeline execution
+          ⚠️ Note: Manual verification recommended for:
+            - Monitor pipeline execution in RHOAI Dashboard
+            - Verify models uploaded to MinIO after successful runs
         error_msg: |
-          {{ '✅' if _task1_ok else '❌' }} Exercise 5: Pipeline server is configured
+          {{ '✅' if _task1_ok else '❌' }} Exercise 5.1: Pipeline server is configured
+          {{ '✅' if _task2_ok else '❌' }} Exercise 5.1: Pipeline API route is accessible
+          {{ '✅' if _task3_ok else '❌' }} Exercise 5.2: Model retraining pipeline imported
+          {{ '✅' if _task4_ok else '❌' }} Exercise 5.2: Pipeline run created
+          {{ '✅' if _task5_ok else '❌' }} Exercise 5.3: Scheduled run configured

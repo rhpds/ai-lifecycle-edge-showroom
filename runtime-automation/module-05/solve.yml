@@ -3,15 +3,137 @@
 - name: Solve Module 5
   hosts: localhost
   gather_facts: false
+  vars:
+    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
+    pipeline_url: "https://raw.githubusercontent.com/rhpds/ai-lifecycle-edge-automation/refs/heads/main/notebooks/pipelines/model-retraining.yaml"
+    pipeline_name: "Model retraining"
+    influxdb_url: "https://influx-db-microshift-001.{{ apps_domain }}"
+
   tasks:
-    - name: "Module 5 requires manual pipeline interaction"
+    # ========================================
+    # Get pipeline API endpoint
+    # ========================================
+    - name: "Get Data Science Pipelines API route"
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        kind: Route
+        namespace: ai-edge-project
+        label_selectors:
+          - app=ds-pipeline-dspa
+      register: r_pipeline_route
+      failed_when: r_pipeline_route.resources | length == 0
+
+    - name: "Set pipeline API URL"
+      ansible.builtin.set_fact:
+        pipeline_api_url: "https://{{ r_pipeline_route.resources[0].spec.host }}"
+
+    # ========================================
+    # Exercise 5.2: Import and execute pipeline
+    # ========================================
+    - name: "Exercise 5.2: Download pipeline YAML"
+      ansible.builtin.uri:
+        url: "{{ pipeline_url }}"
+        return_content: true
+      register: r_pipeline_yaml
+
+    - name: "Exercise 5.2: Upload pipeline to RHOAI"
+      ansible.builtin.uri:
+        url: "{{ pipeline_api_url }}/apis/v2beta1/pipelines/upload"
+        method: POST
+        body_format: form-multipart
+        body:
+          uploadfile:
+            content: "{{ r_pipeline_yaml.content }}"
+            filename: model-retraining.yaml
+          name: "{{ pipeline_name }}"
+          description: "Automated model retraining pipeline"
+        validate_certs: false
+        status_code: [200, 201]
+      register: r_pipeline_upload
+      failed_when: false
+
+    - name: "Exercise 5.2: Get pipeline ID"
+      ansible.builtin.set_fact:
+        pipeline_id: "{{ r_pipeline_upload.json.pipeline_id if r_pipeline_upload.json is defined else '' }}"
+
+    - name: "Exercise 5.2: Create pipeline run"
+      ansible.builtin.uri:
+        url: "{{ pipeline_api_url }}/apis/v2beta1/runs"
+        method: POST
+        body_format: json
+        body:
+          display_name: "First run"
+          experiment_id: ""
+          pipeline_version_reference:
+            pipeline_id: "{{ pipeline_id }}"
+          runtime_config:
+            parameters:
+              aws_access_key_id:
+                stringValue: "minio"
+              aws_s3_bucket:
+                stringValue: "inference"
+              aws_s3_endpoint:
+                stringValue: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
+              aws_secret_access_key:
+                stringValue: "minio123"
+              influxdb_bucket:
+                stringValue: "bms"
+              influxdb_org:
+                stringValue: "redhat"
+              influxdb_token:
+                stringValue: "admin_token"
+              influxdb_url:
+                stringValue: "{{ influxdb_url }}"
+        validate_certs: false
+        status_code: [200, 201]
+      register: r_pipeline_run
+      when: pipeline_id != ''
+      failed_when: false
+
+    # ========================================
+    # Exercise 5.3: Schedule pipeline automation
+    # ========================================
+    - name: "Exercise 5.3: Create scheduled pipeline run"
+      ansible.builtin.uri:
+        url: "{{ pipeline_api_url }}/apis/v2beta1/recurringruns"
+        method: POST
+        body_format: json
+        body:
+          display_name: "Scheduled run"
+          experiment_id: ""
+          max_concurrency: "10"
+          mode: ENABLE
+          trigger:
+            periodic_schedule:
+              interval_second: "600"
+          pipeline_version_reference:
+            pipeline_id: "{{ pipeline_id }}"
+          runtime_config:
+            parameters:
+              aws_access_key_id:
+                stringValue: "minio"
+              aws_s3_bucket:
+                stringValue: "inference"
+              aws_s3_endpoint:
+                stringValue: "http://minio-microshift-vm.microshift-001.svc.cluster.local:30000"
+              aws_secret_access_key:
+                stringValue: "minio123"
+              influxdb_bucket:
+                stringValue: "bms"
+              influxdb_org:
+                stringValue: "redhat"
+              influxdb_token:
+                stringValue: "admin_token"
+              influxdb_url:
+                stringValue: "{{ influxdb_url }}"
+        validate_certs: false
+        status_code: [200, 201]
+      register: r_scheduled_run
+      when: pipeline_id != ''
+      failed_when: false
+
+    - name: "✅ Module 5 solve completed"
       ansible.builtin.debug:
         msg: |
-          Module 5: Pipeline automation
-          ==============================
-          This module requires manual interaction with RHOAI Pipelines:
-          - Import retraining pipeline
-          - Execute pipeline manually
-          - Configure scheduled runs (every 10 minutes)
-
-          Automated solve not applicable for UI-based pipeline configuration.
+          ✅ Module 5: Pipeline automation configured
+          Pipeline imported, first run created, and scheduled for every 10 minutes.
