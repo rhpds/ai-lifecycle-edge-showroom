@@ -4,9 +4,28 @@
   hosts: localhost
   gather_facts: false
   vars:
-    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
+    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') | default('', true) }}"
 
   tasks:
+    - name: "Get cluster ingress domain if not set"
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: config.openshift.io/v1
+        kind: Ingress
+        name: cluster
+      register: r_ingress
+      when: apps_domain == ''
+      failed_when: false
+
+    - name: "Set apps_domain from cluster Ingress"
+      ansible.builtin.set_fact:
+        apps_domain: "{{ r_ingress.resources[0].spec.domain }}"
+      when:
+        - apps_domain == ''
+        - r_ingress is defined
+        - r_ingress.resources is defined
+        - r_ingress.resources | length > 0
+        - r_ingress.resources[0].spec.domain is defined
     # ========================================
     # Exercise 2.1: Access RHOAI Dashboard
     # ========================================
@@ -67,7 +86,9 @@
         s3_endpoint: "{{ r_dataconn.resources[0].data.AWS_S3_ENDPOINT | b64decode }}"
         s3_bucket: "{{ r_dataconn.resources[0].data.AWS_S3_BUCKET | b64decode }}"
         s3_access_key: "{{ r_dataconn.resources[0].data.AWS_ACCESS_KEY_ID | b64decode }}"
-      when: r_dataconn.resources | length > 0
+      when:
+        - r_dataconn.resources is defined
+        - r_dataconn.resources | length > 0
       failed_when: false
 
     # ========================================
@@ -75,13 +96,13 @@
     # ========================================
     - name: Collect all validation results
       ansible.builtin.set_fact:
-        _task1_ok: "{{ (r_rhoai_operator.resources | length > 0) and (r_rhoai_operator.resources[0].status.readyReplicas | default(0) > 0) }}"
-        _task2_ok: "{{ r_dsc.resources | length > 0 }}"
-        _task3_ok: "{{ r_project_ns.resources | length > 0 }}"
-        _task4_ok: "{{ r_dsp.resources | length > 0 }}"
-        _task5_ok: "{{ r_dataconn.resources | length > 0 }}"
-        _task6_ok: "{{ (r_dataconn.resources | length > 0) and (s3_bucket | default('') == 'inference') }}"
-        _task7_ok: "{{ (r_dataconn.resources | length > 0) and ('microshift' in (s3_endpoint | default(''))) }}"
+        _task1_ok: "{{ (r_rhoai_operator.resources is defined) and (r_rhoai_operator.resources | length > 0) and (r_rhoai_operator.resources[0].status.readyReplicas | default(0) > 0) }}"
+        _task2_ok: "{{ (r_dsc.resources is defined) and (r_dsc.resources | length > 0) }}"
+        _task3_ok: "{{ (r_project_ns.resources is defined) and (r_project_ns.resources | length > 0) }}"
+        _task4_ok: "{{ (r_dsp.resources is defined) and (r_dsp.resources | length > 0) }}"
+        _task5_ok: "{{ (r_dataconn.resources is defined) and (r_dataconn.resources | length > 0) }}"
+        _task6_ok: "{{ (r_dataconn.resources is defined) and (r_dataconn.resources | length > 0) and (s3_bucket | default('') == 'inference') }}"
+        _task7_ok: "{{ (r_dataconn.resources is defined) and (r_dataconn.resources | length > 0) and ('microshift' in (s3_endpoint | default(''))) }}"
 
     - name: Validate all tasks
       validation_check:
@@ -90,7 +111,7 @@
           ✅ Exercise 2.1: RHOAI operator is installed and running
           ✅ Exercise 2.1: DataScienceCluster is configured
           ✅ Exercise 2.2: ai-edge-project namespace exists
-          ✅ Exercise 2.2: Data Science Pipelines configured ({{ r_dsp.resources | length }} pipeline(s))
+          ✅ Exercise 2.2: Data Science Pipelines configured ({{ r_dsp.resources | default([]) | length }} pipeline(s))
           ✅ Exercise 2.3: vehicle-models data connection Secret exists
           ✅ Exercise 2.3: vehicle-models points to 'inference' bucket
           ✅ Exercise 2.3: vehicle-models connects to MicroShift MinIO ({{ s3_endpoint | default('unknown') }})

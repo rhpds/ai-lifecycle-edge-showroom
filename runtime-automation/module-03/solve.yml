@@ -7,7 +7,7 @@
     # ========================================
     # Exercise 3.1: Review and access workbench
     # ========================================
-    - name: "Exercise 3.1: Get current model-training Notebook"
+    - name: "Exercise 3.1: Get model-training Notebook"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         api_version: kubeflow.org/v1
@@ -40,7 +40,7 @@
       when: not _has_vehicle_models
       register: r_notebook_patch
 
-    - name: "Exercise 3.1: Wait for workbench pod to restart"
+    - name: "Exercise 3.1: Wait for workbench pod to be Running"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Pod
@@ -52,17 +52,16 @@
         - r_notebook_pod.resources | length > 0
         - r_notebook_pod.resources[0].status.phase == 'Running'
         - r_notebook_pod.resources[0].status.containerStatuses | selectattr('name', 'equalto', 'model-training') | map(attribute='ready') | first
-      retries: 30
-      delay: 10
-      when: not _has_vehicle_models
+      retries: 40
+      delay: 15
 
     # ========================================
     # Exercise 3.2: Import training notebooks
     # ========================================
-    - name: "Exercise 3.2: ⚠️ Manual step - Clone Git repository"
+    - name: "Exercise 3.2: Manual step - Clone Git repository"
       ansible.builtin.debug:
         msg: |
-          ⚠️ Exercise 3.2 requires manual interaction with JupyterLab:
+          Exercise 3.2 requires manual interaction with JupyterLab:
           - Access JupyterLab from RHOAI Dashboard
           - Click Git icon in left sidebar
           - Clone: https://github.com/rhpds/ai-lifecycle-edge-automation.git
@@ -71,10 +70,10 @@
     # ========================================
     # Exercise 3.3: Execute training notebooks
     # ========================================
-    - name: "Exercise 3.3: ⚠️ Manual step - Execute training notebooks"
+    - name: "Exercise 3.3: Manual step - Execute training notebooks"
       ansible.builtin.debug:
         msg: |
-          ⚠️ Exercise 3.3 requires manual notebook execution:
+          Exercise 3.3 requires manual notebook execution:
           Navigate to notebooks/training/ and run in sequence:
           1. 01_retrieve-influx-data.ipynb
           2. 02_prepare-data.ipynb
@@ -85,8 +84,8 @@
           7. 07_save-models.ipynb
           This step cannot be automated.
 
-    - name: "✅ Module 3 solve completed"
+    - name: "Module 3 solve completed"
       ansible.builtin.debug:
         msg: |
-          ✅ Module 3: Model training workbench configured
-          DataConnection attached successfully. Manual notebook execution required.
+          Module 3: Model training workbench configured.
+          Notebook created and DataConnection attached. Manual notebook execution required.

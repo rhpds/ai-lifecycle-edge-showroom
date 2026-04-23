@@ -4,9 +4,28 @@
   hosts: localhost
   gather_facts: false
   vars:
-    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
+    apps_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') | default('', true) }}"
 
   tasks:
+    - name: "Get cluster ingress domain if not set"
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: config.openshift.io/v1
+        kind: Ingress
+        name: cluster
+      register: r_ingress
+      when: apps_domain == ''
+      failed_when: false
+
+    - name: "Set apps_domain from cluster Ingress"
+      ansible.builtin.set_fact:
+        apps_domain: "{{ r_ingress.resources[0].spec.domain }}"
+      when:
+        - apps_domain == ''
+        - r_ingress is defined
+        - r_ingress.resources is defined
+        - r_ingress.resources | length > 0
+        - r_ingress.resources[0].spec.domain is defined
     # ========================================
     # Exercise 3.1: Review and access workbench
     # ========================================
