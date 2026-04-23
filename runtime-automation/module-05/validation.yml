@@ -29,23 +29,21 @@
     # ========================================
     # Exercise 5.2: Check pipeline import and run
     # ========================================
-    - name: "✓ Check pipeline import job completed"
+    - name: "✓ Check pipeline import jobs (created with generateName)"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Job
-        name: import-pipeline-job
         namespace: ai-edge-project
-      register: r_import_job
+      register: r_all_jobs
       failed_when: false
 
-    - name: "✓ Check first run job completed"
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        kind: Job
-        name: first-pipeline-run-job
-        namespace: ai-edge-project
-      register: r_first_run_job
-      failed_when: false
+    - name: "✓ Filter import-pipeline jobs"
+      ansible.builtin.set_fact:
+        r_import_jobs: "{{ r_all_jobs.resources | selectattr('metadata.name', 'match', '^import-pipeline-job-') | list }}"
+
+    - name: "✓ Filter first-pipeline-run jobs"
+      ansible.builtin.set_fact:
+        r_first_run_jobs: "{{ r_all_jobs.resources | selectattr('metadata.name', 'match', '^first-pipeline-run-job-') | list }}"
 
     - name: "✓ Check Workflow resources created by pipeline run"
       kubernetes.core.k8s_info:
@@ -87,8 +85,8 @@
       ansible.builtin.set_fact:
         _task1_ok: "{{ r_dsp.resources | length > 0 }}"
         _task2_ok: "{{ (r_pipeline_pods.resources | length > 0) and (r_pipeline_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0) }}"
-        _task3_ok: "{{ (r_import_job.resources | length > 0) and (r_import_job.resources[0].status.succeeded | default(0) > 0) }}"
-        _task4_ok: "{{ (r_first_run_job.resources | length > 0) and (r_first_run_job.resources[0].status.succeeded | default(0) > 0) }}"
+        _task3_ok: "{{ (r_import_jobs | length > 0) and (r_import_jobs | selectattr('status.succeeded', 'defined') | selectattr('status.succeeded', 'greaterthan', 0) | list | length > 0) }}"
+        _task4_ok: "{{ (r_first_run_jobs | length > 0) and (r_first_run_jobs | selectattr('status.succeeded', 'defined') | selectattr('status.succeeded', 'greaterthan', 0) | list | length > 0) }}"
         _task5_ok: "{{ r_workflows.resources | length > 0 }}"
         _task6_ok: "{{ r_workflow_templates.resources | length > 0 }}"
         _task7_ok: "{{ r_cronworkflow.resources | length > 0 }}"
@@ -111,8 +109,8 @@
         error_msg: |
           {{ '✅' if _task1_ok else '❌' }} Exercise 5.1: Pipeline server is configured
           {{ '✅' if _task2_ok else '❌' }} Exercise 5.1: Pipeline server pods are running
-          {{ '✅' if _task3_ok else '❌' }} Exercise 5.2: Pipeline imported (job status: {{ r_import_job.resources[0].status | default('missing') if r_import_job.resources | length > 0 else 'job not found' }})
-          {{ '✅' if _task4_ok else '❌' }} Exercise 5.2: First run created (job status: {{ r_first_run_job.resources[0].status | default('missing') if r_first_run_job.resources | length > 0 else 'job not found' }})
+          {{ '✅' if _task3_ok else '❌' }} Exercise 5.2: Pipeline imported (found {{ r_import_jobs | length }} job(s), {{ r_import_jobs | selectattr('status.succeeded', 'defined') | selectattr('status.succeeded', 'greaterthan', 0) | list | length }} succeeded)
+          {{ '✅' if _task4_ok else '❌' }} Exercise 5.2: First run created (found {{ r_first_run_jobs | length }} job(s), {{ r_first_run_jobs | selectattr('status.succeeded', 'defined') | selectattr('status.succeeded', 'greaterthan', 0) | list | length }} succeeded)
           {{ '✅' if _task5_ok else '❌' }} Exercise 5.2: Workflow resources created ({{ r_workflows.resources | length }} workflow(s))
           {{ '✅' if _task6_ok else '❌' }} Exercise 5.2: WorkflowTemplates created ({{ r_workflow_templates.resources | length }} template(s))
           {{ '✅' if _task7_ok else '❌' }} Exercise 5.3: CronWorkflow scheduled

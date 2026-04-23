@@ -38,7 +38,7 @@
           apiVersion: batch/v1
           kind: Job
           metadata:
-            name: import-pipeline-job
+            generateName: import-pipeline-job-
             namespace: ai-edge-project
           spec:
             ttlSecondsAfterFinished: 300
@@ -84,8 +84,9 @@
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Job
-        name: import-pipeline-job
         namespace: ai-edge-project
+        label_selectors:
+          - job-name={{ r_import_job.result.metadata.name }}
       register: r_import_status
       until:
         - r_import_status.resources is defined
@@ -107,7 +108,7 @@
           apiVersion: batch/v1
           kind: Job
           metadata:
-            name: first-pipeline-run-job
+            generateName: first-pipeline-run-job-
             namespace: ai-edge-project
           spec:
             ttlSecondsAfterFinished: 300
@@ -159,8 +160,9 @@
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         kind: Job
-        name: first-pipeline-run-job
         namespace: ai-edge-project
+        label_selectors:
+          - job-name={{ r_run_job.result.metadata.name }}
       register: r_run_status
       until:
         - r_run_status.resources is defined
