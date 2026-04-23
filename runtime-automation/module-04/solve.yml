@@ -10,8 +10,8 @@
     - name: "Get default hardware profile resourceVersion"
       kubernetes.core.k8s_info:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        api_version: dashboard.opendatahub.io/v1
-        kind: AcceleratorProfile
+        api_version: infrastructure.opendatahub.io/v1
+        kind: HardwareProfile
         name: default-profile
         namespace: redhat-ods-applications
       register: r_hw_profile
@@ -57,7 +57,6 @@
                 modelFormat:
                   name: openvino_ir
                   version: opset13
-                runtime: stress-detection
                 resources:
                   requests:
                     cpu: "2"
@@ -124,7 +123,6 @@
                 modelFormat:
                   name: openvino_ir
                   version: opset13
-                runtime: time-to-failure
                 resources:
                   requests:
                     cpu: "2"
